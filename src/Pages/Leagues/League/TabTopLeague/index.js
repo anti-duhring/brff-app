@@ -3,7 +3,7 @@ import {useNavigation} from '@react-navigation/native'
 import { NFLStatusContext } from '../../../../components/NFLStatusContext'
 import { useContext } from "react";
 
-const TabTopLeague = ({activeButton}) => {
+const TabTopLeague = ({activeButton, isAble, leagueDraftSettings}) => {
     const navigation = useNavigation();
     const { week } = useContext(NFLStatusContext)
 
@@ -34,22 +34,49 @@ const TabTopLeague = ({activeButton}) => {
     return ( 
         <View style={styles.tabContainer}>
             <View style={playersStyle}>
-                <TouchableOpacity onPress={() => navigation.navigate('Players',{ active: 'Players'})}>
+                <TouchableOpacity onPress={() => {
+                    if(!isAble) return
+                    navigation.navigate('Players',{
+                         active: 'Players',
+                         leagueDraftSettings: leagueDraftSettings
+                    })
+                }}>
                     <Text style={(activeButton=='Players'||activeButton==null) ? styles.activeText : styles.textItem}>Times</Text>
                 </TouchableOpacity>
             </View>
             <View style={matchupsStyle}>
-                <TouchableOpacity onPress={() => navigation.navigate('Matchups',{ active: 'Matchups', week: week})}>
+                <TouchableOpacity onPress={() => {
+                    if(!isAble) return
+
+                    navigation.navigate('Matchups',{ 
+                        active: 'Matchups', 
+                        week: week,
+                        leagueDraftSettings: leagueDraftSettings
+                    })
+                }}>
                     <Text style={(activeButton=='Matchups') ? styles.activeText : styles.textItem}>Matchups</Text>
                 </TouchableOpacity>
             </View>
             <View style={informationsStyle}>
-                <TouchableOpacity onPress={() => navigation.navigate('Informations',{ active: 'Informations'})}>
+                <TouchableOpacity onPress={() => {
+                    if(!isAble) return
+
+                    navigation.navigate('Informations',{ 
+                        active: 'Informations',
+                        leagueDraftSettings: leagueDraftSettings
+                    })
+                }}>
                     <Text style={(activeButton=='Informations') ? styles.activeText : styles.textItem}>Informações</Text>
                 </TouchableOpacity>
             </View>
             <View style={teamStyle}>
-                <TouchableOpacity onPress={() => navigation.navigate('Team',{ active: 'Team'})}>
+                <TouchableOpacity onPress={() => {
+                    if(!isAble) return
+                    navigation.navigate('Team',{ 
+                        active: 'Team',
+                        leagueDraftSettings: leagueDraftSettings
+                    })
+                }}>
                     <Text style={(activeButton=='Team') ? styles.activeText : styles.textItem}>Meu time</Text>
                 </TouchableOpacity>
             </View>

@@ -17,6 +17,8 @@ const Matchups = ({route}) => {
     const league = route.params?.leagueObject;
     const leagueID = league.league_id
     const leagueScoringSettings = league.scoring_settings;
+    const leagueDraftSettings = route.params?.leagueDraftSettings;
+    const scoring_type = leagueDraftSettings[0].metadata.scoring_type;
     const roster = league.roster_positions;
     const roster_bench = roster.filter((item) => {
         return item.indexOf('BN') !== -1;
@@ -75,7 +77,7 @@ const Matchups = ({route}) => {
     },[allProjectedPoints])
 
     useEffect(() => {
-        getPlayersProjectedPoints(week, 'regular', 'ppr')
+        getPlayersProjectedPoints(week, 'regular', scoring_type)
     },[week])
 
     
@@ -407,7 +409,7 @@ const Matchups = ({route}) => {
     return ( 
         <View style={{flex:1,backgroundColor:'#0B0D0F'}}>
             <HeaderLeagueContextProvider leagueObject={league}>
-                <TabTopLeague activeButton={route.params?.active} />
+                <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} />
                 <WeekSelect />
                 <MatchupField />
                 <SliderBox />

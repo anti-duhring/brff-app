@@ -9,6 +9,8 @@ import { HeaderLeagueContextProvider } from "../../../../components/HeaderLeague
 const Players = ({navigation, route}) => {
     const leagueId = route.params?.leagueObject.league_id;
     const leagueObject = route.params?.leagueObject;
+    const [leagueDraftSettings, setLeagueDraftSettings] = useState(null)
+
     const [isLoading, setIsLoading] = useState(true)
     const [players, setPlayers] = useState([])
     const [DATA, setDATA] = useState([])
@@ -31,21 +33,36 @@ const Players = ({navigation, route}) => {
                       }
                     })
                   )
-                setIsLoading(false)
+                
             })
             .catch((error) => {
               console.log('Erro:',error)
             })
           
     }
+
+    const getDraftSettings = async() => {
+      const URL = `https://api.sleeper.app/v1/league/${leagueId}/drafts`;
+      fetch(URL)
+      .then(response => response.json())
+      .then(data => {
+        setLeagueDraftSettings(data)
+        setIsLoading(false)
+      })
+      .catch((error) => {
+        console.log('Erro:',error)
+      })
+    }
+
 useEffect(() => {
     getInfos();
+    getDraftSettings();
 },[])
 
     return ( 
     <View style={{flex:1,backgroundColor:'#0B0D0F',}}>
       <HeaderLeagueContextProvider leagueObject={leagueObject}>
-      <TabTopLeague activeButton={route.params?.active}   />
+      <TabTopLeague activeButton={route.params?.active} isAble={leagueDraftSettings ? true : false} leagueDraftSettings={leagueDraftSettings}   />
           {isLoading ?
           <View style={{flex:1,padding:10,}}>
       <SkeletonPlaceholder>

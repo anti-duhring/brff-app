@@ -6,6 +6,7 @@ import { HeaderLeagueContextProvider } from "../../../../components/HeaderLeague
 
 const Informations = ({navigation, route}) => {
     const league = route.params?.leagueObject;
+    const leagueDraftSettings = route.params?.leagueDraftSettings
     const scoringLeague = league.scoring_settings;
     const leagueID = league.league_id
     const [scoringSettings, setScoringSettings] = useState([])
@@ -99,7 +100,7 @@ const Informations = ({navigation, route}) => {
     return ( 
         <View style={{flex:1,backgroundColor:'#0B0D0F'}}>
         <HeaderLeagueContextProvider leagueObject={league}>
-            <TabTopLeague activeButton={route.params?.active} />
+            <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} />
             <View
                 style={{ borderRadius:12,margin:10,padding:10,
                 shadowColor:'#000',

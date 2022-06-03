@@ -10,6 +10,7 @@ import { getColorPosition } from "../../../../functions/GetRoster";
 const Geral = ({navigation, route}) => {
     const league = route.params?.leagueObject;
     const leagueID = league.league_id
+    const leagueDraftSettings = route.params?.leagueDraftSettings
     const roster = league.roster_positions;
     const roster_bench = roster.filter((item) => {
         return item.indexOf('BN') !== -1;
@@ -122,7 +123,7 @@ const Geral = ({navigation, route}) => {
 
     return ( 
         <HeaderLeagueContextProvider leagueObject={league}>
-            <TabTopLeague activeButton={route.params?.active} />
+            <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} />
 
                 <View style={styles.boxContainer}
                 >
