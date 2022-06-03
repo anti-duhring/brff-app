@@ -165,6 +165,11 @@ export default function App() {
   if(loginState.isLoading){
     return (
       <View style={{flex:1,justifyContent:'center',alignItems:'center',backgroundColor:'#0B0D0F'}}>
+        <StatusBar
+          animated={true}
+          backgroundColor="#0B0D0F"
+          barStyle="light-content"
+         />
         <ActivityIndicator size="large" color="#008037" />
       </View>
     )

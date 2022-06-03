@@ -54,8 +54,12 @@ const Matchups = ({route}) => {
     const [errorMessage, setErrorMessage] = useState(null)
     const controller = new AbortController();
     const signal = controller.signal;
+
+    if(week<=0) week = 1;
   
     useEffect(() => {
+        if(!allProjectedPoints) return
+
         setTotalPoints(null)
         setOpponentTotalPoints(null)
 
@@ -71,10 +75,10 @@ const Matchups = ({route}) => {
     },[allProjectedPoints])
 
     useEffect(() => {
-        getPlayersProjectedPoints()
+        getPlayersProjectedPoints(week, 'regular', 'ppr')
     },[week])
 
-    if(week<=0) week = 1;
+    
 
     const getRosterID = async(_user_ID, _league_ID) => {
         fetch(`https://api.sleeper.app/v1/league/${_league_ID}/rosters`,{signal})
@@ -178,14 +182,14 @@ const Matchups = ({route}) => {
         return players
     }
 
-    const getPlayersProjectedPoints = async() => {
+    const getPlayersProjectedPoints = async(_week, _season_type, _league_type) => {
         console.log('Fetching projections...')
         const WEEK = 1;
         const SEASON_TYPE = 'regular';
         const POSITIONS = 'position[]=DEF&position[]=FLEX&position[]=K&position[]=QB&position[]=RB&position[]=TE&position[]=WR';
         const LEAGUE_TYPE = 'ppr';
 
-        const URL = `https://api.sleeper.com/projections/nfl/2022/${WEEK}?season_type=${SEASON_TYPE}&${POSITIONS}&order_by=${LEAGUE_TYPE}`;
+        const URL = `https://api.sleeper.com/projections/nfl/2022/${_week}?season_type=${_season_type}&${POSITIONS}&order_by=${_league_type}`;
 
         fetch(URL)
         .then(response => response.json())
@@ -281,18 +285,59 @@ const Matchups = ({route}) => {
         </View>
     )
 
-    const SliderBox = () => (
+    const SliderBox = () => {
+        let userProjectedPoints = 0.0;
+        let opponentProjectedPoints = 0.0;
+
+        if(starters && opponentStarters) {
+            starters.map(player => {
+                userProjectedPoints += player.projected_points
+            })
+    
+            opponentStarters.map(player => {
+                opponentProjectedPoints += player.projected_points
+            })
+        }
+
+        return (
         <View style={{justifyContent:'flex-start',
         alignItems:'center',marginTop:-30,marginBottom:20,}}>
-                <MultiSlider markerStyle={{backgroundColor:'blue',display:'none'}} unselectedStyle={{backgroundColor:'#008037',borderTopRightRadius:12,borderBottomRightRadius:12}} selectedStyle={{backgroundColor:'gray',borderTopLeftRadius
-                :12,borderBottomLeftRadius:12}} max={(totalPoints && opponentTotalPoints && totalPoints + opponentTotalPoints > 0) ? totalPoints + opponentTotalPoints : 100} sliderLength={windowWidth -30} values={(totalPoints && opponentTotalPoints && totalPoints + opponentTotalPoints > 0) ? [totalPoints] : [50]}
-                trackStyle={{height:5,}} containerStyle={{height:5,}} />
+                <MultiSlider 
+                    markerStyle={{backgroundColor:'blue',display:'none'}} 
+                    unselectedStyle={{backgroundColor:'#008037',borderTopRightRadius:12,borderBottomRightRadius:12}} 
+                    selectedStyle={{backgroundColor:'gray',borderTopLeftRadius
+                    :12,borderBottomLeftRadius:12}} 
+                    max={
+                        (totalPoints + opponentTotalPoints > 0) ? 
+                        totalPoints + opponentTotalPoints 
+                        : 
+                        (userProjectedPoints + opponentProjectedPoints > 0) ?
+                        userProjectedPoints + opponentProjectedPoints : 100
+                    } 
+                    sliderLength={windowWidth -30} 
+                    values={
+                        (opponentTotalPoints > 0) ? 
+                        [opponentTotalPoints] 
+                        : 
+                        (opponentProjectedPoints > 0) ?
+                        [opponentProjectedPoints] : [50]
+                    }
+                    
+                    trackStyle={{height:5,}} 
+                    containerStyle={{height:5,}} 
+                />
                 <View style={{flexDirection:'row',paddingHorizontal:20,}}>
-                    <Text style={{color:'#C6C6C6',flex:1,textAlign:'left'}}>{opponentTotalPoints ? opponentTotalPoints : '0.0'}</Text>
-                    <Text style={{color:'#C6C6C6',flex:1,textAlign:'right'}}>{totalPoints ? totalPoints : '0.0'} </Text>
+                    <Text style={{color:'#C6C6C6',flex:1,textAlign:'left'}}>
+                        {opponentTotalPoints ? opponentTotalPoints : 
+                        opponentProjectedPoints.toFixed(1)}
+                    </Text>
+                    <Text style={{color:'#C6C6C6',flex:1,textAlign:'right'}}>
+                        {totalPoints ? totalPoints 
+                        : userProjectedPoints.toFixed(1)} 
+                    </Text>
                 </View>
         </View>
-    )
+    )}
 
     const WeekSelect = () => (
         <View style={{marginTop:20,marginLeft:10,}}>
