@@ -354,7 +354,7 @@ const Matchups = ({route}) => {
                 
                 <Text style={{color:'#C6C6C6',flex:3,textAlign:'center'}}>Semana {week}</Text>
                 <TouchableOpacity 
-                    onPress={() => navigation.navigate('Matchups',{ active: 'Matchups', week: week + 1})} 
+                    onPress={() => navigation.navigate('Matchups',{ active: 'Matchups', week: week + 1, leagueDraftSettings: leagueDraftSettings})} 
                     style={{flex:1}}
                 >
                     <Entypo name="chevron-right" style={{textAlign:'center'}} size={24} color="#C6C6C6" />

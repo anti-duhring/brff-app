@@ -1,34 +1,96 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import {useNavigation} from '@react-navigation/native'
 import { NFLStatusContext } from '../../../../components/NFLStatusContext'
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
+import { AntDesign } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons'; 
+
+const COLOR = 'rgba(0, 206, 78,  1)'//'#008037'
+const GREEN2 = '#15191C' //'rgba(0, 206, 78,  .1)'
+const COLORTEXT = '#0B0D0F';
 
 const TabTopLeague = ({activeButton, isAble, leagueDraftSettings}) => {
     const navigation = useNavigation();
     const { week } = useContext(NFLStatusContext)
 
-    let playersStyle = [styles.tabItem,styles.active];
-    let informationsStyle = [styles.tabItem];
-    let matchupsStyle = [styles.tabItem];
-    let teamStyle = [styles.tabItem];
+    useEffect(() => {
+        console.log(activeButton)
+    },[])
 
-    
-        if(activeButton=='Informations'){
-            playersStyle = [styles.tabItem];
-            teamStyle = [styles.tabItem];
-            matchupsStyle = [styles.tabItem];
-            informationsStyle = [styles.tabItem, styles.active]
-        } else if(activeButton=='Team') {
-            playersStyle = [styles.tabItem];
-            informationsStyle = [styles.tabItem];
-            matchupsStyle = [styles.tabItem];
-            teamStyle = [styles.tabItem, styles.active]
-        } else if(activeButton=='Matchups') {
-            playersStyle = [styles.tabItem];
-            informationsStyle = [styles.tabItem];
-            matchupsStyle = [styles.tabItem, styles.active];
-            teamStyle = [styles.tabItem]
-        }
+
+    return(
+        <View style={{flexDirection:'row',padding:10,justifyContent:'center',alignContent:'center'}}>
+            <View style={(activeButton=='Players'||!activeButton) ? styles.activeTab : styles.inactiveTab}>
+                <TouchableOpacity style={styles.buttonContent} onPress={() => {
+                    if(!isAble) return
+                    navigation.navigate('Players',{
+                        active: 'Players',
+                         leagueDraftSettings: leagueDraftSettings
+                    })
+                }}>
+                    {(activeButton=='Players'||!activeButton) ? 
+                    <>
+                        <AntDesign name="team" size={20} color={COLORTEXT} />
+                        <Text style={styles.textActiveTab}>TIMES</Text>
+                    </> : 
+                    <AntDesign name="team" size={20} color={COLOR} />}
+                </TouchableOpacity>
+            </View>
+            <View style={(activeButton=='Matchups') ? styles.activeTab : styles.inactiveTab}>
+                <TouchableOpacity style={styles.buttonContent} onPress={() => {
+                    if(!isAble) return
+
+                    navigation.navigate('Matchups',{ 
+                        active: 'Matchups', 
+                        week: week,
+                        leagueDraftSettings: leagueDraftSettings
+                    })
+                }}>
+                    {(activeButton=='Matchups') ? 
+                    <>
+                        <Ionicons name="american-football-outline" size={20} color={COLORTEXT} />
+                        <Text style={styles.textActiveTab}>MATCHUPS</Text>
+                    </> : 
+                    <Ionicons name="american-football-outline" size={20} color={COLOR} />}
+                </TouchableOpacity>
+            </View>
+            <View style={(activeButton=='Informations') ? styles.activeTab : styles.inactiveTab}>
+                <TouchableOpacity style={styles.buttonContent} onPress={() => {
+                    if(!isAble) return
+
+                    navigation.navigate('Informations',{ 
+                        active: 'Informations',
+                        leagueDraftSettings: leagueDraftSettings
+                    })
+                }}>
+                    {(activeButton=='Informations') ? 
+                    <>
+                        <MaterialCommunityIcons name="information-outline" size={20} color={COLORTEXT} />
+                        <Text style={styles.textActiveTab}>INFORMAÇÕES</Text>
+                    </> : 
+                    <MaterialCommunityIcons name="information-outline" size={20} color={COLOR} />}
+
+                </TouchableOpacity>
+            </View>
+            <View style={(activeButton=='Team') ? styles.activeTab : styles.inactiveTab}>
+                <TouchableOpacity style={styles.buttonContent} onPress={() => {
+                    if(!isAble) return
+                    navigation.navigate('Team',{ 
+                        active: 'Team',
+                        leagueDraftSettings: leagueDraftSettings
+                    })
+                }}>
+                {(activeButton=='Team') ? 
+                    <>
+                        <MaterialCommunityIcons name="football-helmet" size={20} color={COLORTEXT} />
+                        <Text style={styles.textActiveTab}>MEU TIME</Text>
+                    </> : 
+                    <MaterialCommunityIcons name="football-helmet" size={20} color={COLOR} />}
+                </TouchableOpacity>
+            </View>
+        </View>
+    )
     
 
     return ( 
@@ -41,7 +103,7 @@ const TabTopLeague = ({activeButton, isAble, leagueDraftSettings}) => {
                          leagueDraftSettings: leagueDraftSettings
                     })
                 }}>
-                    <Text style={(activeButton=='Players'||activeButton==null) ? styles.activeText : styles.textItem}>Times</Text>
+                    <Text style={(active=='Players'||active==null) ? styles.activeText : styles.textItem}>Times</Text>
                 </TouchableOpacity>
             </View>
             <View style={matchupsStyle}>
@@ -54,7 +116,7 @@ const TabTopLeague = ({activeButton, isAble, leagueDraftSettings}) => {
                         leagueDraftSettings: leagueDraftSettings
                     })
                 }}>
-                    <Text style={(activeButton=='Matchups') ? styles.activeText : styles.textItem}>Matchups</Text>
+                    <Text style={(active=='Matchups') ? styles.activeText : styles.textItem}>Matchups</Text>
                 </TouchableOpacity>
             </View>
             <View style={informationsStyle}>
@@ -66,7 +128,7 @@ const TabTopLeague = ({activeButton, isAble, leagueDraftSettings}) => {
                         leagueDraftSettings: leagueDraftSettings
                     })
                 }}>
-                    <Text style={(activeButton=='Informations') ? styles.activeText : styles.textItem}>Informações</Text>
+                    <Text style={(active=='Informations') ? styles.activeText : styles.textItem}>Informações</Text>
                 </TouchableOpacity>
             </View>
             <View style={teamStyle}>
@@ -77,7 +139,7 @@ const TabTopLeague = ({activeButton, isAble, leagueDraftSettings}) => {
                         leagueDraftSettings: leagueDraftSettings
                     })
                 }}>
-                    <Text style={(activeButton=='Team') ? styles.activeText : styles.textItem}>Meu time</Text>
+                    <Text style={(active=='Team') ? styles.activeText : styles.textItem}>Meu time</Text>
                 </TouchableOpacity>
             </View>
 
@@ -115,5 +177,33 @@ const styles = StyleSheet.create({
     activeText: {
         color: '#008037',
         fontWeight:'bold'
+    },
+    activeTab: {
+        flexDirection:'row',
+        backgroundColor:COLOR,
+        flex:3,
+        marginHorizontal:5,
+        padding:5,
+        justifyContent:'center',
+        alignContent:'center',
+        borderRadius:5,
+    },
+    inactiveTab: {
+        flexDirection:'row',
+        backgroundColor:GREEN2,
+        flex:1,
+        marginHorizontal:5,
+        padding:5,
+        justifyContent:'center',
+        alignContent:'center',
+        borderRadius:5
+    },
+    textActiveTab: {
+        marginLeft:5,
+        color:COLORTEXT,
+        fontWeight:'600'
+    },
+    buttonContent: {
+        flexDirection:'row'
     }
 })

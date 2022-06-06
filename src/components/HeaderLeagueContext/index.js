@@ -40,7 +40,6 @@ export const HeaderLeagueContextProvider = ({children, leagueObject}) => {
             minHeight={55}
             minOverlayOpacity={0}
             headerImage={require('../../../assets/Images/leagueHeader2.png')}
-            /*headerContainerStyle={{borderBottomLeftRadius:30,borderBottomRightRadius:30,backgroundColor:'#0B0D0F'}}*/
             scrollViewBackgroundColor='#0B0D0F'
             renderFixedForeground={() => (
                 <Animated.View style={[styles.navtitleView,{opacity}]}>

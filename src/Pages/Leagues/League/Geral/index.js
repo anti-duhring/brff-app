@@ -102,7 +102,7 @@ const Geral = ({navigation, route}) => {
     if(!hasPlayers) {
         return (
             <HeaderLeagueContextProvider leagueObject={league}>
-            <TabTopLeague activeButton={route.params?.active} />
+            <TabTopLeague leagueDraftSettings={leagueDraftSettings} isAble={true} activeButton={route.params?.active} />
 
                 <View
                     style={styles.boxContainer}
