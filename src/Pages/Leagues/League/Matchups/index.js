@@ -10,6 +10,7 @@ import { Entypo } from '@expo/vector-icons';
 import { useNavigation } from "@react-navigation/native";
 import { getColorPosition, getPlayerPoints } from "../../../../functions/GetRoster";
 import { AllPlayersContext } from "../../../../components/AllPlayersContext";
+import { LIGHT_GREEN, LIGHT_BLACK, LIGHT_GRAY } from '../../../../components/Variables'
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -306,7 +307,7 @@ const Matchups = ({route}) => {
         alignItems:'center',marginTop:-30,marginBottom:20,}}>
                 <MultiSlider 
                     markerStyle={{backgroundColor:'blue',display:'none'}} 
-                    unselectedStyle={{backgroundColor:'#008037',borderTopRightRadius:12,borderBottomRightRadius:12}} 
+                    unselectedStyle={{backgroundColor:LIGHT_GREEN,borderTopRightRadius:12,borderBottomRightRadius:12}} 
                     selectedStyle={{backgroundColor:'gray',borderTopLeftRadius
                     :12,borderBottomLeftRadius:12}} 
                     max={
@@ -329,11 +330,11 @@ const Matchups = ({route}) => {
                     containerStyle={{height:5,}} 
                 />
                 <View style={{flexDirection:'row',paddingHorizontal:20,}}>
-                    <Text style={{color:'#C6C6C6',flex:1,textAlign:'left'}}>
+                    <Text style={{color:LIGHT_GRAY,flex:1,textAlign:'left'}}>
                         {opponentTotalPoints ? opponentTotalPoints : 
                         opponentProjectedPoints.toFixed(1)}
                     </Text>
-                    <Text style={{color:'#C6C6C6',flex:1,textAlign:'right'}}>
+                    <Text style={{color:LIGHT_GRAY,flex:1,textAlign:'right'}}>
                         {totalPoints ? totalPoints 
                         : userProjectedPoints.toFixed(1)} 
                     </Text>
@@ -343,7 +344,7 @@ const Matchups = ({route}) => {
 
     const WeekSelect = () => (
         <View style={{marginTop:20,marginLeft:10,}}>
-            <View style={{width:150,height:40,backgroundColor:'#15191C',flexDirection:'row',justifyContent:'center',alignContent:'center',alignItems:'center',borderRadius:12,}}>
+            <View style={{width:150,height:40,backgroundColor:LIGHT_BLACK,flexDirection:'row',justifyContent:'center',alignContent:'center',alignItems:'center',borderRadius:12,}}>
                 <TouchableOpacity 
                     disabled={(week==1) ? true : false}
                     onPress={() => navigation.navigate('Matchups',{ active: 'Matchups', week: week - 1})} 
@@ -352,7 +353,7 @@ const Matchups = ({route}) => {
                     <Entypo name="chevron-left" style={{textAlign:'center'}} size={24} color="#C6C6C6" />
                 </TouchableOpacity>
                 
-                <Text style={{color:'#C6C6C6',flex:3,textAlign:'center'}}>Semana {week}</Text>
+                <Text style={{color:LIGHT_GRAY,flex:3,textAlign:'center'}}>Semana {week}</Text>
                 <TouchableOpacity 
                     onPress={() => navigation.navigate('Matchups',{ active: 'Matchups', week: week + 1, leagueDraftSettings: leagueDraftSettings})} 
                     style={{flex:1}}
@@ -508,7 +509,7 @@ const styles = StyleSheet.create({
         elevation:10,
         borderWidth:1,
         borderColor: 'rgba(255,255,255,0)',
-        backgroundColor: '#15191C',
+        backgroundColor: LIGHT_BLACK,
     },
     shadowStyle: {
         width:40,
@@ -557,7 +558,7 @@ const styles = StyleSheet.create({
     title:{
         fontSize:17,
         fontWeight:'bold',
-        color:'#C6C6C6',
+        color:LIGHT_GRAY,
         flex:1,
         textAlign:'center'
     },
@@ -587,12 +588,12 @@ const styles = StyleSheet.create({
     playerMatchupLeft: {
         flex:3,
         textAlign:'left',
-        color:'#C6C6C6',
+        color:LIGHT_GRAY,
     },
     playerMatchupRight: {
         flex:3,
         textAlign:'right',
-        color:'#C6C6C6'
+        color:LIGHT_GRAY
     },
     placeholderBarName: {
         width: '100%', 
@@ -601,7 +602,7 @@ const styles = StyleSheet.create({
     },
     playerMatchupPoints: {
         flex:1,
-        color:'#C6C6C6'
+        color:LIGHT_GRAY
     },
     matchupContainer: {
         flex:1,

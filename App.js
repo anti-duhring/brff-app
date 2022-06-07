@@ -195,7 +195,7 @@ export default function App() {
             drawerActiveBackgroundColor:'rgba(0, 128, 55, 1)',//'#15191C',
             drawerActiveTintColor:'#FCFCFC',
             drawerInactiveTintColor:'#656668',
-            drawerType: 'slide',
+            drawerType: 'front',
             drawerLabelStyle: {marginLeft:-25, fontFamily: 'Roboto-Medium', fontSize:15}
           }}
           drawerContent={(props) => { 
