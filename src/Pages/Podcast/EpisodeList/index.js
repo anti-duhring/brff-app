@@ -7,6 +7,7 @@ import { scaleAnimation } from '../../../animations/scale'
 import { AntDesign } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+import { BORDER_RADIUS } from "../../../components/Variables";
 
 const EpisodeList = ({navigation}) => {
     const [isLoading, setIsLoading] = useState(true)
@@ -143,94 +144,30 @@ const EpisodeList = ({navigation}) => {
         </View>
     )
 
-    return ( 
-        <View style={{flex:1,backgroundColor:'#0B0D0F'}}>
-            <Pressable onPress={Keyboard.dismiss}>
-            {errorMessage && <Text>{errorMessage}</Text>}
-            <View style={{alignItems:'center', padding:10}}>
-                <View style={{ padding:5, borderRadius: 5, backgroundColor: '#15191C', width:200, flexDirection:'row', alignItems:'center'}}>
-                    <FontAwesome name="search" style={{paddingLeft:5,paddingRight:10}} size={17} color="#C1C1C1" />
-                    <TextInput
-                        value={searchText}
-                        onChangeText={setSearchText}
-                        style={{width:150, color:'#FCFCFC'}}
-                        placeholder='Pesquisar...'
-                        placeholderTextColor={'#C1C1C1'}
-                    />
-                </View>
-                <View>
-
-                </View>
+    const EpisodePlaceholder = () => {
+        return (
+            <View style={{marginHorizontal:10,marginBottom:20,}}>
+                <SkeletonPlaceholder highlightColor="#ffffff1a" backgroundColor="#15191C">
+                    <View style={{height:85, width:'100%', borderTopLeftRadius:BORDER_RADIUS,borderTopRightRadius:BORDER_RADIUS}} />
+                    <View style={{marginTop:10,flexDirection:'row',justifyContent:'space-between',alignItems:'flex-start'}}>
+                        <View style={{width:200,height:20}} />
+                        <View style={{width:36,height:36,borderRadius:36,marginRight:30}} />
+                        
+                    </View>
+                    <View style={{width:100,height:20,marginTop:-5,}} />
+                </SkeletonPlaceholder>
             </View>
+        )
+    }
 
-            {!errorMessage && isLoading ?
-                            <View>
-                                <View style={{padding:10, marginBottom:10,}}>
-                    <SkeletonPlaceholder highlightColor="#ffffff1a" backgroundColor="#15191C">
-                        <View style={{marginBottom:10}}>
-                            <View style={{height:100, width: 340, borderRadius: 4}} />
-                        </View>
-                        <View style={{ flexDirection: 'row', alignItems: "center" }}>
-                            <View style={{ marginRight: 20 }}>
-                                <View style={{ width: 270, height: 20, borderRadius: 4 }} />
-                                <View style={{ marginTop: 6, width: 130, height: 20, borderRadius: 4 }} />  
-                            </View>
-                            <View style={{ marginLeft:0,width: 36, height: 36, borderRadius: 50 }} />    
-                        </View>
-                    </SkeletonPlaceholder>
-                </View>
-                                <View style={{padding:10, marginBottom:10}}>
-                    <SkeletonPlaceholder highlightColor="#ffffff1a" backgroundColor="#15191C">
-                    <View style={{marginBottom:10}}>
-                    <View style={{height:100, width: 340, borderRadius: 4}} />
-                </View>
-                <View style={{ flexDirection: 'row', alignItems: "center" }}>
-                    <View style={{ marginRight: 20 }}>
-                        <View style={{ width: 270, height: 20, borderRadius: 4 }} />
-                        <View style={{ marginTop: 6, width: 130, height: 20, borderRadius: 4 }} />  
-                    </View>
-                    <View style={{ marginLeft:0,width: 36, height: 36, borderRadius: 50 }} />    
-                </View>
-            </SkeletonPlaceholder>
-        </View>
-        <View style={{padding:10, marginBottom:10}}>
-            <SkeletonPlaceholder highlightColor="#ffffff1a" backgroundColor="#15191C">
-                <View style={{marginBottom:10}}>
-                    <View style={{height:100, width: 340, borderRadius: 4}} />
-                </View>
-                <View style={{ flexDirection: 'row', alignItems: "center" }}>
-                    <View style={{ marginRight: 20 }}>
-                        <View style={{ width: 270, height: 20, borderRadius: 4 }} />
-                        <View style={{ marginTop: 6, width: 130, height: 20, borderRadius: 4 }} />  
-                    </View>
-                    <View style={{ marginLeft:0,width: 36, height: 36, borderRadius: 50 }} />    
-                </View>
-            </SkeletonPlaceholder>
-        </View>
-        </View>
-            : 
-            <Animated.FlatList
-            data={episodes}
-            keyExtractor={item => item.key}
-            contentContainerStyle={{
-              padding:10,
-              paddingBottom:80
-            }}
-            removeClippedSubviews={false}
-            initialNumToRender={10}
-            maxToRenderPerBatch={10}
-            ListFooterComponent={<Footer />}
-            //getItemLayout={(data, index) => ({length: 175, offset: 175 * index, index})}
-            onEndReachedThreshold={0.5}
-            onEndReached={
-                () => setShowItems(showItems + 10)
-            }
-
-            renderItem={({item, index}) => {
-                if(index > showItems) return
-
-              return <Animated.View
+    const Episode = ({item,index}) => {
+        if(index > showItems) return
+        if(!item) return null
+        return (
+            <Animated.View
                 style={{ 
+                marginHorizontal:10,
+                marginBottom:10,
                 borderRadius:12,
                 marginBottom:10,
                 borderWidth:1,
@@ -266,9 +203,48 @@ const EpisodeList = ({navigation}) => {
                 </ImageBackground>
                 </Pressable>
               </Animated.View>
-              
-            }}
-          />}
+        )
+    }
+
+    return ( 
+        <View style={{flex:1,backgroundColor:'#0B0D0F'}}>
+            <Pressable onPress={Keyboard.dismiss}>
+            {errorMessage && <Text>{errorMessage}</Text>}
+            <View style={{alignItems:'center', padding:10}}>
+                <View style={{ padding:5, borderRadius: 5, backgroundColor: '#15191C', width:200, flexDirection:'row', alignItems:'center'}}>
+                    <FontAwesome name="search" style={{paddingLeft:5,paddingRight:10}} size={17} color="#C1C1C1" />
+                    <TextInput
+                        value={searchText}
+                        onChangeText={setSearchText}
+                        style={{width:150, color:'#FCFCFC'}}
+                        placeholder='Pesquisar...'
+                        placeholderTextColor={'#C1C1C1'}
+                    />
+                </View>
+                <View>
+
+                </View>
+            </View>
+            { isLoading ?
+            new Array(5).fill(0).map((item, index) => {
+                return <EpisodePlaceholder key={index} />
+            }) :
+            <Animated.FlatList
+                data={episodes}
+                keyExtractor={item => item.key}
+                contentContainerStyle={{
+                paddingBottom:80
+                }}
+                removeClippedSubviews={false}
+                ListFooterComponent={<Footer />}
+                //getItemLayout={(data, index) => ({length: 175, offset: 175 * index, index})}
+                onEndReachedThreshold={0.5}
+                onEndReached={
+                    () => setShowItems(showItems + 10)
+                }
+                renderItem={Episode}
+            />
+            }
           </Pressable>
         </View>
      );
@@ -280,11 +256,11 @@ const styles = StyleSheet.create({
     imageBackground: {
         height:170,
         backgroundColor: 'black',
-        borderRadius:12,
+        borderRadius:BORDER_RADIUS,
     },
     episodeContainer:{
         padding:10,
         height:'100%',
-        borderRadius:12,
+        borderRadius:BORDER_RADIUS,
     }
 })

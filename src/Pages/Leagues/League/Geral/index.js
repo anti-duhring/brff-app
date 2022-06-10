@@ -15,6 +15,14 @@ const Geral = ({navigation, route}) => {
     const roster_bench = roster.filter((item) => {
         return item.indexOf('BN') !== -1;
     });
+    const playerEmpty = {
+        index: null,
+        name: 'Vazio',
+        player_id: 0,
+        position: null,
+        points: 0,
+        projected_points: 0
+    }
 
     const { userData } = useContext(UserDataContext)
     const userID = userData.user_id;
@@ -141,8 +149,11 @@ const Geral = ({navigation, route}) => {
                             : 
                         roster.map((position, index) => {
                             if(position=='BN') return
+
+                            const player = starters[index] || playerEmpty;
+
                             return (
-                                <Player key={index} position={position} name={starters[index].name} />
+                                <Player key={index} position={position} name={player.name} />
                             )
                         })}
                     
@@ -150,16 +161,17 @@ const Geral = ({navigation, route}) => {
                         <Text style={styles.title}>Banco</Text>
                     </View>
                     {!bench ? 
-                        roster.map((position, index) => {     
-                            if(position!='BN') return
+                        roster_bench.map((position, index) => {     
+                            
                             return (
                                 <PlayerPlaceholder key={index} position={position} />
                             )
                         }) 
                             : 
                         roster_bench.map((position, index) => {
+                            const player = bench[index] || playerEmpty;
                             return (
-                                <Player key={index} position={position} name={bench[index].name} />
+                                <Player key={index} position={position} name={player.name} />
                             )
                         })}
                 </View>

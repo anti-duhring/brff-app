@@ -10,7 +10,7 @@ import { Entypo } from '@expo/vector-icons';
 import { useNavigation } from "@react-navigation/native";
 import { getColorPosition, getPlayerPoints } from "../../../../functions/GetRoster";
 import { AllPlayersContext } from "../../../../components/AllPlayersContext";
-import { LIGHT_GREEN, LIGHT_BLACK, LIGHT_GRAY } from '../../../../components/Variables'
+import { LIGHT_GREEN, LIGHT_BLACK, LIGHT_GRAY, DARK_GRAY, DARKER_GRAY } from '../../../../components/Variables'
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -365,27 +365,31 @@ const Matchups = ({route}) => {
         
     )
 
-    const MatchupPlayers = ({playerUserName, playerOpponentName, playerUserID, playerOpponentID, playerUserProjectedPoints, playerOpponentProjectedPoints, position}) => (
+    const MatchupPlayers = ({playerUserName, playerOpponentName, playerUserID, playerOpponentID, playerUserProjectedPoints, playerOpponentProjectedPoints, position}) => {
+        const playerOpponentPoints = getPlayerPoints(playerOpponentID, playersPoints, opponentPlayersPoints);
+        const playerUserPoints = getPlayerPoints(playerUserID, playersPoints, opponentPlayersPoints);
+        
+        return (
         <View style={styles.matchupContainer}>
 
         <View style={styles.matchupPlayerContainer}>
             <Text style={styles.playerMatchupLeft}>{playerOpponentName}</Text>
-            <Text style={[styles.playerMatchupPoints,{textAlign:'right'}]}>
-                {playerOpponentProjectedPoints.toFixed(1)/*(playerOpponentID!=0) ?getPlayerPoints(playerOpponentID, playersPoints, opponentPlayersPoints) : null*/}
+            <Text style={[styles.playerMatchupPoints,{textAlign:'right',color:(playerOpponentPoints=='0.0') ? DARKER_GRAY : LIGHT_GRAY}]}>
+                {(playerOpponentPoints=='0.0') ? playerOpponentProjectedPoints.toFixed(1) : playerOpponentPoints}
             </Text>
         </View>
         <Text style={[styles.position, {color:getColorPosition(position)}]}>
             {position.replace(/_/g,' ')}
         </Text>
         <View style={styles.matchupPlayerContainer}>
-            <Text style={[styles.playerMatchupPoints,{textAlign:'left'}]}>
-                {playerUserProjectedPoints.toFixed(1)/*(playerUserID!=0) ? getPlayerPoints(playerUserID, playersPoints, opponentPlayersPoints) : null*/}
+            <Text style={[styles.playerMatchupPoints,{textAlign:'left',color:(playerOpponentPoints=='0.0') ? DARKER_GRAY : LIGHT_GRAY}]}>
+                {(playerUserPoints=='0.0') ? playerUserProjectedPoints.toFixed(1) : playerUserPoints}
             </Text>
             <Text style={styles.playerMatchupRight}>{playerUserName}</Text>
         </View>
         
         </View>
-    )
+    )}
 
     const MatchupPlayersPlaceholder = ({position}) => (
         <View style={styles.matchupContainer}>
@@ -471,8 +475,10 @@ const Matchups = ({route}) => {
                             return (
                                 <MatchupPlayers
                                     key={index}
+
                                     playerUserID={playerUser.player_id}
                                     playerOpponentID={playerOpponent.player_id}
+
                                     playerUserName={playerUser.name}
                                     playerOpponentName={playerOpponent.name}
 

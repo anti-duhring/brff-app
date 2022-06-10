@@ -38,16 +38,6 @@ const Episode = ({navigation, route}) => {
     }
 
 
-    useFocusEffect(() => {
-        // This will run when component is `focused` or mounted.
-        StatusBar.setHidden(true);
-      
-        // This will run when component is `blured` or unmounted.
-        return () => {
-          StatusBar.setHidden(false);
-        }
-      });
-
     return ( 
         <View style={styles.episodeBody}>
         <HeaderImageScrollView
@@ -56,7 +46,7 @@ const Episode = ({navigation, route}) => {
             maxOverlayOpacity={0.7}
             minOverlayOpacity={0}
             fadeOutForeground={true}
-            contentContainerStyle={{backgroundColor:'transparent',top:-60}}
+            contentContainerStyle={{backgroundColor:'transparent',top:-30}}
             scrollViewBackgroundColor={'transparent'}
             renderForeground={() => (
                     <View style={styles.foregroundContainer}>
