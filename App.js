@@ -1,4 +1,4 @@
-import { React, useEffect, useMemo, useReducer, useState, useContext } from "react";
+import { React, useEffect, useMemo, useReducer } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { View, ActivityIndicator, Vibration, StatusBar } from "react-native";
@@ -11,18 +11,16 @@ import { AuthContext } from "./src/components/Context";
 import { UserDataContext } from "./src/components/UserDataContext";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DefaultDrawer from "./src/components/DefaultDrawer";
-import { createStackNavigator } from "@react-navigation/stack";
 import Podcast from "./src/Pages/Podcast";
 import { NFLStatusContextProvider } from "./src/components/NFLStatusContext";
 import { AllPlayersContextProvider } from "./src/components/AllPlayersContext";
 import { PlayerContextProvider } from "./src/components/PlayerContext";
 import TrackPlayer, { Capability } from "react-native-track-player";
-//import { FontAwesome } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
+import { WHITE, DARK_GREEN, DARKER_GRAY } from "./src/components/Variables";
 
 const Drawer = createDrawerNavigator();
-const Stack = createStackNavigator();
 
 
 
@@ -192,15 +190,17 @@ export default function App() {
         <Drawer.Navigator 
           useLegacyImplementation
           screenOptions={{
-            drawerActiveBackgroundColor:'rgba(0, 128, 55, 1)',//'#15191C',
-            drawerActiveTintColor:'#FCFCFC',
-            drawerInactiveTintColor:'#656668',
+            drawerActiveBackgroundColor:DARK_GREEN,//'#15191C',
+            drawerActiveTintColor:WHITE,
+            drawerInactiveTintColor:DARKER_GRAY,
             drawerType: 'front',
-            drawerLabelStyle: {marginLeft:-25, fontFamily: 'Roboto-Medium', fontSize:15}
+            drawerLabelStyle: {marginLeft:-25, fontFamily: 'Roboto-Medium', fontSize:15},
+            drawerStyle: {display: (loginState.userToken) ? 'flex' : 'none'}
           }}
+          
           drawerContent={(props) => { 
             if(loginState.userToken!=null){
-              return <CustomDrawer dataUser={loginState} {...props} />
+              return <CustomDrawer isLogged={true} dataUser={loginState} {...props} />
             } else{
               return <DefaultDrawer {...props} />
             }
@@ -225,12 +225,6 @@ export default function App() {
             drawerIcon: ({color}) => (
               <FontAwesome5 name="podcast" size={17} color={color} />
             )}} component={Podcast}/>
-          <Drawer.Screen name="Perfil" options={{
-            headerShown:false,
-            drawerIcon: ({color}) => (
-              <FontAwesome5 name="user-alt" size={17} color={color} />
-            )
-          }} component={Profile}/>
           
           </>
         ) : (

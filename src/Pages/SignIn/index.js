@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Pressable, Keyboard, TouchableOpacity, TextInput, Image, Linking } from 'react-native';
 import { useState, useContext } from 'react';
 import { AuthContext } from '../../components/Context';
-
+import {BORDER_RADIUS, DARK_BLACK, DARK_GRAY, LIGHT_BLACK, LIGHT_GRAY, LIGHT_GREEN, WHITE} from '../../components/Variables'
 
 const SignIn = () => {
   const [username, setUsername] = useState('')
@@ -26,13 +26,13 @@ const SignIn = () => {
         </View>
       </View>
       <View style={styles.login}> 
-        <TextInput style={{padding:10, margin:10}}  placeholder="Nome de usuário do sleeper" value={username}  onChangeText={setUsername} />      
+        <TextInput style={styles.loginInput} placeholderTextColor={DARK_GRAY} placeholder="Nome de usuário do sleeper" value={username}  onChangeText={setUsername} />      
         <View style={styles.buttonContainer}>
          <TouchableOpacity style={styles.buttonLogin} onPress={() => loginHandle(username)}>
-           <Text style={styles.text}>Login</Text>
+           <Text style={styles.loginText}>Login</Text>
          </TouchableOpacity>
-         <TouchableOpacity style={styles.buttonLogin} onPress={() => Linking.openURL('https://sleeper.app/create')}>
-           <Text style={styles.text}>Cadastrar</Text>
+         <TouchableOpacity style={styles.buttonRegister} onPress={() => Linking.openURL('https://sleeper.app/create')}>
+           <Text style={styles.text}>Não tem conta? Cadastrar</Text>
          </TouchableOpacity>
         </View>
      </View>
@@ -51,28 +51,37 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
     },
     login:{
-      backgroundColor:'white',
+      backgroundColor: LIGHT_BLACK,
       padding:10,
       width:'90%',
-      borderRadius:5,
+      borderRadius:BORDER_RADIUS,
     },
     buttonContainer: {
-      flexDirection:'row',
-      justifyContent:'space-between',
-      
+      flexDirection:'column',
+      justifyContent:'center',
+      alignItems:'center',
+      marginTop:40,
     },
     buttonLogin: {
       textAlign:'center',
-      backgroundColor:'#008037',
-      color:'white',
+      backgroundColor:LIGHT_GREEN,
       paddingTop:15,
       paddingBottom:15,
       borderRadius:5,
-      width:'48%',
+      width:'100%',
+      elevation:10,
+    },
+    buttonRegister: {
+      marginVertical:20,
     },
     text: {
       textAlign:'center',
       color:'white'
+    },
+    loginText: {
+      color:WHITE,
+      textAlign:'center',
+      fontSize:15
     },
     titleContainer:{
       marginBottom:50,
@@ -110,5 +119,12 @@ const styles = StyleSheet.create({
     titleImage:{
       width:80,
       height:80,
+    },
+    loginInput: {
+      padding:10, 
+      margin:10, 
+      color:WHITE,
+      backgroundColor:'rgba(0,0,0,0.2)',
+      borderRadius:5
     }
   });

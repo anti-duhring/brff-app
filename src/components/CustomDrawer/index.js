@@ -1,42 +1,17 @@
-import { useContext, useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image, ImageBackground } from "react-native";
-import { DrawerContentScrollView, DrawerItemList } from "@react-navigation/drawer";
+import { useContext } from "react";
+import { View, Text, StyleSheet, Image, ImageBackground } from "react-native";
+import { DrawerContentScrollView, DrawerItemList, DrawerItem } from "@react-navigation/drawer";
 import { AuthContext } from '../../components/Context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserDataContext } from "../UserDataContext";
+import { AntDesign } from '@expo/vector-icons';
+import { WHITE, DARK_GREEN, DARKER_GRAY } from "../Variables";
 
 const CustomDrawer = (props) => {
-    const { signOut } = useContext(AuthContext)
-    const { userData } = useContext(UserDataContext)
-    const username = userData.username;
-    const displayName = userData.display_name;
-    const userAvatar = userData.avatar;
-
-
-    /*const getUserInfo = async() => {
-        setUsername(props.dataUser.userName)
-        setDisplayName(props.dataUser.userDisplayName)
-        setUserAvatar(props.dataUser.avatar)
-        /*let userID = null;
-        try {
-            userID = await AsyncStorage.getItem('userToken')
-
-            fetch(`https://api.sleeper.app/v1/user/${userID}`)
-            .then(response => response.json())
-            .then((data) => {
-                setUsername(data.username)
-                setDisplayName(data.display_name)
-                setUserAvatar(data.avatar)
-            })
-        } catch(e){
-            console.log(e)
-        }
-    }*/
-
-    /*useEffect(() => {
-        getUserInfo();
-        console.log(userData)
-    })*/
+        const { signOut } = useContext(AuthContext)
+        const { userData } = useContext(UserDataContext)
+        const username = userData.username;
+        const displayName = userData.display_name;
+        const userAvatar = userData.avatar;
 
     return (
     <View style={{flex:1}}>
@@ -55,11 +30,17 @@ const CustomDrawer = (props) => {
         </ImageBackground>
         <DrawerContentScrollView style={styles.drawerContainer} {...props}>  
             <DrawerItemList {...props} />
-            <View style={styles.logoutContainer}>
-                <TouchableOpacity style={styles.buttonLogout} onPress={() => signOut()}>
-                    <Text style={styles.text}>Sair</Text>
-                </TouchableOpacity>
-            </View>
+            <DrawerItem
+                label="Sair"
+                icon={({color}) => (
+                    <AntDesign name="logout"  size={17} color={color} />
+                )}
+                labelStyle={{marginLeft:-25, fontFamily: 'Roboto-Medium', fontSize:15}}
+                activeTintColor={WHITE}
+                inactiveTintColor={DARKER_GRAY}
+                activeBackgroundColor={DARK_GREEN}
+                onPress={() => signOut()}
+            />
         </DrawerContentScrollView>
     </View>
     );

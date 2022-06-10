@@ -5,6 +5,7 @@ import { AllPlayersContext } from '../../components/AllPlayersContext'
 import ProgressiveImage from '../../components/ProgressiveImage';
 import { Feather } from '@expo/vector-icons';
 import { Entypo } from '@expo/vector-icons';
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 
 const TrendingPlayers = ({navigation}) => {
   const [trendingAdd, setTrendingAdd] = useState(null)
@@ -40,8 +41,27 @@ const TrendingPlayers = ({navigation}) => {
 
   }, [])
 
+  const PlayerPlaceholder = () => (
+    <View style={styles.playerContainer}>
+      <Image source={require('../../../assets/Images/player_default.png')} style={styles.imagePlayer} resizeMode='contain' />
+      <View style={styles.playerNameContainer}>
+        <SkeletonPlaceholder highlightColor="#303840" backgroundColor="#262D33">
+          <View style={{ width: 100, height: 15, borderRadius: 4 }} />
+        </SkeletonPlaceholder>
+        <SkeletonPlaceholder highlightColor="#303840" backgroundColor="#262D33">
+          <View style={{ width: 50, height: 15, borderRadius: 4, marginTop:5 }} />
+        </SkeletonPlaceholder>
+      </View>
+      <View style={styles.playerCountContainer}>
+        <SkeletonPlaceholder highlightColor="#303840" backgroundColor="#262D33">
+          <View style={{ width: 50, height: 20, borderRadius: 4 }} />
+        </SkeletonPlaceholder>
+      </View>
+    </View>
+  )
+
   const Player = ({id, avatar, player, type}) => (
-    <View key={id} style={styles.playerContainer}>
+    <View style={styles.playerContainer}>
     <ProgressiveImage style={styles.imagePlayer} uri={avatar} resizeMode='contain'/>
     <View style={styles.playerNameContainer}>
       <Text style={styles.playerName}>{allPlayers[id].full_name}</Text>
@@ -66,12 +86,17 @@ const TrendingPlayers = ({navigation}) => {
       <View style={styles.boxContainer}>
         <Text style={styles.title}>Trending up</Text>
         <View style={styles.playersList}>
-        {trendingAdd && trendingAdd.map(player => {
+        {(trendingAdd) ? trendingAdd.map(player => {
           const id = player.player_id;
           const avatar = `https://sleepercdn.com/content/nfl/players/thumb/${id}.jpg`;
 
           return (
             <Player key={id} id={id} avatar={avatar} player={player} type='add' />
+          )
+        }) :
+        new Array(25).fill(0).map((player, index) => {
+          return (
+            <PlayerPlaceholder key={index} />
           )
         })}
         </View>
@@ -79,12 +104,17 @@ const TrendingPlayers = ({navigation}) => {
       <View style={styles.boxContainer}>
         <Text style={styles.title}>Trending down</Text>
         <View style={styles.playersList}>
-        {trendingDrop && trendingDrop.map(player => {
+        {(trendingDrop) ? trendingDrop.map(player => {
           const id = player.player_id;
           const avatar = `https://sleepercdn.com/content/nfl/players/thumb/${id}.jpg`;
 
           return (
             <Player key={id} id={id} avatar={avatar} player={player} type='drop' />
+          )
+        }) :
+        new Array(25).fill(0).map((player, index) => {
+          return (
+            <PlayerPlaceholder key={index} />
           )
         })}
         </View>
@@ -139,7 +169,7 @@ const styles = StyleSheet.create({
     marginLeft:10,
   },
   playersList: {
-    marginTop: 10,
+    marginTop: 0,
   },
   playerCountAdd: {
     //flex: 1,
