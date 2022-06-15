@@ -52,6 +52,24 @@ const TabTopLeague = ({activeButton, isAble, leagueDraftSettings}) => {
                     <Ionicons name="american-football-outline" size={20} color={COLOR} />}
                 </TouchableOpacity>
             </View>
+            <View style={(activeButton=='PlayoffBracket') ? styles.activeTab : styles.inactiveTab}>
+                <TouchableOpacity style={styles.buttonContent} onPress={() => {
+                    if(!isAble) return
+
+                    navigation.navigate('PlayoffBracket',{ 
+                        active: 'PlayoffBracket',
+                        leagueDraftSettings: leagueDraftSettings
+                    })
+                }}>
+                    {(activeButton=='PlayoffBracket') ? 
+                    <>
+                        <Ionicons name="trophy-outline" size={20} color={COLORTEXT} />
+                        <Text style={styles.textActiveTab}>PLAYOFFS</Text>
+                    </> : 
+                    <Ionicons name="trophy-outline" size={20} color={COLOR} />}
+
+                </TouchableOpacity>
+            </View>
             <View style={(activeButton=='Informations') ? styles.activeTab : styles.inactiveTab}>
                 <TouchableOpacity style={styles.buttonContent} onPress={() => {
                     if(!isAble) return

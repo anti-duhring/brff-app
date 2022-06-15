@@ -6,6 +6,7 @@ import Geral from './Geral'
 import Players from './Players'
 import PlayerProfile from "./Players/PlayerProfile";
 import Matchups from "./Matchups";
+import PlayoffBracket from "./PlayoffBracket";
 
 const Stack = createStackNavigator();
 
@@ -61,6 +62,16 @@ const League = ({navigation, route}) => {
               </TouchableOpacity>
             ),
             }} component={Geral} />
+
+            <Stack.Screen name="PlayoffBracket" initialParams={{leagueObject:route.params?.leagueObject}} options={{
+            title: '',//route.params?.leagueName,
+            headerTransparent: true,
+            headerLeft: () => (
+              <TouchableOpacity style={[styles.barButtons,{marginLeft:10, marginTop:-30}]} onPress={() => navigation.navigate('LeagueList')}>
+                <Ionicons name="arrow-back" size={24} color="white" />
+              </TouchableOpacity>
+            ),
+            }} component={PlayoffBracket} />
 
         </Stack.Navigator>
     )
