@@ -4,7 +4,7 @@ import TabTopLeague from "../TabTopLeague";
 import { HeaderLeagueContextProvider } from "../../../../components/HeaderLeagueContext";
 import ViewLightDark from "../../../../components/ViewLightDark";
 import { Entypo } from '@expo/vector-icons';
-import { DARK_GRAY, LIGHT_BLACK, LIGHT_GRAY, LIGHT_GREEN, WHITE } from "../../../../components/Variables";
+import { DARK_BLACK, DARK_GRAY, DARK_GREEN, LIGHT_BLACK, LIGHT_GRAY, LIGHT_GREEN, WHITE } from "../../../../components/Variables";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const PlayoffBracket = ({route}) => {
@@ -16,6 +16,21 @@ const PlayoffBracket = ({route}) => {
     const [leagueRostersData, setLeagueRostersData] = useState(null);
     const [leagueUsersData, setLeagueUsersData] = useState(null)
     const [round, setRound] = useState(1)
+    const playerNull = {
+        rosterID: 0,
+        userData: {
+            display_name: '{result} do matchup {matchup}',
+            avatar: null
+        },
+        rosterData: {
+            settings: {
+                wins: 0,
+                ties: 0,
+                losses: 0,
+                fpts: 0
+            }
+        }
+    }
 
     const getPlayerRoster = (rosterID) => {
         let playerRoster = null;
@@ -90,25 +105,37 @@ const PlayoffBracket = ({route}) => {
         
     )
 
-    const PlayerMatchup = ({player, position}) => {
+    const PlayerMatchup = ({player, position, from}) => {
+
+        const Avatar = () => (
+            <Image source={(player.userData.avatar) ? {uri: `https://sleepercdn.com/avatars/${player.userData.avatar}`} : require('../../../../../assets/Images/player_default.png')} style={{width:50,height:50,borderRadius:50,resizeMode: 'cover',backgroundColor:DARK_BLACK}} />
+        );
+        const FantasyPoints = () => (
+            <Text style={[{fontSize:22,color:WHITE},(position=='left') ? {marginLeft:15} : {marginRight: 15}]}>
+                {player.rosterData.settings.fpts.toFixed(1)}
+            </Text>
+        );
+
         return (
-            <View>
+            <View style={{flex:1}}>
                 <View style={[styles.playerMatchupContainer,{justifyContent: (position=='left') ? 'flex-start' : 'flex-end'}]}>
                     {
                         (position=='left') ?
                         <>
-                        <Image source={{uri: `https://sleepercdn.com/avatars/${player.userData.avatar}`}} style={{width:50,height:50,borderRadius:50,resizeMode: 'cover'}} />
-                        <Text style={[{fontSize:22,color:WHITE},{marginLeft:15,}]}>{player.rosterData.settings.fpts.toFixed(1)}</Text>
+                            <Avatar />
+                            <FantasyPoints />
                         </> :
                         <>
-                        <Text style={[{fontSize:22,color:WHITE},{marginRight:15,}]}>{player.rosterData.settings.fpts.toFixed(1)}</Text>
-                        <Image source={{uri: `https://sleepercdn.com/avatars/${player.userData.avatar}`}} style={{width:50,height:50,borderRadius:50,resizeMode: 'cover'}} />
+                            <FantasyPoints />
+                            <Avatar />
                         </>
                     }
 
                     </View>
                     <View style={{flex:1,alignItems:(position=='left') ? 'flex-start' : 'flex-end'}}>
-                        <Text style={{color:WHITE}}>{player.userData.display_name}</Text>
+                        <Text style={{color:WHITE, textAlign: (position=='left') ? 'left' : 'right'}}>    
+                            {(!from) ? player.userData.display_name : (from.w) ? player.userData.display_name.replace(/{matchup}/g,from.w).replace(/{result}/g,'Vencedor') : player.userData.display_name.replace(/{matchup}/g,from.l).replace(/{result}/g,'Perdedor')}
+                        </Text>
                         <Text style={{color:DARK_GRAY}}>{player.rosterData.settings.wins}-{player.rosterData.settings.losses}{(player.rosterData.settings.ties!=0) ? '-'+player.rosterData.settings.ties : null}</Text>
                     </View>
                 </View>
@@ -116,16 +143,13 @@ const PlayoffBracket = ({route}) => {
     }
 
     const Matchup = (props) => {
-        /*                        <View style={{borderWidth:1,borderColor:LIGHT_GREEN,width:40,height:40, justifyContent:'center',alignItems:'center',borderRadius:40}}>
-                            <Text style={styles.matchupVsText}>VS</Text>
-                        </View>*/
         return (
             <ViewLightDark style={{flexDirection:'row'}} title={`Matchup ${props.matchup.m}`} titleAlign='center'>
-                    <PlayerMatchup player={props.player1} position='left' />
+                    <PlayerMatchup player={props.player1} position='left' from={props.matchup.t1_from} />
                     <View style={styles.matchupVsContainer}>
                         <MaterialCommunityIcons name="sword-cross" size={35} color={LIGHT_GREEN} />
                     </View>
-                    <PlayerMatchup player={props.player2} position='right' />
+                    <PlayerMatchup player={props.player2} position='right' from={props.matchup.t2_from} />
             </ViewLightDark>
         )
     }
@@ -147,16 +171,24 @@ const PlayoffBracket = ({route}) => {
                     {leagueRostersData && leagueUsersData && playoffData?.map((matchup, index) => {
                         if(matchup.r != round) return
 
-                        if(!matchup.t1 || !matchup.t2) return
+                        let player1;
+                        let player2;
 
-                        let player1 = {rosterID: matchup.t1}
-                        let player2 = {rosterID: matchup.t2}
+                        if(matchup.t1) {
+                            player1 = {rosterID: matchup.t1}
+                            player1.rosterData = getPlayerRoster(player1.rosterID);
+                            player1.userData = getPlayerInfo(player1.rosterData.owner_id);
+                        } else {
+                            player1 = playerNull;
+                        }
 
-                        player1.rosterData = getPlayerRoster(player1.rosterID);
-                        player2.rosterData = getPlayerRoster(player2.rosterID);
-
-                        player1.userData = getPlayerInfo(player1.rosterData.owner_id);
-                        player2.userData = getPlayerInfo(player2.rosterData.owner_id);
+                        if(matchup.t2) {
+                            player2 = {rosterID: matchup.t2}
+                            player2.rosterData = getPlayerRoster(player2.rosterID);
+                            player2.userData = getPlayerInfo(player2.rosterData.owner_id);
+                        } else {
+                            player2 = playerNull;
+                        }
                         
                             return (
                                 <Matchup matchup={matchup} player1={player1} player2={player2} key={index} />
