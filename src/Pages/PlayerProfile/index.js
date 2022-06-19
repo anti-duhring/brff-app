@@ -1,7 +1,9 @@
 import { View, Text, Image, Dimensions, StyleSheet } from "react-native";
-import { useEffect, useState } from "react";
-import PlayerProfileHeader from "../../../../../components/PlayerProfileHeader";
+import { useEffect, useState, useContext } from "react";
+import PlayerProfileHeader from "../../components/PlayerProfileHeader";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+import { AllPlayersContext } from "../../components/AllPlayersContext";
+import { getColorPosition } from "../../functions/GetRoster";
 
 const MAX_HEIGHT = 200;
 const MIN_HEIGHT = 55;
@@ -20,6 +22,8 @@ const PlayerProfile = ({navigation, route}) => {
     const [userInfos, setUserInfos] = useState(null)
     const [hasPlayers, setHasPlayers] = useState(false)
 
+    const { allPlayers } = useContext(AllPlayersContext)
+
     const [errorMessage, setErrorMessage] = useState(null)
     const controller = new AbortController();
     const signal = controller.signal;
@@ -30,11 +34,16 @@ const PlayerProfile = ({navigation, route}) => {
         .then((data) => {
             data.map((roster, index) => {
                 if(roster.owner_id==userID && roster.players) {
+                    const benchs = roster.players.filter((item) => {
+                        return roster.starters.indexOf(item) === -1;
+                    });
+
                     setHasPlayers(true)
                     setRosterData(roster)
                     setUserInfos(roster.settings)
-                    getStartersInfo(roster.starters)
-                    getBenchInfo(roster.players, roster.starters)
+
+                    setStarters(getPlayers(roster.starters))
+                    setBench(getPlayers(benchs))
                 }
             })
         }).catch((e) => {
@@ -44,37 +53,27 @@ const PlayerProfile = ({navigation, route}) => {
         })
     }
 
-    const getBenchInfo = async(allplayers, startersplayers) => {
-        let benchWithInfo = [];
-        let allbenchs = allplayers.filter((item) => {
-            return startersplayers.indexOf(item) === -1;
-        });
-        await allbenchs.reduce(async(memo, player, index) => {
-            await memo;
-            if(player != 0){
-                const response = await fetch(`https://teste-draft.netlify.app/.netlify/functions/getplayersdata?name=${player}`)
-                const data = await response.json()
-                
-                let name = data.full_name;
-                if(isNaN(player)) name = `${data.first_name} ${data.last_name}`
-
-                benchWithInfo.push({
-                    name: name,
-                    position: data.fantasy_positions[0],
+    const getPlayers = (_players) => {
+        let players = [];
+        _players.map((player, index) => {
+            if(player!=0) {
+                players.push({
+                    name: allPlayers[player].full_name,
+                    position: allPlayers[player].fantasy_positions[0],
                     index: index
                 })
-            } else {
-                benchWithInfo.push({
+            } else{
+                players.push({
                     name: 'Empty',
                     position: 'Empty',
                     index: index
                 })
             }
-        }, Promise.resolve())
-        setBench(benchWithInfo)
+        })
+        return players
     }
 
-    const getStartersInfo = async(players) => {
+    /*const getStartersInfo = async(players) => {
         let startersWithInfo = []
         await players.reduce(async(memo, player, index) => {
             await memo;
@@ -99,40 +98,8 @@ const PlayerProfile = ({navigation, route}) => {
             }
         }, Promise.resolve())
         setStarters(startersWithInfo)
-    }
+    }*/
     
-    const getColorPosition = (position) => {
-        let colorPosition = 'black';
-        switch(position){
-            case 'QB':
-                colorPosition = 'red'
-                break;
-            case 'RB':
-                colorPosition = 'teal'
-                break;
-            case 'WR':
-                colorPosition = 'blue'
-                break;
-            case 'TE':
-                colorPosition = 'yellow'
-                break;
-            case 'FLEX':
-                colorPosition = 'pink'
-                break;
-            case 'SUPER_FLEX':
-                colorPosition = 'green'
-                break;
-            case 'K':
-                colorPosition = 'purple'
-                break;
-            case 'DEF':
-                colorPosition = 'gray'
-                break;
-            default:
-                colorPosition = 'black'
-        }
-        return colorPosition
-    }
 
     useEffect(() => {
         getRoster()

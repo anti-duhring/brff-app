@@ -1,17 +1,17 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import {useNavigation} from '@react-navigation/native'
-import { NFLStatusContext } from '../../../../components/NFLStatusContext'
+import { NFLStatusContext } from '../NFLStatusContext'
 import { useContext, useEffect } from "react";
 import { AntDesign } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons'; 
-import { LIGHT_GREEN, DARK_BLACK, LIGHT_BLACK } from '../../../../components/Variables';
+import { LIGHT_GREEN, DARK_BLACK, LIGHT_BLACK } from '../Variables';
 
 const COLOR = LIGHT_GREEN
 const GREEN2 = LIGHT_BLACK //'rgba(0, 206, 78,  .1)'
 const COLORTEXT = DARK_BLACK;
 
-const TabTopLeague = ({activeButton, isAble, leagueDraftSettings}) => {
+const TabTopLeague = ({activeButton, isAble, leagueDraftSettings, leagueObject}) => {
     const navigation = useNavigation();
     const { week } = useContext(NFLStatusContext)
 
@@ -23,6 +23,7 @@ const TabTopLeague = ({activeButton, isAble, leagueDraftSettings}) => {
                     if(!isAble) return
                     navigation.navigate('Players',{
                         active: 'Players',
+                        leagueObject: leagueObject,
                          leagueDraftSettings: leagueDraftSettings
                     })
                 }}>
@@ -41,6 +42,7 @@ const TabTopLeague = ({activeButton, isAble, leagueDraftSettings}) => {
                     navigation.navigate('Matchups',{ 
                         active: 'Matchups', 
                         week: week,
+                        leagueObject: leagueObject,
                         leagueDraftSettings: leagueDraftSettings
                     })
                 }}>
@@ -58,6 +60,7 @@ const TabTopLeague = ({activeButton, isAble, leagueDraftSettings}) => {
 
                     navigation.navigate('PlayoffBracket',{ 
                         active: 'PlayoffBracket',
+                        leagueObject: leagueObject,
                         leagueDraftSettings: leagueDraftSettings
                     })
                 }}>
@@ -76,13 +79,14 @@ const TabTopLeague = ({activeButton, isAble, leagueDraftSettings}) => {
 
                     navigation.navigate('Informations',{ 
                         active: 'Informations',
+                        leagueObject: leagueObject,
                         leagueDraftSettings: leagueDraftSettings
                     })
                 }}>
                     {(activeButton=='Informations') ? 
                     <>
                         <MaterialCommunityIcons name="information-outline" size={20} color={COLORTEXT} />
-                        <Text style={styles.textActiveTab}>INFORMAÇÕES</Text>
+                        <Text style={styles.textActiveTab}>INFOS</Text>
                     </> : 
                     <MaterialCommunityIcons name="information-outline" size={20} color={COLOR} />}
 
@@ -93,6 +97,7 @@ const TabTopLeague = ({activeButton, isAble, leagueDraftSettings}) => {
                     if(!isAble) return
                     navigation.navigate('Team',{ 
                         active: 'Team',
+                        leagueObject: leagueObject,
                         leagueDraftSettings: leagueDraftSettings
                     })
                 }}>

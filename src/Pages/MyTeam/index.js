@@ -1,13 +1,13 @@
 import { Text, View, StyleSheet } from "react-native";
-import TabTopLeague from '../TabTopLeague'
-import { HeaderLeagueContextProvider } from "../../../../components/HeaderLeagueContext";
-import { UserDataContext } from "../../../../components/UserDataContext";
-import { AllPlayersContext } from "../../../../components/AllPlayersContext";
+import TabTopLeague from '../../components/TabTopLeague'
+import { HeaderLeagueContextProvider } from "../../components/HeaderLeagueContext";
+import { UserDataContext } from "../../components/UserDataContext";
+import { AllPlayersContext } from "../../components/AllPlayersContext";
 import { useState, useEffect, useContext } from "react";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
-import { getColorPosition } from "../../../../functions/GetRoster";
+import { getColorPosition } from "../../functions/GetRoster";
 
-const Geral = ({navigation, route}) => {
+const MyTeam = ({navigation, route}) => {
     const league = route.params?.leagueObject;
     const leagueID = league.league_id
     const leagueDraftSettings = route.params?.leagueDraftSettings
@@ -110,7 +110,7 @@ const Geral = ({navigation, route}) => {
     if(!hasPlayers) {
         return (
             <HeaderLeagueContextProvider leagueObject={league}>
-            <TabTopLeague leagueDraftSettings={leagueDraftSettings} isAble={true} activeButton={route.params?.active} />
+            <TabTopLeague leagueDraftSettings={leagueDraftSettings} isAble={true} activeButton={route.params?.active} leagueObject={league} />
 
                 <View
                     style={styles.boxContainer}
@@ -131,7 +131,7 @@ const Geral = ({navigation, route}) => {
 
     return ( 
         <HeaderLeagueContextProvider leagueObject={league}>
-            <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} />
+            <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} />
 
                 <View style={styles.boxContainer}
                 >
@@ -179,7 +179,7 @@ const Geral = ({navigation, route}) => {
     );
 }
  
-export default Geral;
+export default MyTeam;
 
 const styles = StyleSheet.create({
     boxContainer: {

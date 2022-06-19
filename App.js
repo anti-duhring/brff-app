@@ -2,16 +2,15 @@ import { React, useEffect, useMemo, useReducer } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { View, ActivityIndicator, Vibration, StatusBar } from "react-native";
-import Profile from './src/Pages/Profile';
+import StackScreens from "./src/screens/StackScreens";
 import SignIn from './src/Pages/SignIn';
-import Leagues from "./src/Pages/Leagues";
-import Players from "./src/Pages/Players";
+import PodcastScreens from './src/screens/PodcastScreens'
+import TrendingPlayers from "./src/Pages/TrendingPlayers";
 import CustomDrawer from "./src/components/CustomDrawer";
 import { AuthContext } from "./src/components/Context";
 import { UserDataContext } from "./src/components/UserDataContext";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DefaultDrawer from "./src/components/DefaultDrawer";
-import Podcast from "./src/Pages/Podcast";
 import { NFLStatusContextProvider } from "./src/components/NFLStatusContext";
 import { AllPlayersContextProvider } from "./src/components/AllPlayersContext";
 import { PlayerContextProvider } from "./src/components/PlayerContext";
@@ -209,7 +208,7 @@ export default function App() {
         {loginState.userToken != null ? (
           <>
           
-          <Drawer.Screen name="Leagues"  component={Leagues} options={{
+          <Drawer.Screen name="Leagues"  component={StackScreens} options={{
             title:'Ligas',
             headerShown: false,
             drawerIcon: ({color}) => (
@@ -219,12 +218,12 @@ export default function App() {
             headerShown: false,
             drawerIcon: ({color}) => (
             <AntDesign name="areachart"  size={17} color={color} />
-          )}} component={Players}/>
+          )}} component={TrendingPlayers}/>
           <Drawer.Screen name="Podcast" options={{
             headerShown: false,
             drawerIcon: ({color}) => (
               <FontAwesome5 name="podcast" size={17} color={color} />
-            )}} component={Podcast}/>
+            )}} component={PodcastScreens}/>
           
           </>
         ) : (

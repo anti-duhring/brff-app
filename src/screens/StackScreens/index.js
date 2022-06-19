@@ -1,20 +1,61 @@
-import { TouchableOpacity, StyleSheet } from "react-native";
+import { TouchableOpacity, StyleSheet, Pressable } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
+
+import LeagueList from '../../Pages/LeagueList';
+import Informations from '../../Pages/Informations';
+import MyTeam from '../../Pages/MyTeam';
+import Players from '../../Pages/Players'
+import PlayerProfile from '../../Pages/PlayerProfile';
+import Matchups from '../../Pages/Matchups';
+import PlayoffBracket from '../../Pages/PlayoffBracket';
+
+import { Entypo } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
-import Informations from './Informations'
-import Geral from './Geral'
-import Players from './Players'
-import PlayerProfile from "./Players/PlayerProfile";
-import Matchups from "./Matchups";
-import PlayoffBracket from "./PlayoffBracket";
+import { Easing } from 'react-native-reanimated'; 
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator()
 
-const League = ({navigation, route}) => {
+const config = {
+  animation: 'spring',
+  config: {
+    stiffness: 1000,
+    damping: 50,
+    mass: 3,
+    overshootCampling: false,
+    restDisplacementThreshold: 0.01,
+    restSpeedThreshold: 0.01,
+  }
+}
+
+const closeConfig = {
+  animation: 'timing',
+  config: {
+    duration: 200,
+    easing: Easing.linearm
+  }
+}
+
+const StackScreens = ({navigation,route}) => {
+
 
     return ( 
-        <Stack.Navigator initialRouteName="Players" screenOptions={{animationTypeForReplace:'pop'}}>
-          <Stack.Screen name="PlayerProfile" initialParams={{playerObject:route.params?.playerObject}} options={{
+        <Stack.Navigator initialRouteName='LeagueList' screenOptions={{
+            animation:'slide_from_bottom',
+            presentation:'card'
+          }}>
+  
+            <Stack.Screen name="LeagueList"  options={{ 
+            title:'',
+            headerTitleStyle:{color:'#FCFCFC'},
+            headerTransparent: true,
+            headerLeft: () => (
+             <Pressable style={styles.toggleButton} onPress={() => navigation.toggleDrawer()}>
+               <Entypo name="menu" size={24} color="#C6C6C6" />
+             </Pressable>
+            ) }} component={LeagueList} />
+  
+
+            <Stack.Screen name="PlayerProfile" options={{
             title:null,
             headerTransparent: true,
             headerLeft: () => (
@@ -23,7 +64,7 @@ const League = ({navigation, route}) => {
               </TouchableOpacity>
             )}} component={PlayerProfile} />
 
-          <Stack.Screen name="Players" initialParams={{leagueObject:route.params?.leagueObject}} options={{
+          <Stack.Screen name="Players" options={{
             title: '',//route.params?.leagueName,
             headerTransparent: true,
             headerLeft: () => (
@@ -33,7 +74,7 @@ const League = ({navigation, route}) => {
             ),
             }} component={Players} />
 
-          <Stack.Screen name="Informations" initialParams={{leagueObject:route.params?.leagueObject}} options={{
+          <Stack.Screen name="Informations" options={{
             title: '',//route.params?.leagueName,
             headerTransparent: true,
             headerLeft: () => (
@@ -43,7 +84,7 @@ const League = ({navigation, route}) => {
             ),
             }} component={Informations} />
 
-          <Stack.Screen name="Matchups" initialParams={{leagueObject:route.params?.leagueObject}} options={{
+          <Stack.Screen name="Matchups"  options={{
             title: '',//route.params?.leagueName,
             headerTransparent: true,
             headerLeft: () => (
@@ -53,7 +94,7 @@ const League = ({navigation, route}) => {
             ),
           }} component={Matchups} />
 
-          <Stack.Screen name="Team" initialParams={{leagueObject:route.params?.leagueObject}} options={{
+          <Stack.Screen name="Team"  options={{
             title: '',//route.params?.leagueName,
             headerTransparent: true,
             headerLeft: () => (
@@ -61,9 +102,9 @@ const League = ({navigation, route}) => {
                 <Ionicons name="arrow-back" size={24} color="white" />
               </TouchableOpacity>
             ),
-            }} component={Geral} />
+            }} component={MyTeam} />
 
-            <Stack.Screen name="PlayoffBracket" initialParams={{leagueObject:route.params?.leagueObject}} options={{
+            <Stack.Screen name="PlayoffBracket"  options={{
             title: '',//route.params?.leagueName,
             headerTransparent: true,
             headerLeft: () => (
@@ -72,15 +113,18 @@ const League = ({navigation, route}) => {
               </TouchableOpacity>
             ),
             }} component={PlayoffBracket} />
-
+            
         </Stack.Navigator>
-    )
+     );
 }
  
-export default League;
+export default StackScreens;
 
 const styles = StyleSheet.create({
     goBackButton:{
       marginRight:10,
+    },
+    toggleButton: {
+      marginLeft: 10,
     }
   })

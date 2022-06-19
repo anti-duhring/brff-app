@@ -3,11 +3,11 @@ import { useState, useEffect, useContext, useRef } from "react";
 import * as rssParser from 'react-native-rss-parser'
 import { LinearGradient } from 'expo-linear-gradient';
 import TrackPlayer from "react-native-track-player";
-import { scaleAnimation } from '../../../animations/scale'
+import { scaleAnimation } from "../../animations/scale";
 import { AntDesign } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
-import { BORDER_RADIUS } from "../../../components/Variables";
+import { BORDER_RADIUS } from "../../components/Variables";
 
 const EpisodeList = ({navigation}) => {
     const [isLoading, setIsLoading] = useState(true)

@@ -2,8 +2,8 @@ import { useContext, useState, useEffect, useRef } from 'react';
 import { StyleSheet, Text, View, Button, Image, Pressable, ActivityIndicator, ScrollView, FlatList, Animated } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createStackNavigator } from '@react-navigation/stack';
-import { NFLStatusContext } from '../../../components/NFLStatusContext'
-import { scaleAnimation } from '../../../animations/scale'
+import { NFLStatusContext } from '../../components/NFLStatusContext'
+import { scaleAnimation } from '../../animations/scale'
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 
 const Stack = createStackNavigator()
@@ -166,7 +166,7 @@ useEffect(() => {
               >
               <Pressable onPressIn={() => setItemAnimate(item.key)} onPress={() =>{ 
               scaleAnimation(animateX,() => {
-                navigation.navigate('League',{
+                navigation.navigate('Players',{
                   leagueObject: item.leagueObject,
                   leagueName: item.name
                 })

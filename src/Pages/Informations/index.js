@@ -1,8 +1,8 @@
 import { Text, View, StyleSheet } from "react-native";
-import TabTopLeague from '../TabTopLeague'
+import TabTopLeague from '../../components/TabTopLeague'
 import { useState, useEffect, useContext } from "react";
-import { NFLStatusContext } from "../../../../components/NFLStatusContext";
-import { HeaderLeagueContextProvider } from "../../../../components/HeaderLeagueContext";
+import { NFLStatusContext } from "../../components/NFLStatusContext";
+import { HeaderLeagueContextProvider } from "../../components/HeaderLeagueContext";
 
 const Informations = ({navigation, route}) => {
     const league = route.params?.leagueObject;
@@ -100,7 +100,7 @@ const Informations = ({navigation, route}) => {
     return ( 
         <View style={{flex:1,backgroundColor:'#0B0D0F'}}>
         <HeaderLeagueContextProvider leagueObject={league}>
-            <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} />
+            <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} />
             <View
                 style={{ borderRadius:12,margin:10,padding:10,
                 shadowColor:'#000',

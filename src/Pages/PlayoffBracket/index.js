@@ -1,10 +1,10 @@
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { useEffect, useState } from "react";
-import TabTopLeague from "../TabTopLeague";
-import { HeaderLeagueContextProvider } from "../../../../components/HeaderLeagueContext";
-import ViewLightDark from "../../../../components/ViewLightDark";
+import TabTopLeague from "../../components/TabTopLeague";
+import { HeaderLeagueContextProvider } from "../../components/HeaderLeagueContext";
+import ViewLightDark from "../../components/ViewLightDark";
 import { Entypo } from '@expo/vector-icons';
-import { DARK_BLACK, DARK_GRAY, DARK_GREEN, LIGHT_BLACK, LIGHT_GRAY, LIGHT_GREEN, WHITE } from "../../../../components/Variables";
+import { DARK_BLACK, DARK_GRAY, DARK_GREEN, LIGHT_BLACK, LIGHT_GRAY, LIGHT_GREEN, WHITE } from "../../components/Variables";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 
@@ -114,7 +114,7 @@ const PlayoffBracket = ({route}) => {
     )
 
     const PlayerAvatar = ({player}) => (
-        <Image source={(player.userData.avatar) ? {uri: `https://sleepercdn.com/avatars/${player.userData.avatar}`} : require('../../../../../assets/Images/player_default.png')} style={styles.playerAvatar} />
+        <Image source={(player.userData.avatar) ? {uri: `https://sleepercdn.com/avatars/${player.userData.avatar}`} : require('../../../assets/Images/player_default.png')} style={styles.playerAvatar} />
     );
 
     const PlayerFantasyPoints = ({player, position}) => (
@@ -226,7 +226,7 @@ const PlayoffBracket = ({route}) => {
     return ( 
         <View style={{flex:1,backgroundColor:'#0B0D0F',}}>
             <HeaderLeagueContextProvider leagueObject={leagueObject}>
-                <TabTopLeague activeButton={route.params?.active} isAble={true} leagueDraftSettings={leagueDraftSettings}   />
+                <TabTopLeague activeButton={route.params?.active} isAble={true} leagueDraftSettings={leagueDraftSettings} leagueObject={route.params?.leagueObject}   />
 
                 <RoundSelect />
 

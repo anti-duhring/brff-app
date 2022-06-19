@@ -1,16 +1,16 @@
 import { Text, View, StyleSheet, Image, TouchableOpacity } from "react-native";
-import TabTopLeague from '../TabTopLeague'
+import TabTopLeague from '../../components/TabTopLeague'
 import { useState, useEffect, useContext } from "react";
-import { UserDataContext } from "../../../../components/UserDataContext";
-import { HeaderLeagueContextProvider } from "../../../../components/HeaderLeagueContext";
+import { UserDataContext } from "../../components/UserDataContext";
+import { HeaderLeagueContextProvider } from "../../components/HeaderLeagueContext";
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import { Dimensions } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
 import { useNavigation } from "@react-navigation/native";
-import { getColorPosition, getPlayerPoints } from "../../../../functions/GetRoster";
-import { AllPlayersContext } from "../../../../components/AllPlayersContext";
-import { LIGHT_GREEN, LIGHT_BLACK, LIGHT_GRAY, DARK_GRAY, DARKER_GRAY } from '../../../../components/Variables'
+import { getColorPosition, getPlayerPoints } from "../../functions/GetRoster";
+import { AllPlayersContext } from "../../components/AllPlayersContext";
+import { LIGHT_GREEN, LIGHT_BLACK, LIGHT_GRAY, DARK_GRAY, DARKER_GRAY } from '../../components/Variables'
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -261,7 +261,7 @@ const Matchups = ({route}) => {
     }
 
     const Shadow = () => (
-        <Image source={require('../../../../../assets/Images/shadow50.png')} style={styles.shadowStyle} />
+        <Image source={require('../../../assets/Images/shadow50.png')} style={styles.shadowStyle} />
     )
 
     const AvatarField = ({avatar, position}) => {
@@ -281,7 +281,7 @@ const Matchups = ({route}) => {
 
     const MatchupField = () => (
         <View style={styles.matchupField}>
-            <Image source={require('../../../../../assets/Images/field1.png')} style={styles.imageField} />
+            <Image source={require('../../../assets/Images/field1.png')} style={styles.imageField} />
             <AvatarField avatar={opponentData.avatar ? opponentData.avatar : null} position='left' />
             <AvatarField avatar={playerData.avatar ? playerData.avatar : null}
             position='right' />
@@ -347,7 +347,7 @@ const Matchups = ({route}) => {
             <View style={{width:150,height:40,backgroundColor:LIGHT_BLACK,flexDirection:'row',justifyContent:'center',alignContent:'center',alignItems:'center',borderRadius:12,}}>
                 <TouchableOpacity 
                     disabled={(week==1) ? true : false}
-                    onPress={() => navigation.navigate('Matchups',{ active: 'Matchups', week: week - 1})} 
+                    onPress={() => navigation.navigate('Matchups',{ active: 'Matchups', week: week - 1, leagueDraftSettings: leagueDraftSettings, leagueObject:league})} 
                     style={{flex:1,opacity:(week==1) ? 0.2 : 1}}
                 >
                     <Entypo name="chevron-left" style={{textAlign:'center'}} size={24} color="#C6C6C6" />
@@ -355,7 +355,7 @@ const Matchups = ({route}) => {
                 
                 <Text style={{color:LIGHT_GRAY,flex:3,textAlign:'center'}}>Semana {week}</Text>
                 <TouchableOpacity 
-                    onPress={() => navigation.navigate('Matchups',{ active: 'Matchups', week: week + 1, leagueDraftSettings: leagueDraftSettings})} 
+                    onPress={() => navigation.navigate('Matchups',{ active: 'Matchups', week: week + 1, leagueDraftSettings: leagueDraftSettings, leagueObject:league})} 
                     style={{flex:1}}
                 >
                     <Entypo name="chevron-right" style={{textAlign:'center'}} size={24} color="#C6C6C6" />
@@ -414,7 +414,7 @@ const Matchups = ({route}) => {
     return ( 
         <View style={{flex:1,backgroundColor:'#0B0D0F'}}>
             <HeaderLeagueContextProvider leagueObject={league}>
-                <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} />
+                <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} />
                 <WeekSelect />
                 <MatchupField />
                 <SliderBox />

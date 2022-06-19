@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Dimensions, Animated, ImageBackground, StatusBar } from "react-native";
 import { useRef, useState, useEffect } from "react";
 import HeaderImageScrollView, { TriggeringView } from 'react-native-image-header-scroll-view'
-import MusicPlayer from "../../../components/MusicPlayer";
+import MusicPlayer from "../../components/MusicPlayer";
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect } from "@react-navigation/native";
 
@@ -17,7 +17,7 @@ const Episode = ({navigation, route}) => {
     const trackLength = route.params?.trackLength
     let episodeImage = {uri: episode.itunes.image};
 
-    if(episode.itunes.image == 'https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded_nologo400/2234723/2234723-1645583930433-8a8b649a48b9d.jpg') episodeImage = require('../../../../assets/Images/leagueHeader2.png')
+    if(episode.itunes.image == 'https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded_nologo400/2234723/2234723-1645583930433-8a8b649a48b9d.jpg') episodeImage = require('../../../assets/Images/leagueHeader2.png')
 
     const opacity = useRef(new Animated.Value(0)).current;
 
