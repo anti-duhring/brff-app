@@ -11,7 +11,7 @@ const COLOR = LIGHT_GREEN
 const GREEN2 = LIGHT_BLACK //'rgba(0, 206, 78,  .1)'
 const COLORTEXT = DARK_BLACK;
 
-const TabTopLeague = ({activeButton, isAble, leagueDraftSettings, leagueObject}) => {
+const TabTopLeague = ({activeButton, isAble, leagueDraftSettings, leagueObject, leagueUsers}) => {
     const navigation = useNavigation();
     const { week } = useContext(NFLStatusContext)
 
@@ -24,7 +24,8 @@ const TabTopLeague = ({activeButton, isAble, leagueDraftSettings, leagueObject})
                     navigation.navigate('Players',{
                         active: 'Players',
                         leagueObject: leagueObject,
-                         leagueDraftSettings: leagueDraftSettings
+                        leagueDraftSettings: leagueDraftSettings,
+                        leagueUsers: leagueUsers
                     })
                 }}>
                     {(activeButton=='Players'||!activeButton) ? 
@@ -43,7 +44,8 @@ const TabTopLeague = ({activeButton, isAble, leagueDraftSettings, leagueObject})
                         active: 'Matchups', 
                         week: week,
                         leagueObject: leagueObject,
-                        leagueDraftSettings: leagueDraftSettings
+                        leagueDraftSettings: leagueDraftSettings,
+                        leagueUsers: leagueUsers
                     })
                 }}>
                     {(activeButton=='Matchups') ? 
@@ -61,7 +63,8 @@ const TabTopLeague = ({activeButton, isAble, leagueDraftSettings, leagueObject})
                     navigation.navigate('PlayoffBracket',{ 
                         active: 'PlayoffBracket',
                         leagueObject: leagueObject,
-                        leagueDraftSettings: leagueDraftSettings
+                        leagueDraftSettings: leagueDraftSettings,
+                        leagueUsers: leagueUsers
                     })
                 }}>
                     {(activeButton=='PlayoffBracket') ? 
@@ -80,7 +83,8 @@ const TabTopLeague = ({activeButton, isAble, leagueDraftSettings, leagueObject})
                     navigation.navigate('Informations',{ 
                         active: 'Informations',
                         leagueObject: leagueObject,
-                        leagueDraftSettings: leagueDraftSettings
+                        leagueDraftSettings: leagueDraftSettings,
+                        leagueUsers: leagueUsers
                     })
                 }}>
                     {(activeButton=='Informations') ? 
@@ -98,7 +102,8 @@ const TabTopLeague = ({activeButton, isAble, leagueDraftSettings, leagueObject})
                     navigation.navigate('Team',{ 
                         active: 'Team',
                         leagueObject: leagueObject,
-                        leagueDraftSettings: leagueDraftSettings
+                        leagueDraftSettings: leagueDraftSettings,
+                        leagueUsers: leagueUsers
                     })
                 }}>
                 {(activeButton=='Team') ? 

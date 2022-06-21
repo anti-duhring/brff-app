@@ -62,7 +62,7 @@ useEffect(() => {
     return ( 
     <View style={{flex:1,backgroundColor:'#0B0D0F',}}>
       <HeaderLeagueContextProvider leagueObject={leagueObject}>
-      <TabTopLeague activeButton={route.params?.active} isAble={leagueDraftSettings ? true : false} leagueDraftSettings={leagueDraftSettings} leagueObject={leagueObject}  />
+      <TabTopLeague activeButton={route.params?.active} isAble={(leagueDraftSettings && players) ? true : false} leagueUsers={players} leagueDraftSettings={leagueDraftSettings} leagueObject={leagueObject}  />
           {isLoading ?
           <View style={{flex:1,padding:10,}}>
       <SkeletonPlaceholder>

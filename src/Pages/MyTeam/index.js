@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, Image } from "react-native";
 import TabTopLeague from '../../components/TabTopLeague'
 import { HeaderLeagueContextProvider } from "../../components/HeaderLeagueContext";
 import { UserDataContext } from "../../components/UserDataContext";
@@ -6,11 +6,15 @@ import { AllPlayersContext } from "../../components/AllPlayersContext";
 import { useState, useEffect, useContext } from "react";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import { getColorPosition } from "../../functions/GetRoster";
+import ProgressiveImage from "../../components/ProgressiveImage";
+import ViewLightDark from '../../components/ViewLightDark'
+import { DARK_BLACK } from "../../components/Variables";
 
 const MyTeam = ({navigation, route}) => {
     const league = route.params?.leagueObject;
     const leagueID = league.league_id
-    const leagueDraftSettings = route.params?.leagueDraftSettings
+    const leagueDraftSettings = route.params?.leagueDraftSettings;
+    const leagueUsers = route.params?.leagueUsers;
     const roster = league.roster_positions;
     const roster_bench = roster.filter((item) => {
         return item.indexOf('BN') !== -1;
@@ -18,7 +22,7 @@ const MyTeam = ({navigation, route}) => {
     const playerEmpty = {
         index: null,
         name: 'Vazio',
-        player_id: 0,
+        player_id: null,
         position: null,
         points: 0,
         projected_points: 0
@@ -29,7 +33,7 @@ const MyTeam = ({navigation, route}) => {
 
     const [starters, setStarters] = useState(null)
     const [bench, setBench] = useState(null)
-    const [hasPlayers, setHasPlayers] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
 
     const { allPlayers } = useContext(AllPlayersContext)
 
@@ -42,15 +46,20 @@ const MyTeam = ({navigation, route}) => {
         .then(response => response.json())
         .then((data) => {
             data.map((roster, index) => {
-                if(roster.owner_id==userID && roster.players) {
-                    const benchs = roster.players.filter((item) => {
-                        return roster.starters.indexOf(item) === -1;
-                    });
-
-                    setHasPlayers(true)
-
-                    setStarters(getPlayers(roster.starters))
-                    setBench(getPlayers(benchs))
+                if(roster.owner_id==userID) {
+                    if(roster.players) {
+                        const benchs = roster.players.filter((item) => {
+                            return roster.starters.indexOf(item) === -1;
+                        });
+    
+                        setStarters(getPlayers(roster.starters))
+                        setBench(getPlayers(benchs))
+                        
+                    } else {
+                        setStarters(null)
+                        setBench(null)
+                    }
+                    setIsLoading(false);
                 }
             })
         }).catch((e) => {
@@ -62,18 +71,21 @@ const MyTeam = ({navigation, route}) => {
 
     const getPlayers = (_players) => {
         let players = [];
+
         _players.map((player, index) => {
             if(player!=0) {
                 players.push({
                     name: allPlayers[player].full_name,
                     position: allPlayers[player].fantasy_positions[0],
+                    player_id: player,
                     index: index
                 })
             } else{
                 players.push({
                     name: 'Empty',
                     position: 'Empty',
-                    index: index
+                    index: index,
+                    player_id: 0,
                 })
             }
         })
@@ -85,11 +97,13 @@ const MyTeam = ({navigation, route}) => {
         getRoster()
     },[])
 
-    const Player = ({position, name}) => (
+    const Player = ({position, name, player}) => (
         <View style={styles.playerContainer}>
             <View style={styles.positionLegend}>
-                <Text style={[styles.playerPosition,{color:getColorPosition(position)}]}>{position.replace(/_/g,' ')}</Text></View>
+                <Text style={[styles.playerPosition,{color:getColorPosition(position)}]}>{position.replace(/_/g,' ')}</Text>
+            </View>
             <View style={styles.playerNameContainer}>
+                <ProgressiveImage style={styles.imagePlayer} uri={`https://sleepercdn.com/content/nfl/players/thumb/${player.player_id}.jpg`} resizeMode='contain'/>
                 <Text style={styles.playerName}>{name}</Text>
             </View>
         </View>
@@ -100,6 +114,7 @@ const MyTeam = ({navigation, route}) => {
         <View style={styles.positionLegend}>
             <Text style={[styles.playerPosition,{color:getColorPosition(position)}]}>{position.replace(/_/g,' ')}</Text></View>
         <View style={styles.playerNameContainer}>
+            <Image source={require('../../../assets/Images/player_default.png')} style={styles.imagePlayer} resizeMode='contain' />
             <SkeletonPlaceholder highlightColor="#303840" backgroundColor="#262D33">
                 <View style={{ width: 100, height: 20, borderRadius: 4 }} />
             </SkeletonPlaceholder>
@@ -107,74 +122,60 @@ const MyTeam = ({navigation, route}) => {
     </View>
     )
 
-    if(!hasPlayers) {
+    if(isLoading) {
         return (
             <HeaderLeagueContextProvider leagueObject={league}>
             <TabTopLeague leagueDraftSettings={leagueDraftSettings} isAble={true} activeButton={route.params?.active} leagueObject={league} />
 
-                <View
-                    style={styles.boxContainer}
-                >
-                    <View style={styles.informationContent}>
-                        <Text style={styles.title}>Titulares</Text>
-                    </View>
-                    {roster.map((position, index) => {     
+            <ViewLightDark title='Titulares'>
+                {roster.map((position, index) => {     
                             if(position=='BN') return
                             return (
-                                <Player key={index} name={'Vazio'} position={position} />
+                                <PlayerPlaceholder key={index} position={position} />
                             )
                         })}
-                </View>
+                </ViewLightDark>
+                <ViewLightDark title='Banco'>
+                {roster.map((position, index) => {     
+                            if(position!='BN') return
+                            return (
+                                <PlayerPlaceholder key={index} position={position} />
+                            )
+                        })}
+                </ViewLightDark>
             </HeaderLeagueContextProvider>
         )
     }
 
     return ( 
         <HeaderLeagueContextProvider leagueObject={league}>
-            <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} />
+            <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueUsers={leagueUsers} />
 
-                <View style={styles.boxContainer}
-                >
-
-                    <View style={styles.informationContent}>
-                        <Text style={styles.title}>Titulares</Text>
-                    </View>
-                        {!starters ? 
-                        roster.map((position, index) => {     
-                            if(position=='BN') return
-                            return (
-                                <PlayerPlaceholder key={index} position={position} />
-                            )
-                        }) 
-                            : 
+                <ViewLightDark title='Titulares'>
+                {
                         roster.map((position, index) => {
                             if(position=='BN') return
+                            let player;
 
-                            const player = starters[index] || playerEmpty;
+                            (starters && starters[index]) ? player = starters[index] : player = playerEmpty
 
                             return (
-                                <Player key={index} position={position} name={player.name} />
+                                <Player key={index} position={position} player={player} name={player.name} />
                             )
                         })}
-                    
-                    <View style={styles.informationContent}>
-                        <Text style={styles.title}>Banco</Text>
-                    </View>
-                    {!bench ? 
-                        roster_bench.map((position, index) => {     
-                            
-                            return (
-                                <PlayerPlaceholder key={index} position={position} />
-                            )
-                        }) 
-                            : 
-                        roster_bench.map((position, index) => {
-                            const player = bench[index] || playerEmpty;
-                            return (
-                                <Player key={index} position={position} name={player.name} />
-                            )
-                        })}
-                </View>
+                </ViewLightDark>
+                <ViewLightDark title='Banco'>
+                {
+                    roster_bench.map((position, index) => {
+                        let player;
+
+                            (bench && bench[index]) ? player = bench[index] : player = playerEmpty
+                        return (
+                            <Player key={index} position={position} name={player.name} player={player} />
+                        )
+                    })
+                }
+                </ViewLightDark>
         </HeaderLeagueContextProvider> 
     );
 }
@@ -204,7 +205,7 @@ const styles = StyleSheet.create({
         paddingTop:0,
     },
     positionLegend: {
-        width:50,
+        width:60,
         paddingTop:5,
         paddingBottom:5,
         borderRadius:5,
@@ -223,7 +224,8 @@ const styles = StyleSheet.create({
     },
     playerContainer: {
         flexDirection:'row',
-        paddingVertical:10
+        paddingVertical:10,
+        alignItems:'center'
     },
     playerPosition: {
         textAlign:'center', 
@@ -231,9 +233,18 @@ const styles = StyleSheet.create({
     },
     playerNameContainer: {
         justifyContent:'center',
-        paddingLeft:10
+        paddingLeft:10,
+        flexDirection:'row',
+        alignItems:'center'
     },
     playerName: {
         color:'white'
+    },
+    imagePlayer: {
+        width: 40,
+        height: 40,
+        borderRadius:20,
+        backgroundColor: DARK_BLACK,
+        marginRight: 10,
     }
 })

@@ -62,16 +62,16 @@ const TrendingPlayers = ({navigation}) => {
 
   const Player = ({id, avatar, player, type}) => (
     <View style={styles.playerContainer}>
-    <ProgressiveImage style={styles.imagePlayer} uri={avatar} resizeMode='contain'/>
-    <View style={styles.playerNameContainer}>
-      <Text style={styles.playerName}>{allPlayers[id].full_name}</Text>
-      <Text style={styles.playerPosition}>{allPlayers[id].position} - {(allPlayers[id].team) ? allPlayers[id].team : 'Free Agent'}</Text>
+      <ProgressiveImage style={styles.imagePlayer} uri={avatar} resizeMode='contain'/>
+      <View style={styles.playerNameContainer}>
+        <Text style={styles.playerName}>{allPlayers[id].full_name}</Text>
+        <Text style={styles.playerPosition}>{allPlayers[id].position} - {(allPlayers[id].team) ? allPlayers[id].team : 'Free Agent'}</Text>
+      </View>
+      <View style={styles.playerCountContainer}>
+        {(type=='add') ? <Feather name="trending-up" size={20} color={LIGHT_GREEN} /> : <Feather name="trending-down" size={20} color='#FF0E00' />}
+        <Text style={(type=='add') ? styles.playerCountAdd : styles.playerCountDrop}>{player.count}</Text>
+      </View>
     </View>
-    <View style={styles.playerCountContainer}>
-      {(type=='add') ? <Feather name="trending-up" size={20} color={LIGHT_GREEN} /> : <Feather name="trending-down" size={20} color='#FF0E00' />}
-      <Text style={(type=='add') ? styles.playerCountAdd : styles.playerCountDrop}>{player.count}</Text>
-    </View>
-  </View>
   )
   
 

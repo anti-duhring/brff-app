@@ -7,5 +7,6 @@ export const LIGHT_GRAY = '#C6C6C6';
 export const DARKER_GRAY = '#656668';
 export const DARK_GRAY = '#949494';
 export const WHITE = '#FCFCFC';
+export const HEADER_BUTTON_BG = 'rgba(0, 0, 0, 0.5)';
 
 export const BORDER_RADIUS = 12;

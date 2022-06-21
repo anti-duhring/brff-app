@@ -4,6 +4,7 @@ import HeaderImageScrollView, { TriggeringView } from 'react-native-image-header
 import MusicPlayer from "../../components/MusicPlayer";
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect } from "@react-navigation/native";
+import ViewLightDark from "../../components/ViewLightDark";
 
 const MAX_HEIGHT = 200;
 const MIN_HEIGHT = 55;
@@ -86,12 +87,11 @@ const Episode = ({navigation, route}) => {
                         </Text>
                     </LinearGradient>
                     <View style={[styles.section, styles.sectionLarge]}>
-                        <View>
-                            <Text style={styles.sectionText}>{episodeDescription}</Text>
-                        </View>
+                        <ViewLightDark containerStyle={{margin:0}}>
+                            <Text style={styles.sectionText}>{episodeDescription.replace(/(<([^>]+)>)/ig,'').replace(/&nbsp;/ig,'')}</Text>
+                        </ViewLightDark>
                         <View>
                             <Text style={styles.sectionInfo}>Publicado em: {episode.published}</Text>
-                        <Text style={styles.sectionInfo}>{episode.id}</Text>
                         </View>
                     </View>
                     </View>

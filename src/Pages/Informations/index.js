@@ -64,6 +64,7 @@ const Informations = ({navigation, route}) => {
                     .replace(/\brush_td\b/g,'{ATK}$6%TD corrido')
                     .replace(/\bfum\b/g,'{ATK}$15%Fumble')
                     .replace(/\bst_ff\b/g,'{ST}$15%Fumble forçado')
+                    .replace(/\bbonus_rec_te\b/g,'{ATK}Bônus recepção de TE')
          return [str, keyArray[1]]
     }
     /*objectToArray(scoringLeague).forEach((setting) => {

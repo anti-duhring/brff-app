@@ -7,6 +7,7 @@ import EpisodeList from '../../Pages/EpisodeList';
 import { Entypo } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { Easing } from 'react-native-reanimated'; 
+import { HEADER_BUTTON_BG } from '../../components/Variables';
 
 const Stack = createStackNavigator()
 
@@ -78,7 +79,7 @@ Ouça você também! ${episodeLink}`
               </TouchableOpacity>
             ),
             headerRight: () => (
-              <TouchableOpacity style={{marginRight:10,}} onPress={() => {
+              <TouchableOpacity style={[styles.barButtons,{marginRight:10,paddingRight:4}]} onPress={() => {
                 onShare(route.params?.episodeName, route.params?.episodeObject.links[0].url)
               }}>
                 <Entypo name="share" size={24} color="white" />
@@ -98,5 +99,13 @@ const styles = StyleSheet.create({
     },
     toggleButton: {
       marginLeft: 10,
+    },
+    barButtons: {
+      backgroundColor:HEADER_BUTTON_BG,
+      borderRadius: 24,
+      width:35,
+      height:35,
+      justifyContent:'center',
+      alignItems:'center'
     }
   })

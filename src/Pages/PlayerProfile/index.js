@@ -1,13 +1,12 @@
-import { View, Text, Image, Dimensions, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Image } from "react-native";
 import { useEffect, useState, useContext } from "react";
 import PlayerProfileHeader from "../../components/PlayerProfileHeader";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import { AllPlayersContext } from "../../components/AllPlayersContext";
 import { getColorPosition } from "../../functions/GetRoster";
-
-const MAX_HEIGHT = 200;
-const MIN_HEIGHT = 55;
-const WIDTH = Dimensions.get('window').width;
+import ViewLightDark from "../../components/ViewLightDark";
+import { DARK_BLACK } from "../../components/Variables";
+import ProgressiveImage from "../../components/ProgressiveImage";
 
 const PlayerProfile = ({navigation, route}) => {
     const player = route.params?.playerObject;
@@ -15,12 +14,23 @@ const PlayerProfile = ({navigation, route}) => {
     const userID = player.user_id;
     const name = player.display_name;
 
-    const roster = route.params?.roster
+    const roster = route.params?.roster;
+    const roster_bench = roster.filter((item) => {
+        return item.indexOf('BN') !== -1;
+    });
+    const playerEmpty = {
+        index: null,
+        name: 'Vazio',
+        player_id: null,
+        position: null,
+        points: 0,
+        projected_points: 0
+    }
     const [rosterData, setRosterData] = useState(null)
     const [starters, setStarters] = useState(null)
     const [bench, setBench] = useState(null)
     const [userInfos, setUserInfos] = useState(null)
-    const [hasPlayers, setHasPlayers] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
 
     const { allPlayers } = useContext(AllPlayersContext)
 
@@ -33,17 +43,23 @@ const PlayerProfile = ({navigation, route}) => {
         .then(response => response.json())
         .then((data) => {
             data.map((roster, index) => {
-                if(roster.owner_id==userID && roster.players) {
-                    const benchs = roster.players.filter((item) => {
-                        return roster.starters.indexOf(item) === -1;
-                    });
-
-                    setHasPlayers(true)
+                if(roster.owner_id==userID) {
+                    if(roster.players) {
+                        const benchs = roster.players.filter((item) => {
+                            return roster.starters.indexOf(item) === -1;
+                        });
+    
+                        setStarters(getPlayers(roster.starters))
+                        setBench(getPlayers(benchs))
+                        
+                    } else {
+                        setStarters(null)
+                        setBench(null)
+                    }
                     setRosterData(roster)
                     setUserInfos(roster.settings)
 
-                    setStarters(getPlayers(roster.starters))
-                    setBench(getPlayers(benchs))
+                    setIsLoading(false);
                 }
             })
         }).catch((e) => {
@@ -60,12 +76,14 @@ const PlayerProfile = ({navigation, route}) => {
                 players.push({
                     name: allPlayers[player].full_name,
                     position: allPlayers[player].fantasy_positions[0],
+                    player_id: player,
                     index: index
                 })
             } else{
                 players.push({
-                    name: 'Empty',
-                    position: 'Empty',
+                    name: 'Vazio',
+                    position: 'Vazio',
+                    player_id: null,
                     index: index
                 })
             }
@@ -105,27 +123,26 @@ const PlayerProfile = ({navigation, route}) => {
         getRoster()
     },[])
 
-    const ViewPlayer = ({position, isEmpty, playerName}) => (
-        <View style={{flexDirection:'row',paddingVertical:10}}>
+    const Player = ({position, name, player}) => (
+        <View style={styles.playerContainer}>
             <View style={styles.positionLegend}>
-                <Text style={{color:getColorPosition(position),textAlign:'center', fontWeight:'bold'}}>{position.replace(/_/g,' ')}</Text>
+                <Text style={[styles.playerPosition,{color:getColorPosition(position)}]}>{position.replace(/_/g,' ')}</Text>
             </View>
-            <View style={{justifyContent:'center', paddingLeft:10}}>
-                <Text style={{color:'white'}}>{isEmpty ? 'Empty' : playerName}</Text>
+            <View style={styles.playerNameContainer}>
+                <ProgressiveImage style={styles.imagePlayer} uri={`https://sleepercdn.com/content/nfl/players/thumb/${player.player_id}.jpg`} resizeMode='contain'/>
+                <Text style={styles.playerName}>{name}</Text>
             </View>
         </View>
     )
 
-    const ViewPlayerPlaceholder = ({ position}) => (
-        <View style={{flexDirection:'row',paddingVertical:10}}>
+    const PlayerPlaceholder = ({position}) => (
+        <View style={styles.playerContainer}>
         <View style={styles.positionLegend}>
-            <Text style={{color:getColorPosition(position),textAlign:'center', fontWeight:'bold'}}>
-                {position.replace(/_/g,' ')}
-            </Text>
-        </View>
-        <View style={{justifyContent:'center', paddingLeft:10}}>
+            <Text style={[styles.playerPosition,{color:getColorPosition(position)}]}>{position.replace(/_/g,' ')}</Text></View>
+        <View style={styles.playerNameContainer}>
+            <Image source={require('../../../assets/Images/player_default.png')} style={styles.imagePlayer} resizeMode='contain' />
             <SkeletonPlaceholder highlightColor="#303840" backgroundColor="#262D33">
-                    <View style={{ width: 100, height: 20, borderRadius: 4 }} />
+                <View style={{ width: 100, height: 20, borderRadius: 4 }} />
             </SkeletonPlaceholder>
         </View>
     </View>
@@ -185,21 +202,26 @@ const PlayerProfile = ({navigation, route}) => {
         </View>
     )
 
-    if(!hasPlayers) {
+    if(isLoading) {
         return (
             <PlayerProfileHeader playerObject={player}>
                 <InformationPlayer />
-                <View style={styles.boxContainer}>
-                    <View style={styles.informationContent}>
-                        <Text style={styles.title}>Titulares</Text>
-                    </View>
-                    {roster.map((position, index) => {     
+                <ViewLightDark title='Titulares'>
+                {roster.map((position, index) => {     
                             if(position=='BN') return
                             return (
-                                <ViewPlayer key={index} position={position} isEmpty={true} />
+                                <PlayerPlaceholder key={index} position={position} />
                             )
                         })}
-                </View>
+                </ViewLightDark>
+                <ViewLightDark title='Banco'>
+                {roster.map((position, index) => {     
+                            if(position!='BN') return
+                            return (
+                                <PlayerPlaceholder key={index} position={position} />
+                            )
+                        })}
+                </ViewLightDark>
                 </PlayerProfileHeader>
         )
     }
@@ -208,42 +230,31 @@ const PlayerProfile = ({navigation, route}) => {
         <PlayerProfileHeader playerObject={player}>
             <View>
             <InformationPlayer />
-            <View style={styles.boxContainer}>
-                    <View style={styles.informationContent}>
-                        <Text style={styles.title}>Titulares</Text>
-                    </View>
-                        {!starters ? 
-                        roster.map((position, index) => {     
-                            if(position=='BN') return
-                            return (
-                                <ViewPlayerPlaceholder key={index} position={position} />
-                            )
-                        }) 
-                            : 
+            <ViewLightDark title='Titulares'>
+                {
                         roster.map((position, index) => {
                             if(position=='BN') return
+                            let player;
+
+                            (starters && starters[index]) ? player = starters[index] : player = playerEmpty
+
                             return (
-                                <ViewPlayer key={index} position={position} isEmpty={false} playerName={starters[index].name} />
+                                <Player key={index} position={position} player={player} name={player.name} />
                             )
                         })}
-                    
-                    <View style={styles.informationContent}>
-                        <Text style={styles.title}>Banco</Text>
-                    </View>
-                    {!bench ? 
-                        roster.map((position, index) => {     
-                            if(position!='BN') return
-                            return (
-                                <ViewPlayerPlaceholder key={index} position={position} />
-                            )
-                        }) 
-                            : 
-                        bench.map((position, index) => {
-                            return (
-                                <ViewPlayer key={index} position={'BN'} isEmpty={false} playerName={bench[index].name} />
-                            )
-                        })}
-                </View>
+                </ViewLightDark>
+                <ViewLightDark title='Banco'>
+                {
+                    roster_bench.map((position, index) => {
+                        let player;
+
+                            (bench && bench[index]) ? player = bench[index] : player = playerEmpty
+                        return (
+                            <Player key={index} position={position} name={player.name} player={player} />
+                        )
+                    })
+                }
+                </ViewLightDark>
             </View>
         </PlayerProfileHeader>
     )
@@ -257,7 +268,7 @@ const styles = StyleSheet.create({
         paddingTop:0,
     },
     positionLegend: {
-        width:50,
+        width:60,
         paddingTop:5,
         paddingBottom:5,
         borderRadius:5,
@@ -303,5 +314,30 @@ const styles = StyleSheet.create({
     informationView: {
         flexDirection:'row',
         paddingVertical:10
+    },
+    playerContainer: {
+        flexDirection:'row',
+        paddingVertical:10,
+        alignItems:'center'
+    },
+    playerPosition: {
+        textAlign:'center', 
+        fontWeight:'bold'
+    },
+    playerNameContainer: {
+        justifyContent:'center',
+        paddingLeft:10,
+        flexDirection:'row',
+        alignItems:'center'
+    },
+    playerName: {
+        color:'white'
+    },
+    imagePlayer: {
+        width: 40,
+        height: 40,
+        borderRadius:20,
+        backgroundColor: DARK_BLACK,
+        marginRight: 10,
     }
 })

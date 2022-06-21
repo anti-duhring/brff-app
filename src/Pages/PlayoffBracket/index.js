@@ -6,16 +6,19 @@ import ViewLightDark from "../../components/ViewLightDark";
 import { Entypo } from '@expo/vector-icons';
 import { DARK_BLACK, DARK_GRAY, DARK_GREEN, LIGHT_BLACK, LIGHT_GRAY, LIGHT_GREEN, WHITE } from "../../components/Variables";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { FontAwesome5 } from '@expo/vector-icons';
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 
 const PlayoffBracket = ({route}) => {
     const leagueId = route.params?.leagueObject.league_id;
     const leagueObject = route.params?.leagueObject;
     const leagueDraftSettings = route.params?.leagueDraftSettings;
+    const leagueUsers = route.params?.leagueUsers;
 
     const [playoffData, setPlayoffData] = useState(null);
+    const [toiletBowlData, setToiletBowlData] = useState(null);
     const [leagueRostersData, setLeagueRostersData] = useState(null);
-    const [leagueUsersData, setLeagueUsersData] = useState(null)
+    const [leagueUsersData, setLeagueUsersData] = useState(leagueUsers)
     const [round, setRound] = useState(1);
     class PlayerNull {
         constructor(name) {
@@ -61,13 +64,13 @@ const PlayoffBracket = ({route}) => {
         return playerInfo
     }
 
-    const getPlayoffBracket = async() => {
-        const URL = `https://api.sleeper.app/v1/league/${leagueId}/winners_bracket`;
+    const getPlayoffBracket = async(_type) => {
+        const URL = (_type=='winners') ? `https://api.sleeper.app/v1/league/${leagueId}/winners_bracket` : `https://api.sleeper.app/v1/league/${leagueId}/losers_bracket`;
 
         fetch(URL)
         .then(response => response.json())
         .then(data => {
-            setPlayoffData(data)
+            (_type=='winners') ? setPlayoffData(data) : setToiletBowlData(data);
         })
     }
 
@@ -81,15 +84,6 @@ const PlayoffBracket = ({route}) => {
         })
     }
 
-    const getLeagueUsersData = async() => {
-        const URL = `https://api.sleeper.app/v1/league/${leagueId}/users`;
-        
-        fetch(URL)
-        .then(response => response.json())
-        .then(data => {
-            setLeagueUsersData(data);
-        })
-    }
 
     const RoundSelect = () => (
         <ViewLightDark style={styles.roundSelect} containerStyle={styles.roundSelectContainer}>
@@ -152,10 +146,11 @@ const PlayoffBracket = ({route}) => {
 
     const Matchup = (props) => {
         return (
-            <ViewLightDark style={{flexDirection:'row'}} title={`Matchup ${props.matchup.m}`} titleAlign='center'>
+            <ViewLightDark style={{flexDirection:'row'}} title={(props.type=='winners') ? `Matchup ${props.matchup.m}` : `Toilet Bowl - Matchup ${props.matchup.m}`} titleAlign='center'>
                     <PlayerMatchup player={props.player1} position='left' winner={(props.matchup.w == props.player1.rosterID) ? true : false} />
                     <View style={styles.matchupVsContainer}>
-                        <MaterialCommunityIcons name="sword-cross" size={35} color={LIGHT_GREEN} />
+                        {(props.type=='winners') ?
+                        <MaterialCommunityIcons name="sword-cross" size={35} color={LIGHT_GREEN} /> : <FontAwesome5 name="toilet" size={35} color={LIGHT_GREEN} />}
                     </View>
                     <PlayerMatchup player={props.player2} position='right' winner={(props.matchup.w == props.player2.rosterID) ? true : false} />
             </ViewLightDark>
@@ -219,14 +214,15 @@ const PlayoffBracket = ({route}) => {
 
     useEffect(() => {
         getLeagueRostersData();
-        getLeagueUsersData();
-        getPlayoffBracket();
+        //getLeagueUsersData();
+        getPlayoffBracket('winners');
+        getPlayoffBracket('losers');
     },[])
 
     return ( 
         <View style={{flex:1,backgroundColor:'#0B0D0F',}}>
             <HeaderLeagueContextProvider leagueObject={leagueObject}>
-                <TabTopLeague activeButton={route.params?.active} isAble={true} leagueDraftSettings={leagueDraftSettings} leagueObject={route.params?.leagueObject}   />
+                <TabTopLeague activeButton={route.params?.active} isAble={true} leagueDraftSettings={leagueDraftSettings} leagueObject={route.params?.leagueObject} leagueUsers={leagueUsers}  />
 
                 <RoundSelect />
 
@@ -258,7 +254,44 @@ const PlayoffBracket = ({route}) => {
                         }
                         
                             return (
-                                <Matchup matchup={matchup} player1={player1} player2={player2} key={index} />
+                                <Matchup type='winners' matchup={matchup} player1={player1} player2={player2} key={index} />
+                            )
+                        
+                    }) : 
+                    <>
+                        <MatchupPlaceholder />
+                        <MatchupPlaceholder />
+                    </>}
+                </View>
+                <View>
+                    {(leagueRostersData && leagueUsersData && toiletBowlData) ?
+                    
+                    
+                    toiletBowlData.map((matchup, index) => {
+                        if(matchup.r != round) return
+
+                        let player1;
+                        let player2;
+
+                        if(matchup.t1) {
+                            player1 = new Player(matchup.t1);
+                        } else if(!matchup.t1 && matchup.t1_from) {
+                            player1 = new PlayerNull((matchup.t1_from.w) ? `Vencedor do matchup ${matchup.t1_from.w}` : `Perdedor do matchup ${matchup.t1_from.l}`)
+
+                        } else {
+                            player1 = new PlayerNull('Vaga em aberto');
+                        }
+
+                        if(matchup.t2) {
+                            player2 = new Player(matchup.t2);
+                        } else if(!matchup.t2 && matchup.t2_from) {
+                            player2 = new PlayerNull((matchup.t2_from.w) ? `Vencedor do matchup ${matchup.t2_from.w}` : `Perdedor do matchup ${matchup.t2_from.l}`)
+                        } else {
+                            player2 = new PlayerNull('Vaga em aberto');
+                        }
+                        
+                            return (
+                                <Matchup type='losers' matchup={matchup} player1={player1} player2={player2} key={index} />
                             )
                         
                     }) : 

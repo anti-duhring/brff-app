@@ -25,12 +25,12 @@ const styles = StyleSheet.create({
         backgroundColor: LIGHT_BLACK,
     },
     title: {
-        fontSize:17,
+        fontSize:19,
         fontWeight:'bold',
         color:WHITE,
         flex:1
     }, 
     titleContainer: {
-        marginBottom:10,
+        marginBottom:0,
     }
 })

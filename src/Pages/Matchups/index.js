@@ -19,6 +19,7 @@ const Matchups = ({route}) => {
     const leagueID = league.league_id
     const leagueScoringSettings = league.scoring_settings;
     const leagueDraftSettings = route.params?.leagueDraftSettings;
+    const leagueUsers = route.params?.leagueUsers;
     const scoring_type = leagueDraftSettings[0].metadata.scoring_type;
     const roster = league.roster_positions;
     const roster_bench = roster.filter((item) => {
@@ -234,8 +235,26 @@ const Matchups = ({route}) => {
         })
     }
 
-    const getPlayersData = async(_league_id, _player_id, _opponent_id) => {
-        const URL = `https://api.sleeper.app/v1/league/${_league_id}/users`
+    const getPlayersData = (_league_id, _player_id, _opponent_id) => {
+        leagueUsers.map(player => {
+            if(player.user_id == _player_id) {
+                setPlayerData({
+                    ...playerData, 
+                    displayName: player.display_name,
+                    avatar: player.avatar,
+                    teamData: player.metadata
+                })
+            }
+            else if(player.user_id == _opponent_id) {
+                setOpponentData({
+                    ...opponentData, 
+                    displayName: player.display_name,
+                    avatar: player.avatar,
+                    teamData: player.metadata
+                })
+            }
+        })
+        /*const URL = `https://api.sleeper.app/v1/league/${_league_id}/users`
         fetch(URL)
         .then(response => response.json())
         .then(data => {
@@ -257,7 +276,7 @@ const Matchups = ({route}) => {
                     })
                 }
             })
-        })
+        })*/
     }
 
     const Shadow = () => (
@@ -414,7 +433,7 @@ const Matchups = ({route}) => {
     return ( 
         <View style={{flex:1,backgroundColor:'#0B0D0F'}}>
             <HeaderLeagueContextProvider leagueObject={league}>
-                <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} />
+                <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueUsers={leagueUsers} />
                 <WeekSelect />
                 <MatchupField />
                 <SliderBox />

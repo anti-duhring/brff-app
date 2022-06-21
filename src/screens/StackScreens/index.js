@@ -12,6 +12,7 @@ import PlayoffBracket from '../../Pages/PlayoffBracket';
 import { Entypo } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { Easing } from 'react-native-reanimated'; 
+import { HEADER_BUTTON_BG } from '../../components/Variables';
 
 const Stack = createStackNavigator()
 
@@ -41,7 +42,7 @@ const StackScreens = ({navigation,route}) => {
     return ( 
         <Stack.Navigator initialRouteName='LeagueList' screenOptions={{
             animation:'slide_from_bottom',
-            presentation:'card'
+            presentation:'card',
           }}>
   
             <Stack.Screen name="LeagueList"  options={{ 
@@ -59,7 +60,7 @@ const StackScreens = ({navigation,route}) => {
             title:null,
             headerTransparent: true,
             headerLeft: () => (
-              <TouchableOpacity style={[styles.barButtons,{marginLeft:10, marginTop:-30}]} onPress={() => navigation.navigate('LeagueList')}>
+              <TouchableOpacity style={[styles.barButtons,{marginLeft:10}]} onPress={() => navigation.goBack()}>
                 <Ionicons name="close" size={24} color="white" />
               </TouchableOpacity>
             )}} component={PlayerProfile} />
@@ -68,7 +69,7 @@ const StackScreens = ({navigation,route}) => {
             title: '',//route.params?.leagueName,
             headerTransparent: true,
             headerLeft: () => (
-              <TouchableOpacity style={[styles.barButtons,{marginLeft:10, marginTop:-30}]} onPress={() => navigation.navigate('LeagueList')}>
+              <TouchableOpacity style={[styles.barButtons,{marginLeft:10}]} onPress={() => navigation.goBack()}>
                 <Ionicons name="arrow-back" size={24} color="white" />
               </TouchableOpacity>
             ),
@@ -78,7 +79,7 @@ const StackScreens = ({navigation,route}) => {
             title: '',//route.params?.leagueName,
             headerTransparent: true,
             headerLeft: () => (
-              <TouchableOpacity style={[styles.barButtons,{marginLeft:10, marginTop:-30}]} onPress={() => navigation.navigate('LeagueList')}>
+              <TouchableOpacity style={[styles.barButtons,{marginLeft:10}]} onPress={() => navigation.navigate('LeagueList')}>
                 <Ionicons name="arrow-back" size={24} color="white" />
               </TouchableOpacity>
             ),
@@ -88,7 +89,7 @@ const StackScreens = ({navigation,route}) => {
             title: '',//route.params?.leagueName,
             headerTransparent: true,
             headerLeft: () => (
-              <TouchableOpacity style={[styles.barButtons,{marginLeft:10, marginTop:-30}]} onPress={() => navigation.navigate('LeagueList')}>
+              <TouchableOpacity style={[styles.barButtons,{marginLeft:10}]} onPress={() => navigation.navigate('LeagueList')}>
                 <Ionicons name="arrow-back" size={24} color="white" />
               </TouchableOpacity>
             ),
@@ -98,7 +99,7 @@ const StackScreens = ({navigation,route}) => {
             title: '',//route.params?.leagueName,
             headerTransparent: true,
             headerLeft: () => (
-              <TouchableOpacity style={[styles.barButtons,{marginLeft:10, marginTop:-30}]} onPress={() => navigation.navigate('LeagueList')}>
+              <TouchableOpacity style={[styles.barButtons,{marginLeft:10}]} onPress={() => navigation.navigate('LeagueList')}>
                 <Ionicons name="arrow-back" size={24} color="white" />
               </TouchableOpacity>
             ),
@@ -108,7 +109,7 @@ const StackScreens = ({navigation,route}) => {
             title: '',//route.params?.leagueName,
             headerTransparent: true,
             headerLeft: () => (
-              <TouchableOpacity style={[styles.barButtons,{marginLeft:10, marginTop:-30}]} onPress={() => navigation.navigate('LeagueList')}>
+              <TouchableOpacity style={[styles.barButtons,{marginLeft:10}]} onPress={() => navigation.navigate('LeagueList')}>
                 <Ionicons name="arrow-back" size={24} color="white" />
               </TouchableOpacity>
             ),
@@ -126,5 +127,13 @@ const styles = StyleSheet.create({
     },
     toggleButton: {
       marginLeft: 10,
+    },
+    barButtons: {
+      backgroundColor:HEADER_BUTTON_BG,
+      borderRadius: 24,
+      width:35,
+      height:35,
+      justifyContent:'center',
+      alignItems:'center'
     }
   })

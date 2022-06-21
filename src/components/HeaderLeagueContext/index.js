@@ -1,6 +1,7 @@
 import { createContext, useRef } from "react"
 import HeaderImageScrollView, { TriggeringView } from 'react-native-image-header-scroll-view';
 import { View, StatusBar, Text, Image, Animated, StyleSheet } from "react-native";
+import { DARK_BLACK, DARK_GREEN } from "../Variables";
 
 export const HeaderLeagueContext = createContext();
 
@@ -26,13 +27,18 @@ export const HeaderLeagueContextProvider = ({children, leagueObject}) => {
 
     if(leagueObject.avatar==null) avatar = `https://brffootball.com.br/wp-content/uploads/2022/02/cropped-logo.png`
     
+    /*        <StatusBar
+          animated={true}
+          backgroundColor="transparent"
+          translucent={true}
+          barStyle="light-content"
+         />*/
 
     return(
         <HeaderLeagueContext.Provider value={{avatar}}>
         <StatusBar
           animated={true}
-          backgroundColor="transparent"
-          translucent={true}
+          backgroundColor={DARK_GREEN}
           barStyle="light-content"
          />
         <HeaderImageScrollView

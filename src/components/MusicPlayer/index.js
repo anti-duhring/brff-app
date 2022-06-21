@@ -6,6 +6,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import MultiSlider from "@ptomasroos/react-native-multi-slider";
 import { PlayerContext } from "../PlayerContext";
+import { HEADER_BUTTON_BG } from "../Variables";
 
 const WIDTH = Dimensions.get('window').width;
 
@@ -132,7 +133,7 @@ export default MusicPlayer;
 
 const styles = StyleSheet.create({
     playerButton: {
-        backgroundColor:'rgba(0, 0, 0, 0.5)',
+        backgroundColor:HEADER_BUTTON_BG,
         width:50,
         height:50,
         alignItems:'center',
