@@ -1,16 +1,19 @@
-import { Text, View, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { Text, View, StyleSheet, Image, TouchableOpacity, StatusBar } from "react-native";
 import TabTopLeague from '../../components/TabTopLeague'
 import { useState, useEffect, useContext } from "react";
 import { UserDataContext } from "../../components/UserDataContext";
 import { HeaderLeagueContextProvider } from "../../components/HeaderLeagueContext";
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+import Tooltip from 'react-native-walkthrough-tooltip'
 import { Dimensions } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
-import { useNavigation } from "@react-navigation/native";
+import { AntDesign } from '@expo/vector-icons';
 import { getColorPosition, getPlayerPoints } from "../../functions/GetRoster";
 import { AllPlayersContext } from "../../components/AllPlayersContext";
-import { LIGHT_GREEN, LIGHT_BLACK, LIGHT_GRAY, DARK_GRAY, DARKER_GRAY } from '../../components/Variables'
+import { LIGHT_GREEN, LIGHT_BLACK, LIGHT_GRAY, DARK_GRAY, DARKER_GRAY, WHITE, DARK_BLACK } from '../../components/Variables'
+import ViewLightDark from '../../components/ViewLightDark';
+import changeNavigationBarColor from "react-native-navigation-bar-color";
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -29,9 +32,9 @@ const Matchups = ({route}) => {
     const { userData } = useContext(UserDataContext)
     const userID = userData.user_id;
     const [allProjectedPoints, setAllProjectedPoints] = useState(null);
-
-    const navigation = useNavigation();
-    let week = route.params?.week;
+    const [leagueRosters, setLeagueRosters] = useState(null);
+    const [hasMatchup, setHasMatchup] = useState(true);
+    const [week, setWeek] = useState((route.params?.week<=0) ? 1 : route.params?.week);
 
     // Player
     const [playerData, setPlayerData] = useState({})
@@ -39,6 +42,7 @@ const Matchups = ({route}) => {
     const [bench, setBench] = useState(null)
     const [playersPoints, setPlayersPoints] = useState(null)
     const [totalPoints, setTotalPoints] = useState(null)
+    const [playerRosterID, setPlayerRosterID] = useState(null)
     const playerEmpty = {
         index: null,
         name: 'Vazio',
@@ -54,15 +58,19 @@ const Matchups = ({route}) => {
     const [opponentBench, setOpponentBench] = useState(null)
     const [opponentPlayersPoints, setOpponentPlayersPoints] = useState(null)
     const [opponentTotalPoints, setOpponentTotalPoints] = useState(null)
+    const [opponentRosterID, setOpponentRosterID] = useState(null)
 
+    const [showTip, setTip] = useState(false)
     const [errorMessage, setErrorMessage] = useState(null)
     const controller = new AbortController();
     const signal = controller.signal;
 
-    if(week<=0) week = 1;
-  
+    useEffect(() => {
+        getPlayersProjectedPoints(week, 'regular', scoring_type)
+    },[week])
     useEffect(() => {
         if(!allProjectedPoints) return
+
 
         setTotalPoints(null)
         setOpponentTotalPoints(null)
@@ -74,23 +82,27 @@ const Matchups = ({route}) => {
         setOpponentBench(null)
 
         setOpponentData({})
+        setHasMatchup(true)
 
-        getRosterID(userID,leagueID)
+        if(!leagueRosters) {
+            getLeagueRosters(userID,leagueID)
+        } else {
+            getMatchup(playerRosterID, leagueID, week, leagueRosters);
+        }
+        
     },[allProjectedPoints])
-
-    useEffect(() => {
-        getPlayersProjectedPoints(week, 'regular', scoring_type)
-    },[week])
 
     
 
-    const getRosterID = async(_user_ID, _league_ID) => {
+    const getLeagueRosters = async(_user_ID, _league_ID) => {
         fetch(`https://api.sleeper.app/v1/league/${_league_ID}/rosters`,{signal})
         .then(response => response.json())
         .then((data) => {
+            setLeagueRosters(data);
             data.map((roster, index) => {
                 if(roster.owner_id==_user_ID && roster.players) {
-                    getMatchup(roster.roster_id, leagueID, week)
+                    setPlayerRosterID(roster.roster_id)
+                    getMatchup(roster.roster_id, leagueID, week, data)
                 }
             })
         }).catch((e) => {
@@ -100,13 +112,18 @@ const Matchups = ({route}) => {
         })
     }
 
-    const getMatchup = async(_roster_id, _league_id, _week) => {
+    const getMatchup = async(_roster_id, _league_id, _week, _league_rosters) => {
         const URL = `https://api.sleeper.app/v1/league/${_league_id}/matchups/${_week}`
         let matchup_id;
+        let opponent_roster_id;
         fetch(URL)
         .then(response => response.json())
         .then(data => {
-            data.map(async (roster, index) => {
+            if(data.length==0) {
+                setHasMatchup(false)
+                return
+            } 
+            data.map((roster, index) => {
                 if(roster.roster_id==_roster_id) {
                     matchup_id = roster.matchup_id
                     const benchs = roster.players.filter((item) => {
@@ -118,25 +135,25 @@ const Matchups = ({route}) => {
 
                     setStarters(getPlayers(roster.starters))
                     setBench(getPlayers(benchs))
-                    //setStarters(await getStartersPlayers(roster.starters))
-                    //setBench(await getBenchPlayers(roster.players, roster.starters))
                 }
-            })
-            data.map(async (roster) => {
+
                 if(roster.matchup_id == matchup_id && roster.roster_id != _roster_id) {
-                    const benchs = roster.players.filter((item) => {
-                        return roster.starters.indexOf(item) === -1;
-                    })
-
-                    setOpponentPlayersPoints(roster.players_points)
-                    setOpponentTotalPoints(roster.points)
-                    getOwnersID(leagueID, _roster_id, roster.roster_id)
-
-                    setOpponentStarters(getPlayers(roster.starters))
-                    setOpponentBench(getPlayers(benchs))
-
+                        const benchs = roster.players.filter((item) => {
+                            return roster.starters.indexOf(item) === -1;
+                        })
+    
+                        setOpponentPlayersPoints(roster.players_points)
+                        setOpponentTotalPoints(roster.points)
+                        setOpponentRosterID(roster.roster_id)
+                        opponent_roster_id = roster.roster_id;
+    
+                        setOpponentStarters(getPlayers(roster.starters))
+                        setOpponentBench(getPlayers(benchs))
+    
                 }
+                
             })
+            getUsersData(leagueID, _roster_id, opponent_roster_id, _league_rosters)
         }).catch((e) => {
             console.log('Erro:',e)
             controller.abort()
@@ -149,7 +166,6 @@ const Matchups = ({route}) => {
         _players.map((player, index) => {
             if(player!=0) {
                 let projected_points = 0;
-                let player_n;
                 allProjectedPoints.map((playerItem, index) => {
                     if(playerItem.player_id==player) {
                         Object.entries(playerItem.stats).map(item => {
@@ -160,7 +176,6 @@ const Matchups = ({route}) => {
                             projected_points +=  point_made
                             //projected_points.push(item)
                         })
-                        player_n = index
                     }
                 })
 
@@ -174,8 +189,8 @@ const Matchups = ({route}) => {
                 })
             } else{
                 players.push({
-                    name: 'Empty',
-                    position: 'Empty',
+                    name: 'Vazio',
+                    position: 'Vazio',
                     player_id: 0,
                     index: index,
                     points:0,
@@ -204,40 +219,31 @@ const Matchups = ({route}) => {
         })
     }
 
-    const getOwnersID = async(_id_league, _id_user, _id_opponent) => {
-        const URL = `https://api.sleeper.app/v1/league/${_id_league}/rosters`;
+    const getUsersData = async(_id_league, _id_user, _id_opponent, _league_rosters) => {
         let user_id;
-        let opoonent_id;
-        fetch(URL)
-        .then(response => response.json())
-        .then(data => {
-            data.map(roster => {
-                if(roster.roster_id==_id_user){
-                    user_id = roster.owner_id
-                    setPlayerData({
-                        ...playerData, 
-                        rosterID: _id_user,
-                        ownerID: roster.owner_id
-                    })
-                }
-                else if(roster.roster_id==_id_opponent){
-                    opoonent_id = roster.owner_id
-                    setOpponentData({
-                        ...opponentData, 
-                        rosterID: _id_user,
-                        ownerID: roster.owner_id
-                    })
-                }
-            })
-            getPlayersData(_id_league, user_id, opoonent_id)
-        }).catch((e) => {
-            console.log('Erro:',e)
-        })
-    }
+        let opponent_id;
 
-    const getPlayersData = (_league_id, _player_id, _opponent_id) => {
+        _league_rosters.map(roster => {
+            if(roster.roster_id==_id_user){
+                user_id = roster.owner_id
+                setPlayerData({
+                    ...playerData, 
+                    rosterID: _id_user,
+                    ownerID: roster.owner_id
+                })
+            }
+            else if(roster.roster_id==_id_opponent){
+                opponent_id = roster.owner_id
+                setOpponentData({
+                    ...opponentData, 
+                    rosterID: _id_user,
+                    ownerID: roster.owner_id
+                })
+            }
+        })
+
         leagueUsers.map(player => {
-            if(player.user_id == _player_id) {
+            if(player.user_id == user_id) {
                 setPlayerData({
                     ...playerData, 
                     displayName: player.display_name,
@@ -245,7 +251,7 @@ const Matchups = ({route}) => {
                     teamData: player.metadata
                 })
             }
-            else if(player.user_id == _opponent_id) {
+            else if(player.user_id == opponent_id) {
                 setOpponentData({
                     ...opponentData, 
                     displayName: player.display_name,
@@ -254,30 +260,9 @@ const Matchups = ({route}) => {
                 })
             }
         })
-        /*const URL = `https://api.sleeper.app/v1/league/${_league_id}/users`
-        fetch(URL)
-        .then(response => response.json())
-        .then(data => {
-            data.map(player => {
-                if(player.user_id == _player_id) {
-                    setPlayerData({
-                        ...playerData, 
-                        displayName: player.display_name,
-                        avatar: player.avatar,
-                        teamData: player.metadata
-                    })
-                }
-                else if(player.user_id == _opponent_id) {
-                    setOpponentData({
-                        ...opponentData, 
-                        displayName: player.display_name,
-                        avatar: player.avatar,
-                        teamData: player.metadata
-                    })
-                }
-            })
-        })*/
+
     }
+
 
     const Shadow = () => (
         <Image source={require('../../../assets/Images/shadow50.png')} style={styles.shadowStyle} />
@@ -349,24 +334,32 @@ const Matchups = ({route}) => {
                     containerStyle={{height:5,}} 
                 />
                 <View style={{flexDirection:'row',paddingHorizontal:20,}}>
-                    <Text style={{color:LIGHT_GRAY,flex:1,textAlign:'left'}}>
-                        {opponentTotalPoints ? opponentTotalPoints : 
-                        opponentProjectedPoints.toFixed(1)}
-                    </Text>
-                    <Text style={{color:LIGHT_GRAY,flex:1,textAlign:'right'}}>
-                        {totalPoints ? totalPoints 
-                        : userProjectedPoints.toFixed(1)} 
-                    </Text>
+                    <View style={{flex:1,alignItems:'flex-start',}} >
+                    <TooltipMessage position='bottom' message='Pontos de fantasy do oponente.'>
+                        <Text style={{color:LIGHT_GRAY,textAlign:'left'}}>
+                            {opponentTotalPoints ? opponentTotalPoints : 
+                            opponentProjectedPoints.toFixed(1)}
+                        </Text>
+                    </TooltipMessage>
+                    </View>
+                    <View style={{flex:1,alignItems:'flex-end'}} >
+                    <TooltipMessage position='top' message='Pontos de fantasy do seu time.'>
+                        <Text style={{color:LIGHT_GREEN,textAlign:'right'}}>
+                            {totalPoints ? totalPoints 
+                            : userProjectedPoints.toFixed(1)} 
+                        </Text>
+                    </TooltipMessage>
+                    </View>
                 </View>
         </View>
     )}
 
     const WeekSelect = () => (
-        <View style={{marginTop:20,marginLeft:10,}}>
+
             <View style={{width:150,height:40,backgroundColor:LIGHT_BLACK,flexDirection:'row',justifyContent:'center',alignContent:'center',alignItems:'center',borderRadius:12,}}>
                 <TouchableOpacity 
                     disabled={(week==1) ? true : false}
-                    onPress={() => navigation.navigate('Matchups',{ active: 'Matchups', week: week - 1, leagueDraftSettings: leagueDraftSettings, leagueObject:league})} 
+                    onPress={() => setWeek(week - 1)} 
                     style={{flex:1,opacity:(week==1) ? 0.2 : 1}}
                 >
                     <Entypo name="chevron-left" style={{textAlign:'center'}} size={24} color="#C6C6C6" />
@@ -374,17 +367,32 @@ const Matchups = ({route}) => {
                 
                 <Text style={{color:LIGHT_GRAY,flex:3,textAlign:'center'}}>Semana {week}</Text>
                 <TouchableOpacity 
-                    onPress={() => navigation.navigate('Matchups',{ active: 'Matchups', week: week + 1, leagueDraftSettings: leagueDraftSettings, leagueObject:league})} 
+                    onPress={() => setWeek(week + 1)} 
                     style={{flex:1}}
                 >
                     <Entypo name="chevron-right" style={{textAlign:'center'}} size={24} color="#C6C6C6" />
                 </TouchableOpacity>
             </View>
-        </View>
+
         
     )
 
-    const MatchupPlayers = ({playerUserName, playerOpponentName, playerUserID, playerOpponentID, playerUserProjectedPoints, playerOpponentProjectedPoints, position}) => {
+    const TooltipMessage = ({children, message,position, style}) => (
+        <Tooltip
+                 isVisible={showTip}
+                 content={
+                   <View>
+                     <Text> {message} </Text>
+                   </View>
+                 }
+                 onClose={() => setTip(false)}
+                 placement={position}
+                 backgroundColor='rgba(0,0,0,0)'
+                 contentStyle={style}
+                >{children}</Tooltip>
+    )
+
+    const MatchupPlayers = ({playerUserName, playerOpponentName, playerUserID, playerOpponentID, playerUserProjectedPoints, playerOpponentProjectedPoints, position,index}) => {
         const playerOpponentPoints = getPlayerPoints(playerOpponentID, playersPoints, opponentPlayersPoints);
         const playerUserPoints = getPlayerPoints(playerUserID, playersPoints, opponentPlayersPoints);
         
@@ -392,18 +400,25 @@ const Matchups = ({route}) => {
         <View style={styles.matchupContainer}>
 
         <View style={styles.matchupPlayerContainer}>
-            <Text style={styles.playerMatchupLeft}>{playerOpponentName}</Text>
+            <Text style={styles.playerMatchupLeft}>{playerOpponentName}</Text>   
             <Text style={[styles.playerMatchupPoints,{textAlign:'right',color:(playerOpponentPoints=='0.0') ? DARKER_GRAY : LIGHT_GRAY}]}>
-                {(playerOpponentPoints=='0.0') ? playerOpponentProjectedPoints.toFixed(1) : playerOpponentPoints}
+                {(playerOpponentID!=0) ?(playerOpponentPoints=='0.0') ? `*${playerOpponentProjectedPoints.toFixed(1)}` : playerOpponentPoints : null}
             </Text>
         </View>
         <Text style={[styles.position, {color:getColorPosition(position)}]}>
             {position.replace(/_/g,' ')}
         </Text>
         <View style={styles.matchupPlayerContainer}>
-            <Text style={[styles.playerMatchupPoints,{textAlign:'left',color:(playerOpponentPoints=='0.0') ? DARKER_GRAY : LIGHT_GRAY}]}>
-                {(playerUserPoints=='0.0') ? playerUserProjectedPoints.toFixed(1) : playerUserPoints}
+            { (index==0) ? 
+                <View style={{flex:1,alignContent:'center'}}><TooltipMessage position='bottom' message='Pontos de fantasy do jogador. O asterisco (*) indica que o número é apenas uma projeção dos pontos.'>
+                    <Text style={[styles.playerMatchupPoints,{textAlign:'left',color:(playerUserPoints=='0.0') ? DARKER_GRAY : LIGHT_GRAY}]}>
+                        {(playerUserID!=0) ? (playerUserPoints=='0.0') ? `${playerUserProjectedPoints.toFixed(1)}*` : playerUserPoints : null}
+                    </Text>
+                </TooltipMessage></View> :
+            <Text style={[styles.playerMatchupPoints,{textAlign:'left',color:(playerUserPoints=='0.0') ? DARKER_GRAY : LIGHT_GRAY}]}>
+                {(playerUserID!=0) ? (playerUserPoints=='0.0') ? `${playerUserProjectedPoints.toFixed(1)}*` : playerUserPoints : null}
             </Text>
+            }
             <Text style={styles.playerMatchupRight}>{playerUserName}</Text>
         </View>
         
@@ -429,12 +444,49 @@ const Matchups = ({route}) => {
         </View>
     )
 
+    if(league.status!='in_season') {
+        return (
+            <View style={{flex:1,backgroundColor:'#0B0D0F'}}>
+            <HeaderLeagueContextProvider leagueObject={league}>
+                <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueUsers={leagueUsers} />
+                <ViewLightDark>
+                    <Text style={{color: WHITE, textAlign:'center'}}>A temporada regular da liga ainda não começou.</Text>
+                </ViewLightDark>
+            </HeaderLeagueContextProvider>
+        </View>
+        )
+    }
+
+    if(!hasMatchup) {
+        return (
+            <View style={{flex:1,backgroundColor:'#0B0D0F'}}>
+            <HeaderLeagueContextProvider leagueObject={league}>
+                <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueUsers={leagueUsers} />
+                <WeekSelect />
+                <ViewLightDark>
+                    <Text style={{color: WHITE, textAlign:'center'}}>A liga não possui matchup para a semana {week}.</Text>
+                </ViewLightDark>
+            </HeaderLeagueContextProvider>
+        </View>
+        )
+    }
 
     return ( 
         <View style={{flex:1,backgroundColor:'#0B0D0F'}}>
             <HeaderLeagueContextProvider leagueObject={league}>
                 <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueUsers={leagueUsers} />
-                <WeekSelect />
+                <View style={{marginTop:20,marginLeft:10,marginRight:20,flexDirection:'row'}}>
+                    <WeekSelect />
+                    <View style={{flex:1,alignItems:'flex-end', justifyContent:'center'}}>
+
+                        <TouchableOpacity onPress={() => {setTip((showTip) ? false : true); changeNavigationBarColor(DARK_BLACK);}}>
+                            <AntDesign name="questioncircleo" size={20} color={LIGHT_GRAY} />
+                        </TouchableOpacity>
+                   
+
+                    </View>
+                </View>
+                
                 <MatchupField />
                 <SliderBox />
                 <View style={[styles.boxContainer,{marginTop:0}]}>
@@ -454,6 +506,7 @@ const Matchups = ({route}) => {
                             return (
                                 <MatchupPlayers
                                     key={index}
+                                    index={index}
                                     playerUserID={playerUser.player_id}
                                     playerOpponentID={playerOpponent.player_id}
                                     
@@ -558,10 +611,10 @@ const styles = StyleSheet.create({
         resizeMode: 'cover'
     },
     leftAvatar: {
-        left:75
+        left: (windowWidth / 2) / 2 
     },
     rightAvatar: {
-        right:75
+        right: (windowWidth / 2) / 2
     },
     matchupField: {
         marginTop:20,
@@ -583,7 +636,7 @@ const styles = StyleSheet.create({
     title:{
         fontSize:17,
         fontWeight:'bold',
-        color:LIGHT_GRAY,
+        color:WHITE,
         flex:1,
         textAlign:'center'
     },

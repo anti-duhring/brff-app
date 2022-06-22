@@ -56,14 +56,14 @@ const StackScreens = ({navigation,route}) => {
             ) }} component={LeagueList} />
   
 
-            <Stack.Screen name="PlayerProfile" options={{
+            <Stack.Screen name="PlayerProfile" options={({route}) => ({
             title:null,
             headerTransparent: true,
             headerLeft: () => (
               <TouchableOpacity style={[styles.barButtons,{marginLeft:10}]} onPress={() => navigation.goBack()}>
                 <Ionicons name="close" size={24} color="white" />
               </TouchableOpacity>
-            )}} component={PlayerProfile} />
+            )})} component={PlayerProfile} />
 
           <Stack.Screen name="Players" options={{
             title: '',//route.params?.leagueName,

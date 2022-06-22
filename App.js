@@ -2,6 +2,7 @@ import { React, useEffect, useMemo, useReducer } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { View, ActivityIndicator, Vibration, StatusBar } from "react-native";
+import changeNavigationBarColor from "react-native-navigation-bar-color";
 import StackScreens from "./src/screens/StackScreens";
 import SignIn from './src/Pages/SignIn';
 import PodcastScreens from './src/screens/PodcastScreens'
@@ -17,11 +18,11 @@ import { PlayerContextProvider } from "./src/components/PlayerContext";
 import TrackPlayer, { Capability } from "react-native-track-player";
 import { FontAwesome5 } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
-import { WHITE, DARK_GREEN, DARKER_GRAY } from "./src/components/Variables";
+import { WHITE, DARK_GREEN, DARKER_GRAY, DARK_BLACK } from "./src/components/Variables";
 
 const Drawer = createDrawerNavigator();
 
-
+changeNavigationBarColor(DARK_BLACK);
 
 export default function App() {
   //const [isLoading, setIsLoading] = useState(true)
