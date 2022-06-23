@@ -11,7 +11,7 @@ import { Entypo } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import { getColorPosition, getPlayerPoints } from "../../functions/GetRoster";
 import { AllPlayersContext } from "../../components/AllPlayersContext";
-import { LIGHT_GREEN, LIGHT_BLACK, LIGHT_GRAY, DARK_GRAY, DARKER_GRAY, WHITE, DARK_BLACK } from '../../components/Variables'
+import { LIGHT_GREEN, LIGHT_BLACK, LIGHT_GRAY, DARK_GRAY, DARKER_GRAY, WHITE, DARK_BLACK, DARK_GREEN } from '../../components/Variables'
 import ViewLightDark from '../../components/ViewLightDark';
 import changeNavigationBarColor from "react-native-navigation-bar-color";
 
@@ -335,7 +335,7 @@ const Matchups = ({route}) => {
                 />
                 <View style={{flexDirection:'row',paddingHorizontal:20,}}>
                     <View style={{flex:1,alignItems:'flex-start',}} >
-                    <TooltipMessage position='bottom' message='Pontos de fantasy do oponente.'>
+                    <TooltipMessage hasBackground={true}  position='bottom' message='Pontos de fantasy do oponente.'>
                         <Text style={{color:LIGHT_GRAY,textAlign:'left'}}>
                             {opponentTotalPoints ? opponentTotalPoints : 
                             opponentProjectedPoints.toFixed(1)}
@@ -377,19 +377,22 @@ const Matchups = ({route}) => {
         
     )
 
-    const TooltipMessage = ({children, message,position, style}) => (
+    const TooltipMessage = ({children, message,position, hasBackground}) => (
         <Tooltip
-                 isVisible={showTip}
-                 content={
+            isVisible={showTip}
+            content={
                    <View>
-                     <Text> {message} </Text>
+                     <Text style={{color:WHITE}}> {message} </Text>
                    </View>
-                 }
-                 onClose={() => setTip(false)}
-                 placement={position}
-                 backgroundColor='rgba(0,0,0,0)'
-                 contentStyle={style}
-                >{children}</Tooltip>
+            }
+            onClose={() => setTip(false)}
+            placement={position}
+            backgroundColor={(hasBackground) ? 'rgba(0,0,0,0.5)' :'rgba(0,0,0,0)'}
+            useReactNativeModal={true}
+            contentStyle={{backgroundColor:DARK_GREEN}}
+        >
+            {children}
+        </Tooltip>
     )
 
     const MatchupPlayers = ({playerUserName, playerOpponentName, playerUserID, playerOpponentID, playerUserProjectedPoints, playerOpponentProjectedPoints, position,index}) => {
@@ -479,7 +482,7 @@ const Matchups = ({route}) => {
                     <WeekSelect />
                     <View style={{flex:1,alignItems:'flex-end', justifyContent:'center'}}>
 
-                        <TouchableOpacity onPress={() => {setTip((showTip) ? false : true); changeNavigationBarColor(DARK_BLACK);}}>
+                        <TouchableOpacity onPress={() => {setTip((showTip) ? false : true); }}>
                             <AntDesign name="questioncircleo" size={20} color={LIGHT_GRAY} />
                         </TouchableOpacity>
                    

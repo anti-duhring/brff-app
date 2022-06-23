@@ -4,10 +4,12 @@ import TabTopLeague from "../../components/TabTopLeague";
 import { HeaderLeagueContextProvider } from "../../components/HeaderLeagueContext";
 import ViewLightDark from "../../components/ViewLightDark";
 import { Entypo } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
 import { DARK_BLACK, DARK_GRAY, DARK_GREEN, LIGHT_BLACK, LIGHT_GRAY, LIGHT_GREEN, WHITE } from "../../components/Variables";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons';
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+import Tooltip from "react-native-walkthrough-tooltip";
 
 const PlayoffBracket = ({route}) => {
     const leagueId = route.params?.leagueObject.league_id;
@@ -20,6 +22,8 @@ const PlayoffBracket = ({route}) => {
     const [leagueRostersData, setLeagueRostersData] = useState(null);
     const [leagueUsersData, setLeagueUsersData] = useState(leagueUsers)
     const [round, setRound] = useState(1);
+    const [showTip, setTip] = useState(false)
+
     class PlayerNull {
         constructor(name) {
             this.rosterID = 0;
@@ -84,6 +88,24 @@ const PlayoffBracket = ({route}) => {
         })
     }
 
+    const TooltipMessage = ({children, message,position, hasBackground}) => (
+        <Tooltip
+            isVisible={showTip}
+            content={
+                   <View>
+                     <Text style={{color:WHITE}}> {message} </Text>
+                   </View>
+            }
+            onClose={() => setTip(false)}
+            placement={position}
+            backgroundColor={(hasBackground) ? 'rgba(0,0,0,0.5)' :'rgba(0,0,0,0)'}
+            useReactNativeModal={true}
+            contentStyle={{backgroundColor:DARK_GREEN}}
+        >
+            {children}
+        </Tooltip>
+    )
+
 
     const RoundSelect = () => (
         <ViewLightDark style={styles.roundSelect} containerStyle={styles.roundSelectContainer}>
@@ -112,20 +134,26 @@ const PlayoffBracket = ({route}) => {
     );
 
     const PlayerFantasyPoints = ({player, position}) => (
-        <Text style={[{fontSize:22,color:WHITE},(position=='left') ? {marginLeft:15} : {marginRight: 15}]}>
+        <Text style={[{fontSize:22,color:WHITE},(position=='left') ? {marginLeft:0} : {marginRight: 15}]}>
             {player.rosterData.settings.fpts.toFixed(1)}
         </Text>
     );
 
-    const PlayerMatchup = ({player, position, winner}) => {
+    const PlayerMatchup = ({player, position, winner, index}) => {
         return (
-            <View style={{flex:1}}>
+            <View style={{flex:2}}>
                 <View style={[styles.playerMatchupContainer,{justifyContent: (position=='left') ? 'flex-start' : 'flex-end'}]}>
                     {
                         (position=='left') ?
                         <>
-                            <PlayerAvatar player={player} />
-                            <PlayerFantasyPoints player={player} position={position} />
+                                <PlayerAvatar player={player} />
+                            
+                            {(index==0) ? <View style={{alignContent:'flex-start',marginLeft:15}}>
+                                <TooltipMessage hasBackground={true} position='top' message='Pontos de fantasy do time.'>
+                                    <PlayerFantasyPoints player={player} position={position} />
+                                </TooltipMessage>
+                            </View> : <View style={{marginLeft:15}}><PlayerFantasyPoints player={player} position={position} /></View>}
+                            
                         </> :
                         <>
                             <PlayerFantasyPoints player={player} position={position} />
@@ -138,7 +166,12 @@ const PlayoffBracket = ({route}) => {
                         <Text style={{color:WHITE, textAlign: (position=='left') ? 'left' : 'right'}}>    
                             { player.userData.display_name }
                         </Text>
-                        <Text style={{color:DARK_GRAY}}>{player.rosterData.settings.wins}-{player.rosterData.settings.losses}{(player.rosterData.settings.ties!=0) ? '-'+player.rosterData.settings.ties : null}</Text>
+                        {(index==0 && position=='right') ? <View style={{flex:1,alignItems:'flex-end'}}>
+                            <TooltipMessage position='left' message='Vitórias - Derrotas (- Empates)'>
+                                <Text style={{color:DARK_GRAY}}>{player.rosterData.settings.wins} - {player.rosterData.settings.losses}{(player.rosterData.settings.ties!=0) ? ' - '+player.rosterData.settings.ties : null}</Text>
+                            </TooltipMessage>
+                        </View> : <Text style={{color:DARK_GRAY}}>{player.rosterData.settings.wins} - {player.rosterData.settings.losses}{(player.rosterData.settings.ties!=0) ? ' - '+player.rosterData.settings.ties : null}</Text>}
+                        
                     </View>
                 </View>
         )
@@ -147,12 +180,14 @@ const PlayoffBracket = ({route}) => {
     const Matchup = (props) => {
         return (
             <ViewLightDark style={{flexDirection:'row'}} title={(props.type=='winners') ? `Matchup ${props.matchup.m}` : `Toilet Bowl - Matchup ${props.matchup.m}`} titleAlign='center'>
-                    <PlayerMatchup player={props.player1} position='left' winner={(props.matchup.w == props.player1.rosterID) ? true : false} />
-                    <View style={styles.matchupVsContainer}>
-                        {(props.type=='winners') ?
-                        <MaterialCommunityIcons name="sword-cross" size={35} color={LIGHT_GREEN} /> : <FontAwesome5 name="toilet" size={35} color={LIGHT_GREEN} />}
-                    </View>
-                    <PlayerMatchup player={props.player2} position='right' winner={(props.matchup.w == props.player2.rosterID) ? true : false} />
+
+                <PlayerMatchup player={props.player1} position='left' index={props.index} winner={(props.matchup.w == props.player1.rosterID) ? true : false} />
+                <View style={styles.matchupVsContainer}>
+                    {(props.type=='winners') ?
+                    <MaterialCommunityIcons name="sword-cross" size={35} color={LIGHT_GREEN} /> : <FontAwesome5 name="toilet" size={35} color={LIGHT_GREEN} />}
+                </View>
+                <PlayerMatchup player={props.player2} position='right' index={props.index} winner={(props.matchup.w == props.player2.rosterID) ? true : false} />
+
             </ViewLightDark>
         )
     }
@@ -224,7 +259,17 @@ const PlayoffBracket = ({route}) => {
             <HeaderLeagueContextProvider leagueObject={leagueObject}>
                 <TabTopLeague activeButton={route.params?.active} isAble={true} leagueDraftSettings={leagueDraftSettings} leagueObject={route.params?.leagueObject} leagueUsers={leagueUsers}  />
 
-                <RoundSelect />
+                <View style={{marginTop:20,marginLeft:10,marginRight:20,flexDirection:'row'}}>
+                    <RoundSelect />
+                    <View style={{flex:1,alignItems:'flex-end', justifyContent:'center'}}>
+
+                        <TouchableOpacity onPress={() => {setTip((showTip) ? false : true); }}>
+                            <AntDesign name="questioncircleo" size={20} color={LIGHT_GRAY} />
+                        </TouchableOpacity>
+                   
+
+                    </View>
+                </View>
 
                 <View>
                     {(leagueRostersData && leagueUsersData && playoffData) ?
@@ -254,7 +299,7 @@ const PlayoffBracket = ({route}) => {
                         }
                         
                             return (
-                                <Matchup type='winners' matchup={matchup} player1={player1} player2={player2} key={index} />
+                                <Matchup type='winners' matchup={matchup} player1={player1} player2={player2} key={index} index={index} />
                             )
                         
                     }) : 
@@ -276,7 +321,7 @@ const PlayoffBracket = ({route}) => {
                         if(matchup.t1) {
                             player1 = new Player(matchup.t1);
                         } else if(!matchup.t1 && matchup.t1_from) {
-                            player1 = new PlayerNull((matchup.t1_from.w) ? `Vencedor do matchup ${matchup.t1_from.w}` : `Perdedor do matchup ${matchup.t1_from.l}`)
+                            player1 = new PlayerNull((matchup.t1_from.w) ? `Vencedor do Toilet matchup ${matchup.t1_from.w}` : `Perdedor do Toilet matchup ${matchup.t1_from.l}`)
 
                         } else {
                             player1 = new PlayerNull('Vaga em aberto');
@@ -285,7 +330,7 @@ const PlayoffBracket = ({route}) => {
                         if(matchup.t2) {
                             player2 = new Player(matchup.t2);
                         } else if(!matchup.t2 && matchup.t2_from) {
-                            player2 = new PlayerNull((matchup.t2_from.w) ? `Vencedor do matchup ${matchup.t2_from.w}` : `Perdedor do matchup ${matchup.t2_from.l}`)
+                            player2 = new PlayerNull((matchup.t2_from.w) ? `Vencedor do Toilet matchup ${matchup.t2_from.w}` : `Perdedor do Toilet matchup ${matchup.t2_from.l}`)
                         } else {
                             player2 = new PlayerNull('Vaga em aberto');
                         }
@@ -336,8 +381,17 @@ const styles = StyleSheet.create({
         alignItems:'center'
     },
     roundSelectContainer: {
-        marginTop:20,
         width:150,
         height:40,
+    },
+    title: {
+        fontSize:19,
+        fontWeight:'bold',
+        color:WHITE,
+        flex:1,
+        textAlign:'center'
+    }, 
+    titleContainer: {
+        marginBottom:0,
     }
 })
