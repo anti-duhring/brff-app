@@ -10,6 +10,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons';
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import Tooltip from "react-native-walkthrough-tooltip";
+import TooltipButton from "../../components/TooltipButton";
 
 const PlayoffBracket = ({route}) => {
     const leagueId = route.params?.leagueObject.league_id;
@@ -96,7 +97,8 @@ const PlayoffBracket = ({route}) => {
                      <Text style={{color:WHITE}}> {message} </Text>
                    </View>
             }
-            onClose={() => setTip(false)}
+
+            onClose={() =>setTip(false)}
             placement={position}
             backgroundColor={(hasBackground) ? 'rgba(0,0,0,0.5)' :'rgba(0,0,0,0)'}
             useReactNativeModal={true}
@@ -261,14 +263,7 @@ const PlayoffBracket = ({route}) => {
 
                 <View style={{marginTop:20,marginLeft:10,marginRight:20,flexDirection:'row'}}>
                     <RoundSelect />
-                    <View style={{flex:1,alignItems:'flex-end', justifyContent:'center'}}>
-
-                        <TouchableOpacity onPress={() => {setTip((showTip) ? false : true); }}>
-                            <AntDesign name="questioncircleo" size={20} color={LIGHT_GRAY} />
-                        </TouchableOpacity>
-                   
-
-                    </View>
+                    <TooltipButton setTip={setTip} showTip={showTip} />
                 </View>
 
                 <View>

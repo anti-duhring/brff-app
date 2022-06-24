@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, Image, TouchableOpacity, StatusBar } from "react-native";
+import { Text, View, StyleSheet, Image, TouchableOpacity } from "react-native";
 import TabTopLeague from '../../components/TabTopLeague'
 import { useState, useEffect, useContext } from "react";
 import { UserDataContext } from "../../components/UserDataContext";
@@ -8,12 +8,11 @@ import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import Tooltip from 'react-native-walkthrough-tooltip'
 import { Dimensions } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
-import { AntDesign } from '@expo/vector-icons';
 import { getColorPosition, getPlayerPoints } from "../../functions/GetRoster";
 import { AllPlayersContext } from "../../components/AllPlayersContext";
 import { LIGHT_GREEN, LIGHT_BLACK, LIGHT_GRAY, DARK_GRAY, DARKER_GRAY, WHITE, DARK_BLACK, DARK_GREEN } from '../../components/Variables'
 import ViewLightDark from '../../components/ViewLightDark';
-import changeNavigationBarColor from "react-native-navigation-bar-color";
+import TooltipButton from "../../components/TooltipButton";
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -67,10 +66,6 @@ const Matchups = ({route}) => {
 
     useEffect(() => {
         getPlayersProjectedPoints(week, 'regular', scoring_type)
-    },[week])
-    useEffect(() => {
-        if(!allProjectedPoints) return
-
 
         setTotalPoints(null)
         setOpponentTotalPoints(null)
@@ -81,7 +76,7 @@ const Matchups = ({route}) => {
         setOpponentStarters(null)
         setOpponentBench(null)
 
-        setOpponentData({})
+        setOpponentData(null)
         setHasMatchup(true)
 
         if(!leagueRosters) {
@@ -89,9 +84,8 @@ const Matchups = ({route}) => {
         } else {
             getMatchup(playerRosterID, leagueID, week, leagueRosters);
         }
-        
-    },[allProjectedPoints])
 
+    },[week])
     
 
     const getLeagueRosters = async(_user_ID, _league_ID) => {
@@ -124,6 +118,7 @@ const Matchups = ({route}) => {
                 return
             } 
             data.map((roster, index) => {
+
                 if(roster.roster_id==_roster_id) {
                     matchup_id = roster.matchup_id
                     const benchs = roster.players.filter((item) => {
@@ -135,24 +130,28 @@ const Matchups = ({route}) => {
 
                     setStarters(getPlayers(roster.starters))
                     setBench(getPlayers(benchs))
-                }
 
-                if(roster.matchup_id == matchup_id && roster.roster_id != _roster_id) {
-                        const benchs = roster.players.filter((item) => {
-                            return roster.starters.indexOf(item) === -1;
-                        })
-    
-                        setOpponentPlayersPoints(roster.players_points)
-                        setOpponentTotalPoints(roster.points)
-                        setOpponentRosterID(roster.roster_id)
-                        opponent_roster_id = roster.roster_id;
-    
-                        setOpponentStarters(getPlayers(roster.starters))
-                        setOpponentBench(getPlayers(benchs))
-    
                 }
                 
             })
+
+            data.map((roster, index) => {
+                if(roster.matchup_id == matchup_id && roster.roster_id != _roster_id) {
+                    const benchs = roster.players.filter((item) => {
+                        return roster.starters.indexOf(item) === -1;
+                    })
+
+                    setOpponentPlayersPoints(roster.players_points)
+                    setOpponentTotalPoints(roster.points)
+                    setOpponentRosterID(roster.roster_id)
+                    opponent_roster_id = roster.roster_id;
+
+                    setOpponentStarters(getPlayers(roster.starters))
+                    setOpponentBench(getPlayers(benchs))
+
+                }
+            })
+
             getUsersData(leagueID, _roster_id, opponent_roster_id, _league_rosters)
         }).catch((e) => {
             console.log('Erro:',e)
@@ -166,18 +165,6 @@ const Matchups = ({route}) => {
         _players.map((player, index) => {
             if(player!=0) {
                 let projected_points = 0;
-                allProjectedPoints.map((playerItem, index) => {
-                    if(playerItem.player_id==player) {
-                        Object.entries(playerItem.stats).map(item => {
-                            if(!leagueScoringSettings[item[0]]) return
-
-                            const league_score = leagueScoringSettings[item[0]];
-                            const point_made = item[1] * league_score;
-                            projected_points +=  point_made
-                            //projected_points.push(item)
-                        })
-                    }
-                })
 
                 players.push({
                     name: allPlayers[player].full_name,
@@ -214,6 +201,7 @@ const Matchups = ({route}) => {
         .then(response => response.json())
         .then(data => {
             setAllProjectedPoints(data);
+
         }).catch((e) => {
             console.log('Error:', e)
         })
@@ -286,7 +274,7 @@ const Matchups = ({route}) => {
     const MatchupField = () => (
         <View style={styles.matchupField}>
             <Image source={require('../../../assets/Images/field1.png')} style={styles.imageField} />
-            <AvatarField avatar={opponentData.avatar ? opponentData.avatar : null} position='left' />
+            <AvatarField avatar={(opponentData && opponentData.avatar) ? opponentData.avatar : null} position='left' />
             <AvatarField avatar={playerData.avatar ? playerData.avatar : null}
             position='right' />
         </View>
@@ -296,15 +284,14 @@ const Matchups = ({route}) => {
         let userProjectedPoints = 0.0;
         let opponentProjectedPoints = 0.0;
 
-        if(starters && opponentStarters) {
-            starters.map(player => {
+            starters?.map(player => {
                 userProjectedPoints += player.projected_points
             })
     
-            opponentStarters.map(player => {
+            opponentStarters?.map(player => {
                 opponentProjectedPoints += player.projected_points
             })
-        }
+
 
         return (
         <View style={{justifyContent:'flex-start',
@@ -395,35 +382,81 @@ const Matchups = ({route}) => {
         </Tooltip>
     )
 
-    const MatchupPlayers = ({playerUserName, playerOpponentName, playerUserID, playerOpponentID, playerUserProjectedPoints, playerOpponentProjectedPoints, position,index}) => {
-        const playerOpponentPoints = getPlayerPoints(playerOpponentID, playersPoints, opponentPlayersPoints);
-        const playerUserPoints = getPlayerPoints(playerUserID, playersPoints, opponentPlayersPoints);
+    const PlayerContainer = (props) => {
+        const Points = () => (
+            <Text style={[styles.playerMatchupPoints,{textAlign:(props.position=='left') ? 'right' : 'left',color:(props.playerPoints=='0.0') ? DARKER_GRAY : LIGHT_GRAY}]}>
+            {(props.player.player_id!=0) ?(props.playerPoints=='0.0') ? `${(props.position=='left') ? '*' : ''}${props.projectedPoints.toFixed(1)}${(props.position=='right') ? '*' : ''}` : props.playerPoints : null}
+            </Text>
+        )
+
+        if(props.position=='left') {
+            return(
+                <View style={styles.matchupPlayerContainer}>
+                    <Text style={styles.playerMatchupLeft}>{props.player.name}</Text>   
+                    <Points />
+                </View>
+            )
+        } else {
+            return (
+                <View style={styles.matchupPlayerContainer}>
+            { (props.index==0) ? 
+                <View style={{flex:1,alignContent:'center'}}>
+                <TooltipMessage position='bottom' message='Pontos de fantasy do jogador. O asterisco (*) indica que o número é apenas uma projeção dos pontos.'>
+                    <Points />
+                </TooltipMessage>
+                </View> :
+                <Points />
+            }
+            <Text style={styles.playerMatchupRight}>{props.player.name}</Text>
+        </View>
+            )
+            
+        }
+
+    }
+
+    const MatchupPlayers = (props) => {
+        const playerUser = props.playerUser;
+        const playerOpponent = props.playerOpponent;
+        
+        let player_projected_points = 0;
+        let opponent_projected_points = 0;
+
+        const playerOpponentPoints = getPlayerPoints(playerOpponent.player_id, playersPoints, opponentPlayersPoints);
+        const playerUserPoints = getPlayerPoints(playerUser.player_id, playersPoints, opponentPlayersPoints);
+
+
+         allProjectedPoints?.map((playerItem, index) => {
+             if(playerItem.player_id==playerUser.player_id) {
+                 Object.entries(playerItem.stats).map(item => {
+                     if(!leagueScoringSettings[item[0]]) return
+
+                     const league_score = leagueScoringSettings[item[0]];
+                     const point_made = item[1] * league_score;
+                     player_projected_points +=  point_made
+                     //projected_points.push(item)
+                 })
+             }
+             else if(playerItem.player_id==playerOpponent.player_id) {
+                Object.entries(playerItem.stats).map(item => {
+                    if(!leagueScoringSettings[item[0]]) return
+
+                    const league_score = leagueScoringSettings[item[0]];
+                    const point_made = item[1] * league_score;
+                    opponent_projected_points +=  point_made
+                    //projected_points.push(item)
+                })
+            }
+         })
         
         return (
         <View style={styles.matchupContainer}>
 
-        <View style={styles.matchupPlayerContainer}>
-            <Text style={styles.playerMatchupLeft}>{playerOpponentName}</Text>   
-            <Text style={[styles.playerMatchupPoints,{textAlign:'right',color:(playerOpponentPoints=='0.0') ? DARKER_GRAY : LIGHT_GRAY}]}>
-                {(playerOpponentID!=0) ?(playerOpponentPoints=='0.0') ? `*${playerOpponentProjectedPoints.toFixed(1)}` : playerOpponentPoints : null}
+            <PlayerContainer player={playerOpponent} projectedPoints={opponent_projected_points} playerPoints={playerOpponentPoints} position='left' index={props.index} />
+            <Text style={[styles.position, {color:getColorPosition(props.position)}]}>
+                {props.position.replace(/_/g,' ')}
             </Text>
-        </View>
-        <Text style={[styles.position, {color:getColorPosition(position)}]}>
-            {position.replace(/_/g,' ')}
-        </Text>
-        <View style={styles.matchupPlayerContainer}>
-            { (index==0) ? 
-                <View style={{flex:1,alignContent:'center'}}><TooltipMessage position='bottom' message='Pontos de fantasy do jogador. O asterisco (*) indica que o número é apenas uma projeção dos pontos.'>
-                    <Text style={[styles.playerMatchupPoints,{textAlign:'left',color:(playerUserPoints=='0.0') ? DARKER_GRAY : LIGHT_GRAY}]}>
-                        {(playerUserID!=0) ? (playerUserPoints=='0.0') ? `${playerUserProjectedPoints.toFixed(1)}*` : playerUserPoints : null}
-                    </Text>
-                </TooltipMessage></View> :
-            <Text style={[styles.playerMatchupPoints,{textAlign:'left',color:(playerUserPoints=='0.0') ? DARKER_GRAY : LIGHT_GRAY}]}>
-                {(playerUserID!=0) ? (playerUserPoints=='0.0') ? `${playerUserProjectedPoints.toFixed(1)}*` : playerUserPoints : null}
-            </Text>
-            }
-            <Text style={styles.playerMatchupRight}>{playerUserName}</Text>
-        </View>
+            <PlayerContainer player={playerUser} projectedPoints={player_projected_points} playerPoints={playerUserPoints} index={props.index} position='right' />
         
         </View>
     )}
@@ -480,21 +513,14 @@ const Matchups = ({route}) => {
                 <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueUsers={leagueUsers} />
                 <View style={{marginTop:20,marginLeft:10,marginRight:20,flexDirection:'row'}}>
                     <WeekSelect />
-                    <View style={{flex:1,alignItems:'flex-end', justifyContent:'center'}}>
-
-                        <TouchableOpacity onPress={() => {setTip((showTip) ? false : true); }}>
-                            <AntDesign name="questioncircleo" size={20} color={LIGHT_GRAY} />
-                        </TouchableOpacity>
-                   
-
-                    </View>
+                    <TooltipButton setTip={setTip} showTip={showTip} />
                 </View>
                 
                 <MatchupField />
                 <SliderBox />
                 <View style={[styles.boxContainer,{marginTop:0}]}>
                     <View style={styles.titleContainer}>
-                        <Text style={[styles.title,{textAlign:'left'}]}>{(opponentData.displayName) ? opponentData.displayName : 'Oponente'}</Text>
+                        <Text style={[styles.title,{textAlign:'left'}]}>{(opponentData && opponentData.displayName) ? opponentData.displayName : 'Oponente'}</Text>
                         <Text style={styles.title}>Titulares</Text>
                         <Text style={[styles.title,{textAlign:'right'}]}>{userData.display_name}</Text>
                     </View>
@@ -510,15 +536,8 @@ const Matchups = ({route}) => {
                                 <MatchupPlayers
                                     key={index}
                                     index={index}
-                                    playerUserID={playerUser.player_id}
-                                    playerOpponentID={playerOpponent.player_id}
-                                    
-                                    playerUserName={playerUser.name}
-                                    playerOpponentName={playerOpponent.name}
-
-                                    playerUserProjectedPoints={playerUser.projected_points}
-                                    playerOpponentProjectedPoints={playerOpponent.projected_points}
-
+                                    playerUser={playerUser}
+                                    playerOpponent={playerOpponent}
                                     position={position}
                                 />
                             )
@@ -550,16 +569,8 @@ const Matchups = ({route}) => {
                             return (
                                 <MatchupPlayers
                                     key={index}
-
-                                    playerUserID={playerUser.player_id}
-                                    playerOpponentID={playerOpponent.player_id}
-
-                                    playerUserName={playerUser.name}
-                                    playerOpponentName={playerOpponent.name}
-
-                                    playerUserProjectedPoints={playerUser.projected_points}
-                                    playerOpponentProjectedPoints={playerOpponent.projected_points}
-
+                                    playerUser={playerUser}
+                                    playerOpponent={playerOpponent}
                                     position={position}
                                 />
                             )
