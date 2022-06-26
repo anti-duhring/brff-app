@@ -116,3 +116,15 @@ export const getPlayerPoints = (_id, _user_points, _opponent_points) => {
     return point
 }
 
+export const getPlayerProjectedPoints = (_player_stats, _league_scoring_settings) => {
+    let points = 0;
+    Object.entries(_player_stats).map(item => {
+        if(!_league_scoring_settings[item[0]]) return
+
+        const league_score = _league_scoring_settings[item[0]];
+        const point_made = item[1] * league_score;
+        points +=  point_made
+        //projected_points.push(item)
+    })
+    return points
+}

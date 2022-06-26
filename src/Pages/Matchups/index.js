@@ -8,7 +8,7 @@ import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import Tooltip from 'react-native-walkthrough-tooltip'
 import { Dimensions } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
-import { getColorPosition, getPlayerPoints } from "../../functions/GetRoster";
+import { getColorPosition, getPlayerPoints, getPlayerProjectedPoints } from "../../functions/GetRoster";
 import { AllPlayersContext } from "../../components/AllPlayersContext";
 import { LIGHT_GREEN, LIGHT_BLACK, LIGHT_GRAY, DARK_GRAY, DARKER_GRAY, WHITE, DARK_BLACK, DARK_GREEN } from '../../components/Variables'
 import ViewLightDark from '../../components/ViewLightDark';
@@ -100,7 +100,7 @@ const Matchups = ({route}) => {
                 }
             })
         }).catch((e) => {
-            console.log('Erro:',e)
+            console.log('Erro gl:',e)
             controller.abort()
             setErrorMessage(e)
         })
@@ -154,7 +154,7 @@ const Matchups = ({route}) => {
 
             getUsersData(leagueID, _roster_id, opponent_roster_id, _league_rosters)
         }).catch((e) => {
-            console.log('Erro:',e)
+            console.log('Erro gm:',e)
             controller.abort()
             setErrorMessage(e)
         })
@@ -192,7 +192,7 @@ const Matchups = ({route}) => {
         console.log('Fetching projections...')
         const WEEK = 1;
         const SEASON_TYPE = 'regular';
-        const POSITIONS = 'position[]=DEF&position[]=FLEX&position[]=K&position[]=QB&position[]=RB&position[]=TE&position[]=WR';
+        const POSITIONS = 'position[]=DEF&position[]=FLEX&position[]=K&position[]=QB&position[]=RB&position[]=TE&position[]=WR&position[]=IDP_FLEX&position[]=SUPER_FLEX&position[]=DL&position[]=LB&position[]=DB';
         const LEAGUE_TYPE = 'ppr';
 
         const URL = `https://api.sleeper.com/projections/nfl/2022/${_week}?season_type=${_season_type}&${POSITIONS}&order_by=${_league_type}`;
@@ -203,7 +203,7 @@ const Matchups = ({route}) => {
             setAllProjectedPoints(data);
 
         }).catch((e) => {
-            console.log('Error:', e)
+            console.log('Error pp:', e)
         })
     }
 
@@ -284,13 +284,22 @@ const Matchups = ({route}) => {
         let userProjectedPoints = 0.0;
         let opponentProjectedPoints = 0.0;
 
-            starters?.map(player => {
-                userProjectedPoints += player.projected_points
+
+        if(allProjectedPoints && starters && opponentStarters) {
+            const arr1 = allProjectedPoints?.filter((item) => 
+            { return starters.map(a => a.player_id).includes(item.player_id); }
+            );
+            const arr2 = allProjectedPoints?.filter((item) => 
+            { return opponentStarters.map(a => a.player_id).includes(item.player_id); }
+            );
+            arr1.map((player) => {
+                userProjectedPoints += getPlayerProjectedPoints(player.stats, leagueScoringSettings)
+
             })
-    
-            opponentStarters?.map(player => {
-                opponentProjectedPoints += player.projected_points
+            arr2.map((player) => {
+                opponentProjectedPoints += getPlayerProjectedPoints(player.stats, leagueScoringSettings)
             })
+        }
 
 
         return (
@@ -424,28 +433,13 @@ const Matchups = ({route}) => {
 
         const playerOpponentPoints = getPlayerPoints(playerOpponent.player_id, playersPoints, opponentPlayersPoints);
         const playerUserPoints = getPlayerPoints(playerUser.player_id, playersPoints, opponentPlayersPoints);
-
-
+        
          allProjectedPoints?.map((playerItem, index) => {
              if(playerItem.player_id==playerUser.player_id) {
-                 Object.entries(playerItem.stats).map(item => {
-                     if(!leagueScoringSettings[item[0]]) return
-
-                     const league_score = leagueScoringSettings[item[0]];
-                     const point_made = item[1] * league_score;
-                     player_projected_points +=  point_made
-                     //projected_points.push(item)
-                 })
+                player_projected_points = getPlayerProjectedPoints(playerItem.stats, leagueScoringSettings);
              }
              else if(playerItem.player_id==playerOpponent.player_id) {
-                Object.entries(playerItem.stats).map(item => {
-                    if(!leagueScoringSettings[item[0]]) return
-
-                    const league_score = leagueScoringSettings[item[0]];
-                    const point_made = item[1] * league_score;
-                    opponent_projected_points +=  point_made
-                    //projected_points.push(item)
-                })
+                opponent_projected_points = getPlayerProjectedPoints(playerItem.stats, leagueScoringSettings);
             }
          })
         
