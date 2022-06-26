@@ -392,8 +392,9 @@ const Matchups = ({route}) => {
     )
 
     const PlayerContainer = (props) => {
+
         const Points = () => (
-            <Text style={[styles.playerMatchupPoints,{textAlign:(props.position=='left') ? 'right' : 'left',color: DARKER_GRAY /*(props.playerPoints=='0.0') ? DARKER_GRAY : LIGHT_GRAY*/}]}>
+            <Text style={[styles.playerMatchupPoints,{textAlign:(props.position=='left') ? 'right' : 'left',color: (props.index==0 && props.position=='right') ? (showTip) ? WHITE : DARKER_GRAY : DARKER_GRAY /*(props.playerPoints=='0.0') ? DARKER_GRAY : LIGHT_GRAY*/}]}>
             {(props.player.player_id!=0) ?(props.playerPoints=='0.0') ? `${(props.position=='left') ? '*' : ''}${props.projectedPoints.toFixed(1)}${(props.position=='right') ? '*' : ''}` : props.playerPoints : null}
             </Text>
         )
@@ -571,7 +572,6 @@ const Matchups = ({route}) => {
                         })
                     :
                         roster_bench.map((position, index) => {
-                            
                             return (
                                 <MatchupPlayersPlaceholder
                                     key={index}

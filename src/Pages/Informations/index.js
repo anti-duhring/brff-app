@@ -10,7 +10,8 @@ const Informations = ({navigation, route}) => {
     const league = route.params?.leagueObject;
     const leagueDraftSettings = route.params?.leagueDraftSettings
     const scoringLeague = league.scoring_settings;
-    const leagueID = league.league_id
+    const leagueUsers = route.params?.leagueUsers;
+    const leagueID = league.league_id;
     const [scoringSettings, setScoringSettings] = useState([])
     const [generalInformations, setGeneralInformations] = useState([])
     const {season} = useContext(NFLStatusContext)
@@ -141,7 +142,7 @@ const Informations = ({navigation, route}) => {
     return ( 
         <View style={{flex:1,backgroundColor:'#0B0D0F'}}>
         <HeaderLeagueContextProvider leagueObject={league}>
-            <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} />
+            <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueUsers={leagueUsers} />
             <ViewLightDark title='Configurações da liga' titleSize={18}>
                 {generalInformations.map((element, index) => {
                     if(element.season!=season) return

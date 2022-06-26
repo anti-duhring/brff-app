@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, Image } from "react-native";
+import { Text, View, StyleSheet, Image, TouchableOpacity } from "react-native";
 import TabTopLeague from '../../components/TabTopLeague'
 import { HeaderLeagueContextProvider } from "../../components/HeaderLeagueContext";
 import { UserDataContext } from "../../components/UserDataContext";
@@ -25,7 +25,8 @@ const MyTeam = ({navigation, route}) => {
         player_id: null,
         position: null,
         points: 0,
-        projected_points: 0
+        projected_points: 0,
+        team: null,
     }
 
     const { userData } = useContext(UserDataContext)
@@ -77,6 +78,7 @@ const MyTeam = ({navigation, route}) => {
                 players.push({
                     name: allPlayers[player].full_name,
                     position: allPlayers[player].fantasy_positions[0],
+                    team: allPlayers[player].team,
                     player_id: player,
                     index: index
                 })
@@ -85,6 +87,7 @@ const MyTeam = ({navigation, route}) => {
                     name: 'Empty',
                     position: 'Empty',
                     index: index,
+                    team: null,
                     player_id: 0,
                 })
             }
@@ -102,10 +105,15 @@ const MyTeam = ({navigation, route}) => {
             <View style={styles.positionLegend}>
                 <Text style={[styles.playerPosition,{color:getColorPosition(position)}]}>{position.replace(/_/g,' ')}</Text>
             </View>
-            <View style={styles.playerNameContainer}>
-                <ProgressiveImage style={styles.imagePlayer} uri={`https://sleepercdn.com/content/nfl/players/thumb/${player.player_id}.jpg`} resizeMode='contain'/>
-                <Text style={styles.playerName}>{name}</Text>
-            </View>
+            <TouchableOpacity onPress={() => navigation.navigate('PlayerStats', {playerObject: allPlayers[player.player_id]})}>
+                <View style={styles.playerNameContainer}>
+                    <View style={{flexDirection:'row', alignItems:'flex-end',paddingRight:10}}>
+                        <ProgressiveImage style={styles.imagePlayer} uri={`https://sleepercdn.com/content/nfl/players/thumb/${player.player_id}.jpg`} resizeMode='cover'/>
+                        {player.team && <Image style={{width:26,height:26,marginLeft:-25,marginBottom:-5}} source={{uri: `https://sleepercdn.com/images/team_logos/nfl/${player.team.toLowerCase()}.png`}} resizeMode='cover' />}
+                    </View>
+                    <Text style={styles.playerName}>{name}</Text>
+                </View>
+            </TouchableOpacity>
         </View>
     )
 
@@ -127,7 +135,7 @@ const MyTeam = ({navigation, route}) => {
             <HeaderLeagueContextProvider leagueObject={league}>
             <TabTopLeague leagueDraftSettings={leagueDraftSettings} isAble={true} activeButton={route.params?.active} leagueObject={league} />
 
-            <ViewLightDark title='Titulares'>
+            <ViewLightDark title='Titulares' titleSize={18}>
                 {roster.map((position, index) => {     
                             if(position=='BN') return
                             return (
@@ -135,7 +143,7 @@ const MyTeam = ({navigation, route}) => {
                             )
                         })}
                 </ViewLightDark>
-                <ViewLightDark title='Banco'>
+                <ViewLightDark title='Banco' titleSize={18}>
                 {roster.map((position, index) => {     
                             if(position!='BN') return
                             return (
@@ -151,7 +159,7 @@ const MyTeam = ({navigation, route}) => {
         <HeaderLeagueContextProvider leagueObject={league}>
             <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueUsers={leagueUsers} />
 
-                <ViewLightDark title='Titulares'>
+                <ViewLightDark title='Titulares' titleSize={18}>
                 {
                         roster.map((position, index) => {
                             if(position=='BN') return
@@ -164,7 +172,7 @@ const MyTeam = ({navigation, route}) => {
                             )
                         })}
                 </ViewLightDark>
-                <ViewLightDark title='Banco'>
+                <ViewLightDark title='Banco' titleSize={18}>
                 {
                     roster_bench.map((position, index) => {
                         let player;
@@ -241,9 +249,9 @@ const styles = StyleSheet.create({
         color:'white'
     },
     imagePlayer: {
-        width: 40,
-        height: 40,
-        borderRadius:20,
+        width: 45,
+        height: 45,
+        borderRadius:50,
         backgroundColor: DARK_BLACK,
         marginRight: 10,
     }

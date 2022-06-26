@@ -170,7 +170,7 @@ const PlayoffBracket = ({route}) => {
                         </Text>
                         {(index==0 && position=='right') ? <View style={{flex:1,alignItems:'flex-end'}}>
                             <TooltipMessage position='left' message='Vitórias - Derrotas (- Empates)'>
-                                <Text style={{color:DARK_GRAY}}>{player.rosterData.settings.wins} - {player.rosterData.settings.losses}{(player.rosterData.settings.ties!=0) ? ' - '+player.rosterData.settings.ties : null}</Text>
+                                <Text style={{color:(showTip) ? WHITE : DARK_GRAY}}>{player.rosterData.settings.wins} - {player.rosterData.settings.losses}{(player.rosterData.settings.ties!=0) ? ' - '+player.rosterData.settings.ties : null}</Text>
                             </TooltipMessage>
                         </View> : <Text style={{color:DARK_GRAY}}>{player.rosterData.settings.wins} - {player.rosterData.settings.losses}{(player.rosterData.settings.ties!=0) ? ' - '+player.rosterData.settings.ties : null}</Text>}
                         

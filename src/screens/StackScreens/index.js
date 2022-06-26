@@ -13,6 +13,7 @@ import { Entypo } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { Easing } from 'react-native-reanimated'; 
 import { HEADER_BUTTON_BG } from '../../components/Variables';
+import PlayerStats from '../../Pages/PlayerStats';
 
 const Stack = createStackNavigator()
 
@@ -114,6 +115,15 @@ const StackScreens = ({navigation,route}) => {
               </TouchableOpacity>
             ),
             }} component={PlayoffBracket} />
+
+          <Stack.Screen name="PlayerStats" options={({route}) => ({
+            title:null,
+            headerTransparent: true,
+            headerLeft: () => (
+              <TouchableOpacity style={[styles.barButtons,{marginLeft:10}]} onPress={() => navigation.goBack()}>
+                <Ionicons name="close" size={24} color="white" />
+              </TouchableOpacity>
+            )})} component={PlayerStats} />
             
         </Stack.Navigator>
      );

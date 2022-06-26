@@ -23,6 +23,7 @@ const PlayerProfile = ({navigation, route}) => {
         name: 'Vazio',
         player_id: null,
         position: null,
+        team: null,
         points: 0,
         projected_points: 0
     }
@@ -76,6 +77,7 @@ const PlayerProfile = ({navigation, route}) => {
                 players.push({
                     name: allPlayers[player].full_name,
                     position: allPlayers[player].fantasy_positions[0],
+                    team: allPlayers[player].team,
                     player_id: player,
                     index: index
                 })
@@ -84,6 +86,7 @@ const PlayerProfile = ({navigation, route}) => {
                     name: 'Vazio',
                     position: 'Vazio',
                     player_id: null,
+                    team: null,
                     index: index
                 })
             }
@@ -129,7 +132,10 @@ const PlayerProfile = ({navigation, route}) => {
                 <Text style={[styles.playerPosition,{color:getColorPosition(position)}]}>{position.replace(/_/g,' ')}</Text>
             </View>
             <View style={styles.playerNameContainer}>
-                <ProgressiveImage style={styles.imagePlayer} uri={`https://sleepercdn.com/content/nfl/players/thumb/${player.player_id}.jpg`} resizeMode='contain'/>
+                <View style={{flexDirection:'row', alignItems:'flex-end',paddingRight:10}}>
+                    <ProgressiveImage style={styles.imagePlayer} uri={`https://sleepercdn.com/content/nfl/players/thumb/${player.player_id}.jpg`} resizeMode='cover' />
+                    {player.team && <Image style={{width:26,height:26,marginLeft:-25,marginBottom:-5}} source={{uri: `https://sleepercdn.com/images/team_logos/nfl/${player.team.toLowerCase()}.png`}} resizeMode='cover' />}
+                </View>
                 <Text style={styles.playerName}>{name}</Text>
             </View>
         </View>
