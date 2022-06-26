@@ -3,6 +3,8 @@ import TabTopLeague from '../../components/TabTopLeague'
 import { useState, useEffect, useContext } from "react";
 import { NFLStatusContext } from "../../components/NFLStatusContext";
 import { HeaderLeagueContextProvider } from "../../components/HeaderLeagueContext";
+import ViewLightDark from '../../components/ViewLightDark'
+import { LIGHT_GREEN } from "../../components/Variables";
 
 const Informations = ({navigation, route}) => {
     const league = route.params?.leagueObject;
@@ -65,6 +67,7 @@ const Informations = ({navigation, route}) => {
                     .replace(/\bfum\b/g,'{ATK}$15%Fumble')
                     .replace(/\bst_ff\b/g,'{ST}$15%Fumble forçado')
                     .replace(/\bbonus_rec_te\b/g,'{ATK}Bônus recepção de TE')
+                    .replace(/\bpass_int_td\b/g,'{DEF}TD de passe interceptado')
          return [str, keyArray[1]]
     }
     /*objectToArray(scoringLeague).forEach((setting) => {
@@ -92,6 +95,43 @@ const Informations = ({navigation, route}) => {
             })
     }
 
+    const InformationContainer = (props) => {
+        return (
+            <View style={styles.informationContent}>
+                <Text style={[styles.informationTitle,styles.informationConfig]}>{props.name} </Text>
+                <Text style={[styles.informationValue,styles.informationConfig]}>{props.value}</Text>
+            </View>
+        )
+    }
+
+    const ScoringContainer = (props) => {
+        return (
+            <ViewLightDark title={props.title} titleSize={18}>
+            {scoringSettings.map((key, index) => {
+                if(key[0].indexOf(`{${props.type}}`) == -1) return
+                const score = key[0].replace(/{ATK}/g,'').replace(/{ST}/g,'').replace(/{DEF}/g,'')
+                let styleValue = styles.informationValueNegative;
+                let valueSymbol = null;
+                if(key[1] > -1) {
+                    styleValue = styles.informationValuePositive; valueSymbol = '+';
+                }
+
+                return(
+                    <View key={index} style={styles.informationContent}>
+                        <Text style={styles.informationTitle}>
+                            {(score.indexOf('%')!=-1) ? score.split('%')[1] : score} 
+                        </Text>
+                        <Text style={[styles.informationValue, styleValue]}>
+                            {key[1] > 0 && valueSymbol}
+                            {(key[1] < 1 && key[1] > 0) ? key[1].toFixed(2) : key[1]}
+                        </Text>
+                    </View>
+                )
+            })}
+         </ViewLightDark>
+        )
+    }
+
     useEffect(() => {
         getSettings();
         getGeneralInfos();
@@ -102,156 +142,26 @@ const Informations = ({navigation, route}) => {
         <View style={{flex:1,backgroundColor:'#0B0D0F'}}>
         <HeaderLeagueContextProvider leagueObject={league}>
             <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} />
-            <View
-                style={{ borderRadius:12,margin:10,padding:10,
-                shadowColor:'#000',
-                shadowOffset: {
-                  width: 0,
-                  height:10
-                },
-                shadowOpacity:1,
-                shadowRadius:20,
-                elevation:10,
-                borderWidth:1,
-                borderColor: 'rgba(255,255,255,0)',
-                backgroundColor: '#15191C',
-                }}
-            >
-                <View style={styles.informationContent}>
-                    <Text style={styles.title}>Configurações da liga</Text>
-                </View>
+            <ViewLightDark title='Configurações da liga' titleSize={18}>
                 {generalInformations.map((element, index) => {
-                            if(element.season!=season) return
+                    if(element.season!=season) return
 
-                            return (
-                                <View key={index}>
-                                    <View style={styles.informationContent}>
-                                        <Text style={[styles.informationTitle,styles.informationConfig]}>Status </Text>
-                                        <Text style={[styles.informationValue,styles.informationConfig]}>{element.status.replace(/_/g,' ')}</Text>
-                                    </View>
-                                    <View style={styles.informationContent}>
-                                        <Text style={[styles.informationTitle,styles.informationConfig]}>Temporada </Text>
-                                        <Text style={[styles.informationValue,styles.informationConfig]}>{element.season_type}</Text>
-                                    </View>
-                                    <View style={styles.informationContent}>
-                                        <Text style={[styles.informationTitle,,styles.informationConfig]}>Tipo </Text>
-                                        <Text style={[styles.informationValue,styles.informationConfig]}>{element.metadata.scoring_type.replace(/_/g,' ')}</Text>
-                                    </View>
-                                    <View style={styles.informationContent}>
-                                        <Text style={[styles.informationTitle,styles.informationConfig]}>Times </Text>
-                                        <Text style={[styles.informationValue,styles.informationConfig]}>{element.settings.teams}</Text>
-                                    </View>
-                                    <View style={styles.informationContent}>
-                                        <Text style={[styles.informationTitle,styles.informationConfig]}>Draft rounds </Text>
-                                        <Text style={[styles.informationValue,styles.informationConfig]}>{element.settings.rounds}</Text>
-                                    </View>
-                                    <View style={styles.informationContent}>
-                                        <Text style={[styles.informationTitle,styles.informationConfig]}>Autopick </Text>
-                                        <Text style={[styles.informationValue,styles.informationConfig]}>{element.settings.cpu_autopick == 1 && 'Ligado'}
-                                        {element.settings.cpu_autopick == 0 && 'Desligado'}</Text>
-                                    </View>
-                                </View>
-                            )
+                    return (
+                        <View key={index}>
+                            <InformationContainer name='Status' value={element.status.replace(/_/g,' ')} />
+                            <InformationContainer name='Temporada' value={element.season_type} />
+                            <InformationContainer name='Tipo' value={element.metadata.scoring_type.replace(/_/g,' ')} />
+                            <InformationContainer name='Times' value={element.settings.teams} />
+                            <InformationContainer name='Draft rounds' value={element.settings.rounds} />
+                            <InformationContainer name='Autopick' value={(element.settings.cpu_autopick == 1) ? 'Ligado' : 'Desligado'}
+                                    />
+                        </View>
+                    )
                 })}
-
-            </View>
-            <View
-                style={{ borderRadius:12,margin:10,padding:10,
-                shadowColor:'#000',
-                shadowOffset: {
-                  width: 0,
-                  height:10
-                },
-                shadowOpacity:1,
-                shadowRadius:20,
-                elevation:10,
-                borderWidth:1,
-                borderColor: 'rgba(255,255,255,0)',
-                backgroundColor: '#15191C',
-                }}
-              >
-                <View style={styles.informationContainer}>
-                    <View style={styles.informationContent}>
-                        <Text style={styles.title}>Ataque</Text>
-                    </View>
-                    {scoringSettings.map((key, index) => {
-                        if(key[0].indexOf('{DEF}')!=-1||key[0].indexOf('{ST}')!=-1) return
-                        const score = key[0].replace(/{ATK}/g,'').replace(/{ST}/g,'').replace(/{DEF}/g,'')
-                        let styleValue = styles.informationValueNegative;
-                        let valueSymbol = null;
-                        if(key[1] > -1) {
-                            styleValue = styles.informationValuePositive; valueSymbol = '+';
-                        }
-
-                        return(
-                            <View key={index} style={styles.informationContent}>
-                                <Text style={styles.informationTitle}>
-                                    {(score.indexOf('%')!=-1) ? score.split('%')[1] : score} 
-                                </Text>
-                                <Text style={[styles.informationValue, styleValue]}>
-                                    {key[1] > 0 && valueSymbol}
-                                    {(key[1] < 1 && key[1] > 0) ? key[1].toFixed(2) : key[1]}
-                                </Text>
-                            </View>
-                        )
-                    })}
-                </View>
-
-                <View style={styles.informationContainer}>
-                    <View style={styles.informationContent}>
-                        <Text style={styles.title}>Defesa</Text>
-                    </View>
-                    {scoringSettings.map((key, index) => {
-                        if(key[0].indexOf('{ATK}')!=-1||key[0].indexOf('{ST}')!=-1) return
-                        const score = key[0].replace(/{ATK}/g,'').replace(/{ST}/g,'').replace(/{DEF}/g,'')
-                        let styleValue = styles.informationValueNegative;
-                        let valueSymbol = null;
-                        if(key[1] > -1) {
-                            styleValue = styles.informationValuePositive; valueSymbol = '+';
-                        }
-
-                        return(
-                            <View key={index} style={styles.informationContent}>
-                                <Text style={styles.informationTitle}>
-                                    {(score.indexOf('%')!=-1) ? score.split('%')[1] : score} 
-                                </Text>
-                                <Text style={[styles.informationValue, styleValue]}>
-                                    {key[1] > 0 && valueSymbol}
-                                    {(key[1] < 1 && key[1] > 0) ? key[1].toFixed(2) : key[1]}
-                                </Text>
-                            </View>
-                        )
-                    })}
-                </View>
-
-                <View style={styles.informationContainer}>
-                    <View style={styles.informationContent}>
-                        <Text style={styles.title}>Special Team</Text>
-                    </View>
-                    {scoringSettings.map((key, index) => {
-                        if(key[0].indexOf('{ATK}')!=-1||key[0].indexOf('{DEF}')!=-1) return
-                        const score = key[0].replace(/{ATK}/g,'').replace(/{ST}/g,'').replace(/{DEF}/g,'')
-                        let styleValue = styles.informationValueNegative;
-                        let valueSymbol = null;
-                        if(key[1] > -1) {
-                            styleValue = styles.informationValuePositive; valueSymbol = '+';
-                        }
-
-                        return(
-                            <View key={index} style={styles.informationContent}>
-                                <Text style={styles.informationTitle}>
-                                    {(score.indexOf('%')!=-1) ? score.split('%')[1] : score} 
-                                </Text>
-                                <Text style={[styles.informationValue, styleValue]}>
-                                    {key[1] > 0 && valueSymbol}
-                                    {(key[1] < 1 && key[1] > 0) ? key[1].toFixed(2) : key[1]}
-                                </Text>
-                            </View>
-                        )
-                    })}
-                </View>
-              </View>
-
+            </ViewLightDark>    
+            <ScoringContainer type='ATK' title='Ataque' />
+            <ScoringContainer type='DEF' title='Defesa' />
+            <ScoringContainer type='ST' title='Special Team' />
         </HeaderLeagueContextProvider> 
         </View>
     );
@@ -265,7 +175,7 @@ const styles = StyleSheet.create({
     },
     informationContent:{
         flexDirection:'row',
-        marginBottom:10,
+        marginTop:10,
     },
     informationTitle:{
         fontSize:15,
@@ -285,7 +195,7 @@ const styles = StyleSheet.create({
         flex:1
     },
     informationValuePositive: {
-        color:'rgba(0, 128, 55, 1)'
+        color: LIGHT_GREEN
     },
     informationValueNegative: {
         color:'red'

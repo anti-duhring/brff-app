@@ -181,7 +181,7 @@ const PlayoffBracket = ({route}) => {
 
     const Matchup = (props) => {
         return (
-            <ViewLightDark style={{flexDirection:'row'}} title={(props.type=='winners') ? `Matchup ${props.matchup.m}` : `Toilet Bowl - Matchup ${props.matchup.m}`} titleAlign='center'>
+            <ViewLightDark style={{flexDirection:'row'}} title={(props.type=='winners') ? `Matchup ${props.matchup.m}` : `Toilet Bowl - Matchup ${props.matchup.m}`} titleAlign='center' titleSize={18}>
 
                 <PlayerMatchup player={props.player1} position='left' index={props.index} winner={(props.matchup.w == props.player1.rosterID) ? true : false} />
                 <View style={styles.matchupVsContainer}>
@@ -263,7 +263,7 @@ const PlayoffBracket = ({route}) => {
 
                 <View style={{marginTop:20,marginLeft:10,marginRight:20,flexDirection:'row'}}>
                     <RoundSelect />
-                    <TooltipButton setTip={setTip} showTip={showTip} />
+                    {playoffData && <TooltipButton setTip={setTip} showTip={showTip} />}
                 </View>
 
                 <View>

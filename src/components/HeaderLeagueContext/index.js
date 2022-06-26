@@ -42,7 +42,7 @@ export const HeaderLeagueContextProvider = ({children, leagueObject}) => {
           barStyle="light-content"
          />
         <HeaderImageScrollView
-            maxHeight={250}
+            maxHeight={260}
             minHeight={55}
             minOverlayOpacity={0}
             headerImage={require('../../../assets/Images/leagueHeader2.png')}
@@ -53,7 +53,7 @@ export const HeaderLeagueContextProvider = ({children, leagueObject}) => {
                 </Animated.View>
             )}
             renderForeground={() => (
-                <View style={{flex:1,justifyContent:'flex-end',alignItems:'center',marginBottom:30,}}>
+                <View style={{flex:1,justifyContent:'flex-end',alignItems:'center',paddingBottom:30,marginHorizontal:5}}>
                     <Image source={{uri: avatar}} style={{width:100, height:100, borderRadius:100,}} />
                     <Text style={{color:'white',fontSize:24, fontWeight:'bold',marginTop:10}}>{leagueObject.name}</Text>
                     <View style={{paddingVertical:7,paddingHorizontal:10,marginTop:10,borderWidth:1,borderColor:'rgba(255,255,255,0.7)', borderRadius:5,}}>
@@ -78,9 +78,9 @@ const styles = StyleSheet.create({
         height: 55,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingTop: 15,
+        //paddingTop: 15,
         opacity: 0,
-        paddingLeft:30,
+        paddingLeft:40,
     },
     navTitle: {
         color: 'white',

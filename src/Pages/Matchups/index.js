@@ -393,7 +393,7 @@ const Matchups = ({route}) => {
 
     const PlayerContainer = (props) => {
         const Points = () => (
-            <Text style={[styles.playerMatchupPoints,{textAlign:(props.position=='left') ? 'right' : 'left',color:(props.playerPoints=='0.0') ? DARKER_GRAY : LIGHT_GRAY}]}>
+            <Text style={[styles.playerMatchupPoints,{textAlign:(props.position=='left') ? 'right' : 'left',color: DARKER_GRAY /*(props.playerPoints=='0.0') ? DARKER_GRAY : LIGHT_GRAY*/}]}>
             {(props.player.player_id!=0) ?(props.playerPoints=='0.0') ? `${(props.position=='left') ? '*' : ''}${props.projectedPoints.toFixed(1)}${(props.position=='right') ? '*' : ''}` : props.playerPoints : null}
             </Text>
         )
@@ -507,7 +507,7 @@ const Matchups = ({route}) => {
                 <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueUsers={leagueUsers} />
                 <View style={{marginTop:20,marginLeft:10,marginRight:20,flexDirection:'row'}}>
                     <WeekSelect />
-                    <TooltipButton setTip={setTip} showTip={showTip} />
+                    {starters && opponentStarters && <TooltipButton setTip={setTip} showTip={showTip} />}
                 </View>
                 
                 <MatchupField />
