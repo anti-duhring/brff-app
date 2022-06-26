@@ -2,7 +2,7 @@
 NFL Fantasy app with customized podcast
 
 ## Technology
--
+- Sleeper API
 
 ## Funcionality
 <img src="https://user-images.githubusercontent.com/99638905/172257104-bbb17269-fb35-4658-aa4b-40d468742a4a.jpg" width="300"  />
