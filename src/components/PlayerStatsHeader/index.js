@@ -2,6 +2,7 @@ import HeaderImageScrollView, { TriggeringView } from 'react-native-image-header
 import { View, StatusBar, Text, Image, Animated, StyleSheet, Dimensions } from "react-native";
 import {useRef} from 'react'
 import { DARK_GREEN } from '../Variables';
+import ProgressiveImage from '../ProgressiveImage'
 
 const PlayerStatsHeader = ({children, player}) => {
     const opacity = useRef(new Animated.Value(0)).current;
@@ -138,7 +139,8 @@ const PlayerStatsHeader = ({children, player}) => {
             maxHeight={200}
             minHeight={55}
             minOverlayOpacity={0}
-            renderHeader={() => <View style={{backgroundColor:getColorTeam(player.team)}}><Image source={{uri: `https://sleepercdn.com/images/team_logos/nfl/${player.team.toLowerCase()}.png`}} style={{ height: 200, width: Dimensions.get('window').width,opacity:0.3}} resizeMode='contain' /></View> }
+            renderHeader={() => <View style={{backgroundColor:getColorTeam(player.team)}}>
+                <Image source={{uri: `https://sleepercdn.com/images/team_logos/nfl/${player.team.toLowerCase()}.png`}} style={{ height: 200, width: Dimensions.get('window').width,opacity:0.3}} resizeMode='contain' /></View> }
             renderFixedForeground={() => (
                 <Animated.View style={[styles.navtitleView,{opacity}]}>
                     <Text style={styles.navTitle}>{player.full_name}</Text>
@@ -146,7 +148,7 @@ const PlayerStatsHeader = ({children, player}) => {
             )}
             renderForeground={() => (
                 <View style={{flex:1,justifyContent:'flex-end',alignItems:'center',}}>
-                    <Image source={{uri: `https://sleepercdn.com/content/nfl/players/${player.player_id}.jpg`}} style={{width:300, height:200}} resizeMode='cover' />
+                    <ProgressiveImage uri={`https://sleepercdn.com/content/nfl/players/${player.player_id}.jpg`} style={{width:300, height:200}} defaultSource={require('../../../assets/Images/167.jpg')} tintColor={true} resizeMode='cover'/>
                 </View>
             )}
         >

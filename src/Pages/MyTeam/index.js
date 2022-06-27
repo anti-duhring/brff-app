@@ -8,7 +8,7 @@ import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import { getColorPosition } from "../../functions/GetRoster";
 import ProgressiveImage from "../../components/ProgressiveImage";
 import ViewLightDark from '../../components/ViewLightDark'
-import { DARK_BLACK } from "../../components/Variables";
+import { DARK_BLACK, WHITE } from "../../components/Variables";
 
 const MyTeam = ({navigation, route}) => {
     const league = route.params?.leagueObject;
@@ -102,8 +102,8 @@ const MyTeam = ({navigation, route}) => {
 
     const Player = ({position, name, player}) => (
         <View style={styles.playerContainer}>
-            <View style={styles.positionLegend}>
-                <Text style={[styles.playerPosition,{color:getColorPosition(position)}]}>{position.replace(/_/g,' ')}</Text>
+            <View style={[styles.positionLegend,{backgroundColor:getColorPosition(position)}]}>
+                <Text style={[styles.playerPosition,{/*color:getColorPosition(position)*/color:WHITE}]}>{position.replace(/_/g,' ')}</Text>
             </View>
             <TouchableOpacity onPress={() => navigation.navigate('PlayerStats', {playerObject: allPlayers[player.player_id]})}>
                 <View style={styles.playerNameContainer}>

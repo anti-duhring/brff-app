@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext, useRef } from "react";
-import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Pressable, TouchableOpacity, Image } from "react-native";
 import PlayerStatsHeader from "../../components/PlayerStatsHeader";
 import { DARK_GRAY, DARK_GREEN, LIGHT_BLACK, LIGHT_GRAY, LIGHT_GREEN, WHITE } from "../../components/Variables";
 import ViewLightDark from "../../components/ViewLightDark";
@@ -7,6 +7,7 @@ import { NFLStatusContext } from "../../components/NFLStatusContext";
 import Tooltip from "react-native-walkthrough-tooltip";
 import SelectDropdown from "react-native-select-dropdown";
 import { Entypo } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
 
 const PlayerStats = ({route}) => {
     const {season} = useContext(NFLStatusContext);
@@ -17,26 +18,27 @@ const PlayerStats = ({route}) => {
 
     const [rowStatsColored, setRowStatsColored] = useState(null);
     const [showTip, setTip] = useState(null)
+    const [showLegendTip, setShowLegendTip] = useState(false);
 
     const statsToShow = {
-        "RB" : ['rush_yd', 'rush_ypa', 'rush_att','rush_yac', 'rush_td', 'rush_rz_att', 'rush_td_lng', 'rush_lng', 'rec_yd', 'rec','rec_td', 'rec_ypt',  'rec_tgt', 'off_snp'],
-        "QB": ['pass_yd','pass_td','pass_att','cmp_pct','pass_int','pass_rz_att','rush_yd','rush_td','rush_att','off_snp'],
-        "WR": ['rec','rec_yd', 'rec_tgt', 'rec_lng','rec_td','rush_yd', 'rush_ypa', 'rush_att', 'rush_td','off_snp'],
-        "TE": ['rec','rec_yd', 'rec_tgt', 'rec_lng','rec_td','rush_yd', 'rush_ypa', 'rush_att', 'rush_td','off_snp']
+        "RB" : ['rush_yd', 'rush_ypa', 'rush_att','rush_yac', 'rush_td', 'rush_rz_att', 'rec_yd', 'rec','rec_td', 'rec_ypt',  'rec_tgt','fum','fum_lost', 'off_snp'],
+        "QB": ['pass_yd','pass_td','pass_att','cmp_pct','pass_int','pass_rtg', 'pass_rz_att','rush_yd','rush_td','rush_att','pass_sack','pass_sack_yds','fum','fum_lost','off_snp'],
+        "WR": ['rec','rec_yd', 'rec_tgt','rec_ypt','rec_td','fum','fum_lost','rush_yd', 'rush_ypa', 'rush_att', 'rush_td','off_snp'],
+        "TE": ['rec','rec_yd', 'rec_tgt','rec_ypt','rec_td','fum','fum_lost','rush_yd', 'rush_ypa', 'rush_att', 'rush_td','off_snp'],
+        "DL": ['idp_tkl','idp_sack','idp_ff','idp_fum_rec','idp_int', 'idp_def_td','idp_qb_hit', 'idp_tkl_ast', 'idp_tkl_loss', 'def_snp'],
+        "DE": ['idp_tkl','idp_sack','idp_ff','idp_fum_rec','idp_int', 'idp_def_td','idp_qb_hit', 'idp_tkl_ast', 'idp_tkl_loss', 'def_snp'],
+        "LB": ['idp_tkl','idp_sack','idp_ff','idp_fum_rec','idp_int', 'idp_def_td','idp_qb_hit', 'idp_tkl_ast', 'idp_tkl_loss', 'def_snp'],
+        "DB": ['idp_tkl', 'idp_sack','idp_ff','idp_fum_rec','idp_int','idp_def_td','def_snp']
     }
 
     useEffect(() => {
         getPlayerStats(player.player_id, 'regular', season);
-        console.log(player.player_id)
+        //console.log(player.player_id, player.position)
     }, [])
-
-    const objectToArray = (obj) => {
-        return Object.keys(obj).map((key) => {return key})
-    }
 
     const statsToShowName = (position) => {
         return statsToShow[position].map(stat => { 
-            return stat.replace(/\boff_snp\b/g,'Snaps').replace(/\bpass_yd\b/g,'Jardas passadas').replace(/\bpass_td\b/g,'TDs passados').replace(/\bpass_att\b/g,'Passes tentados').replace(/\bcomp_pct\b/g,'Porcentagem (%) de passes completos').replace(/\bpass_int\b/g,'Interceptações').replace(/\bpass_rz_att\b/g,'Tentativas de passe na RZ').replace(/\brush_yd\b/g,'Jardas corridas').replace(/\brush_ypa\b/g,'Jardas corridas por tentativa').replace(/\brush_att\b/g,'Total de corridas tentadas').replace(/\brush_yac\b/g,'Jardas corridas após contato').replace(/\brush_td\b/g,'TDs corridos').replace(/\brush_rz_att\b/g,'Corridas na RedZone').replace(/\brush_td_lng\b/g,'TD mais longo').replace(/\brush_lng\b/g,'Corrida mais longa (em jardas)').replace(/\brec_yd\b/g,'Jardas recebidas').replace(/\brec_lng\b/g,'Recepção mais longa (em jardas)').replace(/\brec\b/g,'Recepções').replace(/\brec_ypt\b/g,'Jardas recebidas por alvo').replace(/\brec_td\b/g,'TDs recebidos').replace(/\brec_tgt\b/g,'Alvos de passe');
+            return stat.replace(/\bpass_rtg\b/g,'Rating no jogo').replace(/\bpass_sack_yds\b/g,'Jardas perdidas nos sacks sofridos').replace(/\bpass_sack\b/g,'Sacks sofridos').replace(/\bfum_lost\b/g,'Fumble sofrido e não recuperado pelo ataque').replace(/\bfum\b/g,'Fumble sofrido').replace(/\bidp_pass_def\b/g,'Passes defendidos').replace(/\bdef_snp\b/g,'Snaps').replace(/\bidp_def_td\b/g,'Touchdowns').replace(/\bidp_fum_rec\b/g,'Fumble recuperado').replace(/\bidp_ff\b/g,'Fumble forçado').replace(/\btm_def_snp\b/g,'Snaps').replace(/\bidp_tkl_loss\b/g,'Tackles pra perdas de jardas').replace(/\bidp_tkl_ast\b/g,'Assistência em tackles (jogador fez o tackle junto com outro defensor)').replace(/\bidp_tkl\b/g,'Tackles totais').replace(/\bidp_qb_hit\b/g,'QB Hits').replace(/\bsack_yd\b/g,'Jardas que o ataque perdeu devido aos sacks do jogador').replace(/\bidp_sack\b/g,'Sacks totais').replace(/\boff_snp\b/g,'Snaps').replace(/\bpass_yd\b/g,'Jardas passadas').replace(/\bpass_td\b/g,'TDs passados').replace(/\bpass_att\b/g,'Passes tentados').replace(/\bcomp_pct\b/g,'Porcentagem (%) de passes completos').replace(/\bpass_int\b/g,'Interceptações').replace(/\bpass_rz_att\b/g,'Tentativas de passe na RZ').replace(/\brush_yd\b/g,'Jardas corridas').replace(/\brush_ypa\b/g,'Jardas corridas por tentativa').replace(/\brush_att\b/g,'Total de corridas tentadas').replace(/\brush_yac\b/g,'Jardas corridas após contato').replace(/\brush_td\b/g,'TDs corridos').replace(/\brush_rz_att\b/g,'Corridas na RedZone').replace(/\brush_td_lng\b/g,'TD mais longo').replace(/\brush_lng\b/g,'Corrida mais longa (em jardas)').replace(/\brec_yd\b/g,'Jardas recebidas').replace(/\brec_lng\b/g,'Recepção mais longa (em jardas)').replace(/\brec\b/g,'Recepções').replace(/\brec_ypt\b/g,'Jardas recebidas por alvo').replace(/\brec_td\b/g,'TDs recebidos').replace(/\brec_tgt\b/g,'Alvos de passe');
         });
     }
 
@@ -171,7 +173,7 @@ const PlayerStats = ({route}) => {
             placement={position}
             backgroundColor={(hasBackground) ? 'rgba(0,0,0,0.5)' :'rgba(0,0,0,0)'}
             useReactNativeModal={true}
-            contentStyle={{backgroundColor:DARK_GREEN}}
+            contentStyle={{backgroundColor:getColorTeam(player.team)}}
         >
             {children}
         </Tooltip>
@@ -214,7 +216,7 @@ const PlayerStats = ({route}) => {
         });
 
         return (
-            <View style={{flexDirection:'row',padding:10}}>
+            <View style={{flexDirection:'row',padding:10, flex:1}}>
             <SelectDropdown
                 data={arr}
                 defaultValue={seasonToShowStats}
@@ -242,13 +244,86 @@ const PlayerStats = ({route}) => {
         )
     }
 
+    const TableStatsContainer = ({children, index}) => (
+        <Pressable onPress={() => setRowStatsColored((rowStatsColored==index) ? null : index)}>
+            <View style={[styles.tableStats,{backgroundColor:(rowStatsColored==index) ? getColorTeam(player.team) : (index % 2 == 0) ? 'rgba(38, 45, 51, 0.3)' : 'transparent'}]} >
+                {children}
+            </View>
+        </Pressable>
+    )
+
+    const TableStats = ({item, index}) => (
+        <TableStatsContainer index={index}>
+                <Text style={styles.columnValue}>{item[0]}</Text>
+                {(item[1]) ? <View style={{flex:1,width:80,alignItems:'center'}}><Image source={{uri: `https://sleepercdn.com/images/team_logos/nfl/${item[1].opponent.toLowerCase()}.png`}} style={{width:25, height:25}} resizeMode='contain' /></View> :     <Text style={styles.columnValue}>-</Text>}
+                { 
+                    statsToShow[player.position]?.map((stat, i) => {
+
+                        if(!item[1]) {
+                            return (
+                                <Text key={i} style={styles.columnValue}>-</Text>
+                            )
+                        }
+                        else if(!item[1].stats[stat]) {
+                            return (
+                                <Text key={i} style={styles.columnValue}>-</Text>
+                            )
+                        } else {
+                            return (
+                                <Text key={i} style={styles.columnValue}>{item[1].stats[stat]}</Text>
+                            )
+                        }
+                    })
+                }
+            </TableStatsContainer>
+    )
+
+    const TableStatsPlaceholder = ({index}) => (
+        <TableStatsContainer index={index}>
+            <Text style={styles.columnValue}>{index + 1}</Text>
+            <Text style={styles.columnValue}>-</Text>
+            {
+                new Array(statsToShow[player.position].length).fill(0).map((stat, i) => {
+                    return (
+                    <Text key={i} style={styles.columnValue}>-</Text>
+                    )
+                })
+            }
+        </TableStatsContainer>
+    )
+
+    const LegendTipButton = () => (
+        <View style={{flex:1,justifyContent:'center',alignItems:'flex-end',marginRight:20}}>
+            <Tooltip
+                isVisible={showLegendTip}
+                content={
+                    <View>
+                        <Text style={{color:WHITE}}>Clique no nome de uma das estatísticas e aguarde o balão surgir para mostrar o seu significado</Text>
+                    </View>
+                }
+
+                onClose={() => setShowLegendTip(false)}
+                placement='left'
+                useReactNativeModal={true}
+                contentStyle={{backgroundColor:getColorTeam(player.team)}}
+            >
+                <TouchableOpacity onPress={() => {setShowLegendTip((showLegendTip) ? false : true); }}>
+                    <AntDesign name="questioncircleo" size={20} color={LIGHT_GRAY} />
+                </TouchableOpacity>
+            </Tooltip>
+         </View>
+    )
+
     return ( 
         <PlayerStatsHeader player={player}>
             <ViewLightDark title={`${player.full_name} #${player.number}`} titleSize={20}>
                 <Informations />
             </ViewLightDark>
 
-            <MenuYearsStats />
+            <View style={{flexDirection:'row'}}>
+                <MenuYearsStats />
+                <LegendTipButton />
+            </View>
 
             <ViewLightDark>
                 <ScrollView horizontal={true} contentContainerStyle={{flexDirection:'column'}}>
@@ -258,43 +333,24 @@ const PlayerStats = ({route}) => {
                         {
                             statsToShow[player.position]?.map((stat, i) => {
 
-                                return (<StatsRowTitle key={i} index={i+3} message={statsToShowName(player.position)[i]} name={stat} />)
+                                return (<StatsRowTitle key={i} index={i+3} message={statsToShowName(player.position)[i]} name={stat.replace(/idp_/g,'')} />)
                             })
                         }
                     </View>
 
-                {playerSeasonStats && 
+                {(playerSeasonStats) ? 
                     Object.entries(playerSeasonStats).map((item, index) => {
                         //if(!item[1]) return
 
                         return (
-                            <Pressable key={index} onPress={() => setRowStatsColored((rowStatsColored==index) ? null : index)}>
-                            <View style={{flexDirection:'row',height:30,justifyContent:'center',borderRadius:5,alignItems:'center',backgroundColor:(rowStatsColored==index) ? getColorTeam(player.team) : (index % 2 == 0) ? 'rgba(255,255,255,0.1)' : 'transparent'}} >
-                                <Text style={styles.columnValue}>{item[0]}</Text>
-                                <Text style={styles.columnValue}>{(item[1]) ? item[1].opponent : '-'}</Text>
-                                { 
-                                    statsToShow[player.position]?.map((stat, i) => {
-
-                                        if(!item[1]) {
-                                            return (
-                                                <Text key={i} style={styles.columnValue}>-</Text>
-                                            )
-                                        }
-                                        else if(!item[1].stats[stat]) {
-                                            return (
-                                                <Text key={i} style={styles.columnValue}>-</Text>
-                                            )
-                                        } else {
-                                            return (
-                                                <Text key={i} style={styles.columnValue}>{item[1].stats[stat]}</Text>
-                                            )
-                                        }
-                                    })
-                                }
-                            </View>
-                            </Pressable>
+                            <TableStats key={index} item={item} index={index} />
                         )
                         
+                     }) :
+                     new Array(18).fill(0).map((item, index) => {
+                        return (
+                            <TableStatsPlaceholder key={index} index={index} />
+                        )
                      })
                 }
                 </ScrollView>
@@ -331,5 +387,12 @@ const styles = StyleSheet.create({
         width:70,
         marginRight:10,
         textAlign:'center'
+    },
+    tableStats: {
+        flexDirection:'row',
+        height:30,
+        justifyContent:'center',
+        borderRadius:5,
+        alignItems:'center',
     }
 })
