@@ -59,6 +59,13 @@ const PlayoffBracket = ({route}) => {
     }
 
     const getPlayerInfo = (owner_id) => {
+        if(!owner_id) {
+            return {
+                display_name: 'Bot',
+                avatar: null
+            }
+        }
+
         let playerInfo = null;
         leagueUsersData.map(user => {
             if(user.user_id == owner_id) {
@@ -166,7 +173,7 @@ const PlayoffBracket = ({route}) => {
                     </View>
                     <View style={{flex:1,alignItems:(position=='left') ? 'flex-start' : 'flex-end'}}>
                         <Text style={{color:WHITE, textAlign: (position=='left') ? 'left' : 'right'}}>    
-                            { player.userData.display_name }
+                            { player.userData && player.userData.display_name }
                         </Text>
                         {(index==0 && position=='right') ? <View style={{flex:1,alignItems:'flex-end'}}>
                             <TooltipMessage position='left' message='Vitórias - Derrotas (- Empates)'>

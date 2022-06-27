@@ -56,7 +56,7 @@ const PlayerStatsHeader = ({children, player}) => {
                 color = 'rgb(49, 29, 0)'
                 break;
             case 'PIT':
-                color = 'rgb(0, 0, 0)'
+                color = 'rgb(255, 182, 18)'
                 break;
             case 'CIN':
                 color = 'rgb(251, 79, 20)'
@@ -80,7 +80,7 @@ const PlayerStatsHeader = ({children, player}) => {
                 color = 'rgb(0, 133, 202)'
                 break;
             case 'ATL':
-                color = 'rgb(0, 0, 0)'
+                color = 'rgb(167, 25, 48)'
                 break;
             case 'NO':
                 color = 'rgb(177, 177, 177)'
