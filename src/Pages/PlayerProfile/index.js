@@ -46,9 +46,9 @@ const PlayerProfile = ({navigation, route}) => {
             data.map((roster, index) => {
                 if(roster.owner_id==userID) {
                     if(roster.players) {
-                        const benchs = roster.players.filter((item) => {
+                        const benchs = (roster.starters) ? roster.players.filter((item) => {
                             return roster.starters.indexOf(item) === -1;
-                        });
+                        }) : null;
     
                         setStarters(getPlayers(roster.starters))
                         setBench(getPlayers(benchs))
@@ -72,6 +72,8 @@ const PlayerProfile = ({navigation, route}) => {
 
     const getPlayers = (_players) => {
         let players = [];
+        if(!_players) return
+
         _players.map((player, index) => {
             if(player!=0) {
                 players.push({
@@ -103,13 +105,17 @@ const PlayerProfile = ({navigation, route}) => {
             <View style={[styles.positionLegend,{backgroundColor:getColorPosition(position)}]}>
                 <Text style={[styles.playerPosition,{color:WHITE}]}>{position.replace(/_/g,' ')}</Text>
             </View>
-            <TouchableOpacity onPress={() => navigation.navigate('PlayerStats', {playerObject: allPlayers[player.player_id]})}>
+            <TouchableOpacity onPress={() => {
+                if(!player.player_id) return
+
+                navigation.navigate('PlayerStats', {playerObject: allPlayers[player.player_id]})
+            }}>
             <View style={styles.playerNameContainer}>
                 <View style={{flexDirection:'row', alignItems:'flex-end',paddingRight:10}}>
                     <ProgressiveImage style={styles.imagePlayer} uri={`https://sleepercdn.com/content/nfl/players/thumb/${player.player_id}.jpg`} resizeMode='cover' />
                     {player.team && <Image style={{width:26,height:26,marginLeft:-25,marginBottom:-5}} source={{uri: `https://sleepercdn.com/images/team_logos/nfl/${player.team.toLowerCase()}.png`}} resizeMode='cover' />}
                 </View>
-                <Text style={styles.playerName}>{name}</Text>
+                <Text style={styles.playerName}>{(player.player_id) ? `${allPlayers[player.player_id].first_name} ${allPlayers[player.player_id].last_name}` : player.name}</Text>
             </View>
             </TouchableOpacity>
         </View>
@@ -225,7 +231,7 @@ const PlayerProfile = ({navigation, route}) => {
                 </ViewLightDark>
                 <ViewLightDark title='Banco'>
                 {
-                    roster_bench.map((position, index) => {
+                    roster_bench?.map((position, index) => {
                         let player;
 
                             (bench && bench[index]) ? player = bench[index] : player = playerEmpty

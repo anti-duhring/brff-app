@@ -19,6 +19,9 @@ const MyTeam = ({navigation, route}) => {
     const roster_bench = roster.filter((item) => {
         return item.indexOf('BN') !== -1;
     });
+    const roster_starters = roster.filter((item) => {
+        return item.indexOf('BN') == -1;
+    });
     const playerEmpty = {
         index: null,
         name: 'Vazio',
@@ -49,10 +52,10 @@ const MyTeam = ({navigation, route}) => {
             data.map((roster, index) => {
                 if(roster.owner_id==userID) {
                     if(roster.players) {
-                        const benchs = roster.players.filter((item) => {
+                        const benchs = (roster.starters) ? roster.players.filter((item) => {
                             return roster.starters.indexOf(item) === -1;
-                        });
-    
+                        }) : null;
+                        
                         setStarters(getPlayers(roster.starters))
                         setBench(getPlayers(benchs))
                         
@@ -72,6 +75,7 @@ const MyTeam = ({navigation, route}) => {
 
     const getPlayers = (_players) => {
         let players = [];
+        if(!_players) return
 
         _players.map((player, index) => {
             if(player!=0) {
@@ -102,19 +106,21 @@ const MyTeam = ({navigation, route}) => {
 
     const Player = ({position, name, player}) => {
         const typePlayer = (isNaN(new Number(player.player_id))) ? 'TEAM' : 'PLAYER';
-        if(typePlayer=='TEAM') console.log(player);
        return (
         <View style={styles.playerContainer}>
             <View style={[styles.positionLegend,{backgroundColor:getColorPosition(position)}]}>
                 <Text style={[styles.playerPosition,{/*color:getColorPosition(position)*/color:WHITE}]}>{position.replace(/_/g,' ')}</Text>
             </View>
-            <TouchableOpacity onPress={() => navigation.navigate('PlayerStats', {playerObject: allPlayers[player.player_id]})}>
+            <TouchableOpacity onPress={() => {
+                if(!player.player_id) return
+                navigation.navigate('PlayerStats', {playerObject: allPlayers[player.player_id]})
+            }}>
                 <View style={styles.playerNameContainer}>
                     <View style={{flexDirection:'row', alignItems:'flex-end',paddingRight:10}}>
                         <ProgressiveImage style={[styles.imagePlayer, {backgroundColor:(typePlayer == 'TEAM') ? 'transparent' : DARK_BLACK}]} uri={(typePlayer == 'TEAM') ? `https://sleepercdn.com/images/team_logos/nfl/${player.team.toLowerCase()}.png` : `https://sleepercdn.com/content/nfl/players/thumb/${player.player_id}.jpg`} resizeMode='cover'/>
                         {player.team && typePlayer == 'PLAYER' &&  <Image style={{width:26,height:26,marginLeft:-25,marginBottom:-5}} source={{uri: `https://sleepercdn.com/images/team_logos/nfl/${player.team.toLowerCase()}.png`}} resizeMode='cover' />}
                     </View>
-                    <Text style={styles.playerName}>{`${allPlayers[player.player_id].first_name} ${allPlayers[player.player_id].last_name}`}</Text>
+                    <Text style={styles.playerName}>{(player.player_id) ? `${allPlayers[player.player_id].first_name} ${allPlayers[player.player_id].last_name}` : player.name}</Text>
                 </View>
             </TouchableOpacity>
         </View>
@@ -139,20 +145,24 @@ const MyTeam = ({navigation, route}) => {
             <TabTopLeague leagueDraftSettings={leagueDraftSettings} isAble={true} activeButton={route.params?.active} leagueObject={league} />
 
             <ViewLightDark title='Titulares' titleSize={18}>
-                {roster.map((position, index) => {     
+                {
+                roster.map((position, index) => {     
                             if(position=='BN') return
                             return (
                                 <PlayerPlaceholder key={index} position={position} />
                             )
-                        })}
+                        }) 
+                }
                 </ViewLightDark>
                 <ViewLightDark title='Banco' titleSize={18}>
-                {roster.map((position, index) => {     
+                { 
+                    roster.map((position, index) => {     
                             if(position!='BN') return
                             return (
                                 <PlayerPlaceholder key={index} position={position} />
                             )
-                        })}
+                    })
+                }
                 </ViewLightDark>
             </HeaderLeagueContextProvider>
         )
@@ -173,18 +183,21 @@ const MyTeam = ({navigation, route}) => {
                             return (
                                 <Player key={index} position={position} player={player} name={player.name} />
                             )
-                        })}
+                        })
+                }
                 </ViewLightDark>
                 <ViewLightDark title='Banco' titleSize={18}>
                 {
-                    roster_bench.map((position, index) => {
+                
+                    roster_bench?.map((position, index) => {
                         let player;
 
                             (bench && bench[index]) ? player = bench[index] : player = playerEmpty
+
                         return (
                             <Player key={index} position={position} name={player.name} player={player} />
                         )
-                    })
+                    }) 
                 }
                 </ViewLightDark>
         </HeaderLeagueContextProvider> 

@@ -121,9 +121,9 @@ const Matchups = ({navigation, route}) => {
 
                 if(roster.roster_id==_roster_id) {
                     matchup_id = roster.matchup_id
-                    const benchs = roster.players.filter((item) => {
+                    const benchs = (roster.starters) ? roster.players.filter((item) => {
                         return roster.starters.indexOf(item) === -1;
-                    })
+                    }) : null;
 
                     setPlayersPoints(roster.players_points)
                     setTotalPoints(roster.points)
@@ -137,9 +137,9 @@ const Matchups = ({navigation, route}) => {
 
             data.map((roster, index) => {
                 if(roster.matchup_id == matchup_id && roster.roster_id != _roster_id) {
-                    const benchs = roster.players.filter((item) => {
+                    const benchs = (roster.starters) ? roster.players.filter((item) => {
                         return roster.starters.indexOf(item) === -1;
-                    })
+                    }) : null;
 
                     setOpponentPlayersPoints(roster.players_points)
                     setOpponentTotalPoints(roster.points)
@@ -162,6 +162,8 @@ const Matchups = ({navigation, route}) => {
 
     const getPlayers = (_players) => {
         let players = [];
+        if(!_players) return
+
         _players.map((player, index) => {
             if(player!=0) {
                 let projected_points = 0;
@@ -402,8 +404,12 @@ const Matchups = ({navigation, route}) => {
         if(props.position=='left') {
             return(
                 <View style={styles.matchupPlayerContainer}>
-                    <TouchableOpacity style={{flex:3}} onPress={() => navigation.navigate('PlayerStats', {playerObject: allPlayers[props.player.player_id]})}>
-                        <Text style={styles.playerMatchupLeft}>{`${allPlayers[props.player.player_id].first_name} ${allPlayers[props.player.player_id].last_name}`}</Text>   
+                    <TouchableOpacity style={{flex:3}} onPress={() => {
+                        if(!props.player_player_id) return
+                        
+                        navigation.navigate('PlayerStats', {playerObject: allPlayers[props.player.player_id]})
+                    }}>
+                        <Text style={styles.playerMatchupLeft}>{(player.player_id) ? `${allPlayers[props.player.player_id].first_name} ${allPlayers[props.player.player_id].last_name}` : player.name}</Text>   
                     </TouchableOpacity>
                     <Points />
                     
@@ -420,8 +426,12 @@ const Matchups = ({navigation, route}) => {
                 </View> :
                 <Points />
             }
-            <TouchableOpacity style={{flex:3}} onPress={() => navigation.navigate('PlayerStats', {playerObject: allPlayers[props.player.player_id]})}>
-                <Text style={styles.playerMatchupRight}>{`${allPlayers[props.player.player_id].first_name} ${allPlayers[props.player.player_id].last_name}`}</Text>
+            <TouchableOpacity style={{flex:3}} onPress={() => {
+                if(!props.player_player_id) return
+                
+                navigation.navigate('PlayerStats', {playerObject: allPlayers[props.player.player_id]})
+            }}>
+                <Text style={styles.playerMatchupRight}>{(props.player.player_id) ? `${allPlayers[props.player.player_id].first_name} ${allPlayers[props.player.player_id].last_name}` : props.player.name}</Text>
             </TouchableOpacity>
         </View>
             )
