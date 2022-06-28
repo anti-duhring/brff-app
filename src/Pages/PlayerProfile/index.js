@@ -1,11 +1,11 @@
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { useEffect, useState, useContext } from "react";
 import PlayerProfileHeader from "../../components/PlayerProfileHeader";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import { AllPlayersContext } from "../../components/AllPlayersContext";
 import { getColorPosition } from "../../functions/GetRoster";
 import ViewLightDark from "../../components/ViewLightDark";
-import { DARK_BLACK } from "../../components/Variables";
+import { DARK_BLACK, WHITE } from "../../components/Variables";
 import ProgressiveImage from "../../components/ProgressiveImage";
 
 const PlayerProfile = ({navigation, route}) => {
@@ -92,35 +92,7 @@ const PlayerProfile = ({navigation, route}) => {
             }
         })
         return players
-    }
-
-    /*const getStartersInfo = async(players) => {
-        let startersWithInfo = []
-        await players.reduce(async(memo, player, index) => {
-            await memo;
-            if(player != 0){
-                const response = await fetch(`https://teste-draft.netlify.app/.netlify/functions/getplayersdata?name=${player}`)
-                const data = await response.json()
-                
-                let name = data.full_name;
-                if(isNaN(player)) name = `${data.first_name} ${data.last_name}`
-
-                startersWithInfo.push({
-                    name: name,
-                    position: data.fantasy_positions[0],
-                    index: index
-                })
-            } else {
-                startersWithInfo.push({
-                    name: 'Empty',
-                    position: 'Empty',
-                    index: index
-                })
-            }
-        }, Promise.resolve())
-        setStarters(startersWithInfo)
-    }*/
-    
+    } 
 
     useEffect(() => {
         getRoster()
@@ -128,9 +100,10 @@ const PlayerProfile = ({navigation, route}) => {
 
     const Player = ({position, name, player}) => (
         <View style={styles.playerContainer}>
-            <View style={styles.positionLegend}>
-                <Text style={[styles.playerPosition,{color:getColorPosition(position)}]}>{position.replace(/_/g,' ')}</Text>
+            <View style={[styles.positionLegend,{backgroundColor:getColorPosition(position)}]}>
+                <Text style={[styles.playerPosition,{color:WHITE}]}>{position.replace(/_/g,' ')}</Text>
             </View>
+            <TouchableOpacity onPress={() => navigation.navigate('PlayerStats', {playerObject: allPlayers[player.player_id]})}>
             <View style={styles.playerNameContainer}>
                 <View style={{flexDirection:'row', alignItems:'flex-end',paddingRight:10}}>
                     <ProgressiveImage style={styles.imagePlayer} uri={`https://sleepercdn.com/content/nfl/players/thumb/${player.player_id}.jpg`} resizeMode='cover' />
@@ -138,13 +111,14 @@ const PlayerProfile = ({navigation, route}) => {
                 </View>
                 <Text style={styles.playerName}>{name}</Text>
             </View>
+            </TouchableOpacity>
         </View>
     )
 
     const PlayerPlaceholder = ({position}) => (
         <View style={styles.playerContainer}>
-        <View style={styles.positionLegend}>
-            <Text style={[styles.playerPosition,{color:getColorPosition(position)}]}>{position.replace(/_/g,' ')}</Text></View>
+        <View style={[styles.positionLegend,{backgroundColor:getColorPosition(position)}]}>
+            <Text style={[styles.playerPosition,{color:WHITE}]}>{position.replace(/_/g,' ')}</Text></View>
         <View style={styles.playerNameContainer}>
             <Image source={require('../../../assets/Images/player_default.png')} style={styles.imagePlayer} resizeMode='contain' />
             <SkeletonPlaceholder highlightColor="#303840" backgroundColor="#262D33">

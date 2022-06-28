@@ -16,7 +16,7 @@ import TooltipButton from "../../components/TooltipButton";
 
 const windowWidth = Dimensions.get('window').width;
 
-const Matchups = ({route}) => {
+const Matchups = ({navigation, route}) => {
     const league = route.params?.leagueObject;
     const leagueID = league.league_id
     const leagueScoringSettings = league.scoring_settings;
@@ -402,8 +402,11 @@ const Matchups = ({route}) => {
         if(props.position=='left') {
             return(
                 <View style={styles.matchupPlayerContainer}>
-                    <Text style={styles.playerMatchupLeft}>{props.player.name}</Text>   
+                    <TouchableOpacity style={{flex:3}} onPress={() => navigation.navigate('PlayerStats', {playerObject: allPlayers[props.player.player_id]})}>
+                        <Text style={styles.playerMatchupLeft}>{props.player.name}</Text>   
+                    </TouchableOpacity>
                     <Points />
+                    
                 </View>
             )
         } else {
@@ -417,7 +420,9 @@ const Matchups = ({route}) => {
                 </View> :
                 <Points />
             }
-            <Text style={styles.playerMatchupRight}>{props.player.name}</Text>
+            <TouchableOpacity style={{flex:3}} onPress={() => navigation.navigate('PlayerStats', {playerObject: allPlayers[props.player.player_id]})}>
+                <Text style={styles.playerMatchupRight}>{props.player.name}</Text>
+            </TouchableOpacity>
         </View>
             )
             
@@ -448,7 +453,7 @@ const Matchups = ({route}) => {
         <View style={styles.matchupContainer}>
 
             <PlayerContainer player={playerOpponent} projectedPoints={opponent_projected_points} playerPoints={playerOpponentPoints} position='left' index={props.index} />
-            <Text style={[styles.position, {color:getColorPosition(props.position)}]}>
+            <Text style={[styles.position, {color:WHITE,backgroundColor:getColorPosition(props.position)}]}>
                 {props.position.replace(/_/g,' ')}
             </Text>
             <PlayerContainer player={playerUser} projectedPoints={player_projected_points} playerPoints={playerUserPoints} index={props.index} position='right' />
@@ -464,7 +469,7 @@ const Matchups = ({route}) => {
                 </SkeletonPlaceholder>
             </View>
 
-        <Text style={[styles.position, {color:getColorPosition(position)}]}>{position.replace(/_/g,' ')}</Text>
+        <Text style={[styles.position, {color:WHITE,backgroundColor:getColorPosition(position)}]}>{position.replace(/_/g,' ')}</Text>
 
         <View style={{flex:3}}>
             <SkeletonPlaceholder highlightColor="#303840" backgroundColor="#262D33">

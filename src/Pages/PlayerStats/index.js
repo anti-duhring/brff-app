@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext, useRef } from "react";
-import { View, Text, StyleSheet, ScrollView, Pressable, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Pressable, TouchableOpacity, Image, ToastAndroid } from "react-native";
 import PlayerStatsHeader from "../../components/PlayerStatsHeader";
 import { DARK_GRAY, DARK_GREEN, LIGHT_BLACK, LIGHT_GRAY, LIGHT_GREEN, WHITE } from "../../components/Variables";
 import ViewLightDark from "../../components/ViewLightDark";
@@ -147,6 +147,10 @@ const PlayerStats = ({route}) => {
         return color
     }
 
+    const showToast = (_message) => {
+        ToastAndroid.show(_message, ToastAndroid.LONG, ToastAndroid.CENTER);
+    }
+
     const getPlayerStats = async(_player_id, _type, _year) => {
         const URL = `https://api.sleeper.com/stats/nfl/player/${_player_id}?season_type=${_type}&season=${_year}&grouping=week`;
         //console.log(URL);
@@ -199,7 +203,7 @@ const PlayerStats = ({route}) => {
     const Informations = () => (
         <>
         <InfoContainer title='Posição' value={player.fantasy_positions} />
-        <InfoContainer title='Time' value={player.team} />
+        <InfoContainer title='Time' value={(player.team) ? player.team : 'Free Agent'} />
         <InfoContainer title='Idade' value={player.age} />
         <InfoContainer title='Altura' value={`${player.height[0]}'${player.height[1]}"`} />
         <InfoContainer title='Peso' value={`${player.weight} lbs`} />
@@ -307,7 +311,7 @@ const PlayerStats = ({route}) => {
                 useReactNativeModal={true}
                 contentStyle={{backgroundColor:getColorTeam(player.team)}}
             >
-                <TouchableOpacity onPress={() => {setShowLegendTip((showLegendTip) ? false : true); }}>
+                <TouchableOpacity onPress={() => { showToast('Clique no nome de uma das estatísticas e aguarde o balão surgir para mostrar o seu significado'); /*setShowLegendTip((showLegendTip) ? false : true); */}}>
                     <AntDesign name="questioncircleo" size={20} color={LIGHT_GRAY} />
                 </TouchableOpacity>
             </Tooltip>

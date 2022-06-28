@@ -140,7 +140,7 @@ const PlayerStatsHeader = ({children, player}) => {
             minHeight={55}
             minOverlayOpacity={0}
             renderHeader={() => <View style={{backgroundColor:getColorTeam(player.team)}}>
-                <Image source={{uri: `https://sleepercdn.com/images/team_logos/nfl/${player.team.toLowerCase()}.png`}} style={{ height: 200, width: Dimensions.get('window').width,opacity:0.3}} resizeMode='contain' /></View> }
+                <Image source={{uri: `https://sleepercdn.com/images/team_logos/nfl/${(player.team) ? player.team.toLowerCase() : null}.png`}} style={{ height: 200, width: Dimensions.get('window').width,opacity:0.3}} resizeMode='contain' /></View> }
             renderFixedForeground={() => (
                 <Animated.View style={[styles.navtitleView,{opacity}]}>
                     <Text style={styles.navTitle}>{player.full_name}</Text>

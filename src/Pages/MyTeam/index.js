@@ -119,8 +119,8 @@ const MyTeam = ({navigation, route}) => {
 
     const PlayerPlaceholder = ({position}) => (
         <View style={styles.playerContainer}>
-        <View style={styles.positionLegend}>
-            <Text style={[styles.playerPosition,{color:getColorPosition(position)}]}>{position.replace(/_/g,' ')}</Text></View>
+        <View style={[styles.positionLegend,{backgroundColor:getColorPosition(position)}]}>
+            <Text style={[styles.playerPosition,{color:WHITE}]}>{position.replace(/_/g,' ')}</Text></View>
         <View style={styles.playerNameContainer}>
             <Image source={require('../../../assets/Images/player_default.png')} style={styles.imagePlayer} resizeMode='contain' />
             <SkeletonPlaceholder highlightColor="#303840" backgroundColor="#262D33">
