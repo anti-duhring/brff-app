@@ -14,6 +14,7 @@ const PlayerStats = ({route}) => {
     const [seasonToShowStats, setSeasonToShowStats] = useState(season)
 
     const player = route.params?.playerObject;
+    const typePlayer = (isNaN(new Number(player.player_id))) ? 'TEAM' : 'PLAYER';
     const [playerSeasonStats, setPlayerSeasonStats] = useState(null);
 
     const [rowStatsColored, setRowStatsColored] = useState(null);
@@ -28,7 +29,9 @@ const PlayerStats = ({route}) => {
         "DL": ['idp_tkl','idp_sack','idp_ff','idp_fum_rec','idp_int', 'idp_def_td','idp_qb_hit', 'idp_tkl_ast', 'idp_tkl_loss', 'def_snp'],
         "DE": ['idp_tkl','idp_sack','idp_ff','idp_fum_rec','idp_int', 'idp_def_td','idp_qb_hit', 'idp_tkl_ast', 'idp_tkl_loss', 'def_snp'],
         "LB": ['idp_tkl','idp_sack','idp_ff','idp_fum_rec','idp_int', 'idp_def_td','idp_qb_hit', 'idp_tkl_ast', 'idp_tkl_loss', 'def_snp'],
-        "DB": ['idp_tkl', 'idp_sack','idp_ff','idp_fum_rec','idp_int','idp_def_td','def_snp']
+        "DB": ['idp_tkl', 'idp_sack','idp_ff','idp_fum_rec','idp_int','idp_def_td','def_snp'],
+        "K": ['xpa', 'xpm','fga','fgm','fgm_20_29','fgm_yds_over_30','fgm_40_49','fgm_50p'],
+        "DEF": ['pts_allow', 'sack', 'ff', 'fum_rec', 'int','def_td', 'yds_allow','tkl_loss']
     }
 
     useEffect(() => {
@@ -38,7 +41,57 @@ const PlayerStats = ({route}) => {
 
     const statsToShowName = (position) => {
         return statsToShow[position].map(stat => { 
-            return stat.replace(/\bpass_rtg\b/g,'Rating no jogo').replace(/\bpass_sack_yds\b/g,'Jardas perdidas nos sacks sofridos').replace(/\bpass_sack\b/g,'Sacks sofridos').replace(/\bfum_lost\b/g,'Fumble sofrido e não recuperado pelo ataque').replace(/\bfum\b/g,'Fumble sofrido').replace(/\bidp_pass_def\b/g,'Passes defendidos').replace(/\bdef_snp\b/g,'Snaps').replace(/\bidp_def_td\b/g,'Touchdowns').replace(/\bidp_fum_rec\b/g,'Fumble recuperado').replace(/\bidp_ff\b/g,'Fumble forçado').replace(/\btm_def_snp\b/g,'Snaps').replace(/\bidp_tkl_loss\b/g,'Tackles pra perdas de jardas').replace(/\bidp_tkl_ast\b/g,'Assistência em tackles (jogador fez o tackle junto com outro defensor)').replace(/\bidp_tkl\b/g,'Tackles totais').replace(/\bidp_qb_hit\b/g,'QB Hits').replace(/\bsack_yd\b/g,'Jardas que o ataque perdeu devido aos sacks do jogador').replace(/\bidp_sack\b/g,'Sacks totais').replace(/\boff_snp\b/g,'Snaps').replace(/\bpass_yd\b/g,'Jardas passadas').replace(/\bpass_td\b/g,'TDs passados').replace(/\bpass_att\b/g,'Passes tentados').replace(/\bcomp_pct\b/g,'Porcentagem (%) de passes completos').replace(/\bpass_int\b/g,'Interceptações').replace(/\bpass_rz_att\b/g,'Tentativas de passe na RZ').replace(/\brush_yd\b/g,'Jardas corridas').replace(/\brush_ypa\b/g,'Jardas corridas por tentativa').replace(/\brush_att\b/g,'Total de corridas tentadas').replace(/\brush_yac\b/g,'Jardas corridas após contato').replace(/\brush_td\b/g,'TDs corridos').replace(/\brush_rz_att\b/g,'Corridas na RedZone').replace(/\brush_td_lng\b/g,'TD mais longo').replace(/\brush_lng\b/g,'Corrida mais longa (em jardas)').replace(/\brec_yd\b/g,'Jardas recebidas').replace(/\brec_lng\b/g,'Recepção mais longa (em jardas)').replace(/\brec\b/g,'Recepções').replace(/\brec_ypt\b/g,'Jardas recebidas por alvo').replace(/\brec_td\b/g,'TDs recebidos').replace(/\brec_tgt\b/g,'Alvos de passe');
+            return stat.replace(/\btkl_loss\b/g,'Tackle pra perda de jardas')
+            .replace(/\byds_allow\b/g,'Jardas cedidas')
+            .replace(/\bdef_td\b/g,'Touchdowns')
+            .replace(/\bint\b/g,'Interceptações')
+            .replace(/\bfum_rec\b/g,'Fumbles recuperados')
+            .replace(/\bff\b/g,'Fumbles forçados')
+            .replace(/\bsack\b/g,'Sacks')
+            .replace(/\bpts_allow\b/g,'Pontos cedidos')
+            .replace(/\bfgm_50p\b/g,'Field Goal de 50 ou mais jardas')
+            .replace(/\bfgm_40_49\b/g,'Field Goal de 40 até 49 jardas')
+            .replace(/\bfgm_yds_over_30\b/g,'Field Goal de 30 até 39 jardas')
+            .replace(/\bfgm_20_29\b/g,'Field Goal de 20 até 29 jardas')
+            .replace(/\bfgn\b/g,'Field Goals acertados')
+            .replace(/\bfga\b/g,'Field Goals tentados')
+            .replace(/\bxpa\b/g,'Extra points acertados')
+            .replace(/\bxpa\b/g,'Extra points tentados')
+            .replace(/\bpass_rtg\b/g,'Rating no jogo')
+            .replace(/\bpass_sack_yds\b/g,'Jardas perdidas nos sacks sofridos')
+            .replace(/\bpass_sack\b/g,'Sacks sofridos')
+            .replace(/\bfum_lost\b/g,'Fumble sofrido e não recuperado pelo ataque')
+            .replace(/\bfum\b/g,'Fumble sofrido')
+            .replace(/\bidp_pass_def\b/g,'Passes defendidos').replace(/\bdef_snp\b/g,'Snaps')
+            .replace(/\bidp_def_td\b/g,'Touchdowns')
+            .replace(/\bidp_fum_rec\b/g,'Fumble recuperado')
+            .replace(/\bidp_ff\b/g,'Fumble forçado')
+            .replace(/\btm_def_snp\b/g,'Snaps')
+            .replace(/\bidp_tkl_loss\b/g,'Tackles pra perda de jardas')
+            .replace(/\bidp_tkl_ast\b/g,'Assistência em tackles (jogador fez o tackle junto com outro defensor)')
+            .replace(/\bidp_tkl\b/g,'Tackles totais')
+            .replace(/\bidp_qb_hit\b/g,'QB Hits')
+            .replace(/\bsack_yd\b/g,'Jardas que o ataque perdeu devido aos sacks do jogador')
+            .replace(/\bidp_sack\b/g,'Sacks totais')
+            .replace(/\boff_snp\b/g,'Snaps')
+            .replace(/\bpass_yd\b/g,'Jardas passadas').replace(/\bpass_td\b/g,'TDs passados')
+            .replace(/\bpass_att\b/g,'Passes tentados').replace(/\bcomp_pct\b/g,'Porcentagem (%) de passes completos')
+            .replace(/\bpass_int\b/g,'Interceptações')
+            .replace(/\bpass_rz_att\b/g,'Tentativas de passe na RZ')
+            .replace(/\brush_yd\b/g,'Jardas corridas')
+            .replace(/\brush_ypa\b/g,'Jardas corridas por tentativa')
+            .replace(/\brush_att\b/g,'Total de corridas tentadas')
+            .replace(/\brush_yac\b/g,'Jardas corridas após contato')
+            .replace(/\brush_td\b/g,'TDs corridos')
+            .replace(/\brush_rz_att\b/g,'Corridas na RedZone')
+            .replace(/\brush_td_lng\b/g,'TD mais longo')
+            .replace(/\brush_lng\b/g,'Corrida mais longa (em jardas)')
+            .replace(/\brec_yd\b/g,'Jardas recebidas')
+            .replace(/\brec_lng\b/g,'Recepção mais longa (em jardas)')
+            .replace(/\brec\b/g,'Recepções')
+            .replace(/\brec_ypt\b/g,'Jardas recebidas por alvo')
+            .replace(/\brec_td\b/g,'TDs recebidos')
+            .replace(/\brec_tgt\b/g,'Alvos de passe');
         });
     }
 
@@ -215,7 +268,7 @@ const PlayerStats = ({route}) => {
     )
 
     const MenuYearsStats = () => {
-        let arr = new Array(player.years_exp + 1).fill(0).map((item, index) => {
+        let arr = new Array((typePlayer == 'TEAM') ? 11 : player.years_exp + 1).fill(0).map((item, index) => {
             return season - index
         });
 
@@ -320,9 +373,12 @@ const PlayerStats = ({route}) => {
 
     return ( 
         <PlayerStatsHeader player={player}>
-            <ViewLightDark title={`${player.full_name} #${player.number}`} titleSize={20}>
+            {(typePlayer=='PLAYER') ? <ViewLightDark title={`${player.full_name} #${player.number}`} titleSize={20}>
                 <Informations />
-            </ViewLightDark>
+            </ViewLightDark> : 
+            <View style={styles.titleContainer}>
+                <Text style={styles.title}>{`Defesa do ${player.first_name} ${player.last_name}`}</Text>
+            </View>}
 
             <View style={{flexDirection:'row'}}>
                 <MenuYearsStats />
@@ -337,7 +393,7 @@ const PlayerStats = ({route}) => {
                         {
                             statsToShow[player.position]?.map((stat, i) => {
 
-                                return (<StatsRowTitle key={i} index={i+3} message={statsToShowName(player.position)[i]} name={stat.replace(/idp_/g,'')} />)
+                                return (<StatsRowTitle key={i} index={i+3} message={statsToShowName(player.position)[i]} name={stat.replace(/idp_/g,'').replace(/\bfgm_yds_over_30\b/g,'fgm_30_39')} />)
                             })
                         }
                     </View>
@@ -398,5 +454,15 @@ const styles = StyleSheet.create({
         justifyContent:'center',
         borderRadius:5,
         alignItems:'center',
+    },
+    title: {
+        fontWeight:'bold',
+        color:WHITE,
+        flex:1,
+        fontSize: 20
+    }, 
+    titleContainer: {
+        margin:10,
+        padding:10,
     }
 })

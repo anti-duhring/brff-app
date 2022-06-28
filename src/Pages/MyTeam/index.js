@@ -100,7 +100,10 @@ const MyTeam = ({navigation, route}) => {
         getRoster()
     },[])
 
-    const Player = ({position, name, player}) => (
+    const Player = ({position, name, player}) => {
+        const typePlayer = (isNaN(new Number(player.player_id))) ? 'TEAM' : 'PLAYER';
+        if(typePlayer=='TEAM') console.log(player);
+       return (
         <View style={styles.playerContainer}>
             <View style={[styles.positionLegend,{backgroundColor:getColorPosition(position)}]}>
                 <Text style={[styles.playerPosition,{/*color:getColorPosition(position)*/color:WHITE}]}>{position.replace(/_/g,' ')}</Text>
@@ -108,14 +111,14 @@ const MyTeam = ({navigation, route}) => {
             <TouchableOpacity onPress={() => navigation.navigate('PlayerStats', {playerObject: allPlayers[player.player_id]})}>
                 <View style={styles.playerNameContainer}>
                     <View style={{flexDirection:'row', alignItems:'flex-end',paddingRight:10}}>
-                        <ProgressiveImage style={styles.imagePlayer} uri={`https://sleepercdn.com/content/nfl/players/thumb/${player.player_id}.jpg`} resizeMode='cover'/>
-                        {player.team && <Image style={{width:26,height:26,marginLeft:-25,marginBottom:-5}} source={{uri: `https://sleepercdn.com/images/team_logos/nfl/${player.team.toLowerCase()}.png`}} resizeMode='cover' />}
+                        <ProgressiveImage style={[styles.imagePlayer, {backgroundColor:(typePlayer == 'TEAM') ? 'transparent' : DARK_BLACK}]} uri={(typePlayer == 'TEAM') ? `https://sleepercdn.com/images/team_logos/nfl/${player.team.toLowerCase()}.png` : `https://sleepercdn.com/content/nfl/players/thumb/${player.player_id}.jpg`} resizeMode='cover'/>
+                        {player.team && typePlayer == 'PLAYER' &&  <Image style={{width:26,height:26,marginLeft:-25,marginBottom:-5}} source={{uri: `https://sleepercdn.com/images/team_logos/nfl/${player.team.toLowerCase()}.png`}} resizeMode='cover' />}
                     </View>
-                    <Text style={styles.playerName}>{name}</Text>
+                    <Text style={styles.playerName}>{`${allPlayers[player.player_id].first_name} ${allPlayers[player.player_id].last_name}`}</Text>
                 </View>
             </TouchableOpacity>
         </View>
-    )
+    )}
 
     const PlayerPlaceholder = ({position}) => (
         <View style={styles.playerContainer}>

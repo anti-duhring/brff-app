@@ -5,6 +5,7 @@ import { DARK_GREEN } from '../Variables';
 import ProgressiveImage from '../ProgressiveImage'
 
 const PlayerStatsHeader = ({children, player}) => {
+    const typePlayer = (isNaN(new Number(player.player_id))) ? 'TEAM' : 'PLAYER';
     const opacity = useRef(new Animated.Value(0)).current;
 
     const fadeIn = () => {
@@ -143,12 +144,12 @@ const PlayerStatsHeader = ({children, player}) => {
                 <Image source={{uri: `https://sleepercdn.com/images/team_logos/nfl/${(player.team) ? player.team.toLowerCase() : null}.png`}} style={{ height: 200, width: Dimensions.get('window').width,opacity:0.3}} resizeMode='contain' /></View> }
             renderFixedForeground={() => (
                 <Animated.View style={[styles.navtitleView,{opacity}]}>
-                    <Text style={styles.navTitle}>{player.full_name}</Text>
+                    <Text style={styles.navTitle}>{`${player.first_name} ${player.last_name}`}</Text>
                 </Animated.View>
             )}
             renderForeground={() => (
                 <View style={{flex:1,justifyContent:'flex-end',alignItems:'center',}}>
-                    <ProgressiveImage uri={`https://sleepercdn.com/content/nfl/players/${player.player_id}.jpg`} style={{width:300, height:200}} defaultSource={require('../../../assets/Images/167.jpg')} tintColor={true} resizeMode='cover'/>
+                    <ProgressiveImage uri={(typePlayer == 'TEAM') ? `https://sleepercdn.com/images/team_logos/nfl/${player.team.toLowerCase()}.png` : `https://sleepercdn.com/content/nfl/players/${player.player_id}.jpg`} style={{width:300, height:200}} defaultSource={require('../../../assets/Images/167.jpg')} tintColor={true} resizeMode={(typePlayer=='TEAM') ? 'contain' : 'cover'}/>
                 </View>
             )}
         >

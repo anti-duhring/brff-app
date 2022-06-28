@@ -403,7 +403,7 @@ const Matchups = ({navigation, route}) => {
             return(
                 <View style={styles.matchupPlayerContainer}>
                     <TouchableOpacity style={{flex:3}} onPress={() => navigation.navigate('PlayerStats', {playerObject: allPlayers[props.player.player_id]})}>
-                        <Text style={styles.playerMatchupLeft}>{props.player.name}</Text>   
+                        <Text style={styles.playerMatchupLeft}>{`${allPlayers[props.player.player_id].first_name} ${allPlayers[props.player.player_id].last_name}`}</Text>   
                     </TouchableOpacity>
                     <Points />
                     
@@ -421,7 +421,7 @@ const Matchups = ({navigation, route}) => {
                 <Points />
             }
             <TouchableOpacity style={{flex:3}} onPress={() => navigation.navigate('PlayerStats', {playerObject: allPlayers[props.player.player_id]})}>
-                <Text style={styles.playerMatchupRight}>{props.player.name}</Text>
+                <Text style={styles.playerMatchupRight}>{`${allPlayers[props.player.player_id].first_name} ${allPlayers[props.player.player_id].last_name}`}</Text>
             </TouchableOpacity>
         </View>
             )
