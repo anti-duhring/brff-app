@@ -159,7 +159,7 @@ useEffect(() => {
                 shadowRadius:20,
                 elevation:10,
                 borderWidth:1,
-                borderColor: (itemAnimate == item.key) ? 'rgba(0, 128, 55, 1)' : 'rgba(255,255,255,0)',
+                borderColor: /*(itemAnimate == item.key) ? 'rgba(0, 128, 55, 1)' :*/ 'rgba(255,255,255,0)',
                 backgroundColor: '#15191C',
                 transform:[{scale: (itemAnimate == item.key) ? animateX : 1}]
                 }}

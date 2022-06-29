@@ -146,7 +146,7 @@ const EpisodeList = ({navigation}) => {
 
     const EpisodePlaceholder = () => {
         return (
-            <View style={{marginHorizontal:10,marginBottom:20,}}>
+            <View style={{marginHorizontal:10,marginBottom:30,}}>
                 <SkeletonPlaceholder highlightColor="#ffffff1a" backgroundColor="#15191C">
                     <View style={{height:85, width:'100%', borderTopLeftRadius:BORDER_RADIUS,borderTopRightRadius:BORDER_RADIUS}} />
                     <View style={{marginTop:10,flexDirection:'row',justifyContent:'space-between',alignItems:'flex-start'}}>

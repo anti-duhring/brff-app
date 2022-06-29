@@ -5,9 +5,9 @@ const ViewLightDark = (props) => {
     return ( 
         <View style={[styles.container,props.containerStyle]}>
             {props.title && <View style={styles.titleContainer}>
-                <Text style={[styles.title, {fontSize:(props.titleSize) ? props.titleSize : 15,textAlign:props.titleAlign}]}>{props.title}</Text>
+                <Text style={[styles.title, {fontSize:(props.titleSize) ? props.titleSize : 15,textAlign:(props.titleAlign) ? props.titleAlign : 'left'}]}>{props.title}</Text>
             </View>}
-            <View style={props.style}>
+            <View style={[props.style]}>
                 {props.children}
             </View>
         </View>
@@ -27,7 +27,6 @@ const styles = StyleSheet.create({
     title: {
         fontWeight:'bold',
         color:WHITE,
-        flex:1
     }, 
     titleContainer: {
         marginBottom:0,

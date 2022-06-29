@@ -349,16 +349,21 @@ const PlayerStats = ({route}) => {
                 }
             });
         });
-        console.log(totalValues);
 
         return (
             <TableStatsContainer index={index}>
                 <Text style={styles.columnValue}>Total</Text>
                 <Text style={styles.columnValue}>-</Text>
                 {
+
                     totalValues.map((stat, i) => {
                        return(
-                        <Text key={i} style={styles.columnValue}>{(statsToShow[player.position][i].indexOf('rtg')!=-1 || statsToShow[player.position][i].indexOf('pct')!=-1) ? (stat / playedGames).toFixed(1) : (stat - Math.floor(stat) != 0) ? stat.toFixed(1) : stat}</Text>
+                        <Text key={i} style={styles.columnValue}>{(
+                            statsToShow[player.position][i].indexOf('rtg')!=-1 || 
+                            statsToShow[player.position][i].indexOf('pct')!=-1 || 
+                            statsToShow[player.position][i].indexOf('ypa')!=-1 || 
+                            statsToShow[player.position][i].indexOf('ypc')!=-1 || 
+                            statsToShow[player.position][i].indexOf('ypt')!=-1) ? (stat / playedGames).toFixed(1) : (stat - Math.floor(stat) != 0) ? stat.toFixed(1) : stat}</Text>
                        ) 
                     })
                 }

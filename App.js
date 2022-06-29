@@ -17,8 +17,8 @@ import { AllPlayersContextProvider } from "./src/components/AllPlayersContext";
 import { PlayerContextProvider } from "./src/components/PlayerContext";
 import TrackPlayer, { Capability } from "react-native-track-player";
 import { FontAwesome5 } from '@expo/vector-icons';
-import { AntDesign } from '@expo/vector-icons';
 import { WHITE, DARK_GREEN, DARKER_GRAY, DARK_BLACK } from "./src/components/Variables";
+import AboutUs from "./src/Pages/AboutUs";
 
 const Drawer = createDrawerNavigator();
 
@@ -215,17 +215,23 @@ export default function App() {
             drawerIcon: ({color}) => (
               <FontAwesome5 name="football-ball" size={17} color={color} />
             )}} />
-          <Drawer.Screen name="Trending Players" options={{
+          <Drawer.Screen name="TrendingPlayers" options={{
             headerShown: false,
+            drawerLabel:'Trending Players' ,
             drawerIcon: ({color}) => (
-            <AntDesign name="areachart"  size={17} color={color} />
+            <FontAwesome5 name="chart-line"  size={17} color={color} />
           )}} component={TrendingPlayers}/>
           <Drawer.Screen name="Podcast" options={{
             headerShown: false,
             drawerIcon: ({color}) => (
               <FontAwesome5 name="podcast" size={17} color={color} />
             )}} component={PodcastScreens}/>
-          
+          <Drawer.Screen name="Sobre" options={{
+            headerShown: false,
+            drawerLabel:'Sobre nós' ,
+            drawerIcon: ({color}) => (
+              <FontAwesome5 name="hands-helping" size={15} color={color} />
+            )}} component={AboutUs}/>
           </>
         ) : (
           <Drawer.Screen name="Login" options={{headerShown: false}} component={SignIn}/>

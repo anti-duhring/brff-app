@@ -1,6 +1,6 @@
 import { TouchableOpacity, StyleSheet, Pressable } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
-
+import { useEffect } from 'react';
 import LeagueList from '../../Pages/LeagueList';
 import Informations from '../../Pages/Informations';
 import MyTeam from '../../Pages/MyTeam';
@@ -37,7 +37,7 @@ const closeConfig = {
   }
 }
 
-const StackScreens = ({navigation,route}) => {
+const StackScreens = ({route}) => {
 
 
     return ( 
@@ -46,7 +46,7 @@ const StackScreens = ({navigation,route}) => {
             presentation:'card',
           }}>
   
-            <Stack.Screen name="LeagueList"  options={{ 
+            <Stack.Screen name="LeagueList"  options={({navigation}) => ({ 
             title:'',
             headerTitleStyle:{color:'#FCFCFC'},
             headerTransparent: true,
@@ -54,10 +54,10 @@ const StackScreens = ({navigation,route}) => {
              <Pressable style={styles.toggleButton} onPress={() => navigation.toggleDrawer()}>
                <Entypo name="menu" size={24} color="#C6C6C6" />
              </Pressable>
-            ) }} component={LeagueList} />
+            ) })} component={LeagueList} />
   
 
-            <Stack.Screen name="PlayerProfile" options={({route}) => ({
+            <Stack.Screen name="PlayerProfile" options={({navigation}) => ({
             title:null,
             headerTransparent: true,
             headerLeft: () => (
@@ -66,7 +66,7 @@ const StackScreens = ({navigation,route}) => {
               </TouchableOpacity>
             )})} component={PlayerProfile} />
 
-          <Stack.Screen name="Players" options={{
+          <Stack.Screen name="Players" options={({navigation}) => ({
             title: '',//route.params?.leagueName,
             headerTransparent: true,
             headerLeft: () => (
@@ -74,9 +74,9 @@ const StackScreens = ({navigation,route}) => {
                 <Ionicons name="arrow-back" size={24} color="white" />
               </TouchableOpacity>
             ),
-            }} component={Players} />
+            })} component={Players} />
 
-          <Stack.Screen name="Informations" options={{
+          <Stack.Screen name="Informations" options={({navigation}) => ({
             title: '',//route.params?.leagueName,
             headerTransparent: true,
             headerLeft: () => (
@@ -84,9 +84,9 @@ const StackScreens = ({navigation,route}) => {
                 <Ionicons name="arrow-back" size={24} color="white" />
               </TouchableOpacity>
             ),
-            }} component={Informations} />
+            })} component={Informations} />
 
-          <Stack.Screen name="Matchups"  options={{
+          <Stack.Screen name="Matchups"  options={({navigation})=>({
             title: '',//route.params?.leagueName,
             headerTransparent: true,
             headerLeft: () => (
@@ -94,9 +94,9 @@ const StackScreens = ({navigation,route}) => {
                 <Ionicons name="arrow-back" size={24} color="white" />
               </TouchableOpacity>
             ),
-          }} component={Matchups} />
+          })} component={Matchups} />
 
-          <Stack.Screen name="Team"  options={{
+          <Stack.Screen name="Team"  options={({navigation})=>({
             title: '',//route.params?.leagueName,
             headerTransparent: true,
             headerLeft: () => (
@@ -104,9 +104,9 @@ const StackScreens = ({navigation,route}) => {
                 <Ionicons name="arrow-back" size={24} color="white" />
               </TouchableOpacity>
             ),
-            }} component={MyTeam} />
+            })} component={MyTeam} />
 
-            <Stack.Screen name="PlayoffBracket"  options={{
+            <Stack.Screen name="PlayoffBracket"  options={({navigation})=>({
             title: '',//route.params?.leagueName,
             headerTransparent: true,
             headerLeft: () => (
@@ -114,13 +114,20 @@ const StackScreens = ({navigation,route}) => {
                 <Ionicons name="arrow-back" size={24} color="white" />
               </TouchableOpacity>
             ),
-            }} component={PlayoffBracket} />
+            })} component={PlayoffBracket} />
 
-          <Stack.Screen name="PlayerStats" options={({route}) => ({
+          <Stack.Screen name="PlayerStats" options={({navigation,route}) => ({
             title:null,
             headerTransparent: true,
             headerLeft: () => (
-              <TouchableOpacity style={[styles.barButtons,{marginLeft:10}]} onPress={() => navigation.goBack()}>
+              <TouchableOpacity style={[styles.barButtons,{marginLeft:10}]} onPress={() => {
+                if(route.params?.goTo){
+                  navigation.popToTop();
+                  navigation.navigate('TrendingPlayers');
+                  return
+                } 
+                navigation.goBack()
+              }}>
                 <Ionicons name="close" size={24} color="white" />
               </TouchableOpacity>
             )})} component={PlayerStats} />

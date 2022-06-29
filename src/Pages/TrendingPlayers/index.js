@@ -1,15 +1,22 @@
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, StatusBar, TextInput, Dimensions } from 'react-native'
 import { useState, useEffect, useContext } from 'react'
 import { DARK_BLACK, LIGHT_GRAY, DARK_GRAY, WHITE, LIGHT_BLACK, BORDER_RADIUS, LIGHT_GREEN } from '../../components/Variables'
 import { AllPlayersContext } from '../../components/AllPlayersContext'
 import ProgressiveImage from '../../components/ProgressiveImage';
 import { Feather } from '@expo/vector-icons';
 import { Entypo } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+import SearchPlayers from '../../components/SearchPlayers';
+
+const WIDTH = Dimensions.get('window').width;
 
 const TrendingPlayers = ({navigation}) => {
   const [trendingAdd, setTrendingAdd] = useState(null)
   const [trendingDrop, setTrendingDrop] = useState(null)
+  const [searchText, setSearchText] = useState('')
+  const [searchPlayers, setSearchPlayers] = useState(null)
+
   const { allPlayers } = useContext(AllPlayersContext)
 
   const [errorMessage, setErrorMessage] = useState(null)
@@ -41,6 +48,29 @@ const TrendingPlayers = ({navigation}) => {
 
   }, [])
 
+  useEffect(() => {
+    if(searchText=='' || !searchText) return
+
+    let count = 0;
+    let players = [];
+    console.log('Yeah')
+
+    Object.entries(allPlayers).map((player, index) => {
+      if(count > 5) return
+      if(!player[1]) return
+      if(!player[1].search_full_name) return
+
+      if(player[1].search_full_name.indexOf(searchText.toLowerCase().replace(/ /g,'')) != -1) {
+
+        players.push(player[1])
+        count++
+      }
+    })
+    console.log(players.length);
+
+    setSearchPlayers(players)
+  },[searchText])
+
   const PlayerPlaceholder = () => (
     <View style={styles.playerContainer}>
       <Image source={require('../../../assets/Images/player_default.png')} style={styles.imagePlayer} resizeMode='contain' />
@@ -62,11 +92,16 @@ const TrendingPlayers = ({navigation}) => {
 
   const Player = ({id, avatar, player, type}) => (
     <View style={styles.playerContainer}>
-      <ProgressiveImage style={styles.imagePlayer} uri={avatar} resizeMode='contain'/>
-      <View style={styles.playerNameContainer}>
-        <Text style={styles.playerName}>{allPlayers[id].full_name}</Text>
-        <Text style={styles.playerPosition}>{allPlayers[id].position} - {(allPlayers[id].team) ? allPlayers[id].team : 'Free Agent'}</Text>
-      </View>
+      <TouchableOpacity style={{flex:2,flexDirection:'row',}} onPress={() => navigation.navigate('PlayerStats', {
+        playerObject: allPlayers[id],
+        goTo: 'TrendingPlayers'
+      })}>
+        <ProgressiveImage style={styles.imagePlayer} uri={avatar} resizeMode='contain'/>
+        <View style={styles.playerNameContainer}>
+          <Text style={styles.playerName}>{allPlayers[id].full_name}</Text>
+          <Text style={styles.playerPosition}>{allPlayers[id].position} - {(allPlayers[id].team) ? allPlayers[id].team : 'Free Agent'}</Text>
+        </View>
+      </TouchableOpacity>
       <View style={styles.playerCountContainer}>
         {(type=='add') ? <Feather name="trending-up" size={20} color={LIGHT_GREEN} /> : <Feather name="trending-down" size={20} color='#FF0E00' />}
         <Text style={(type=='add') ? styles.playerCountAdd : styles.playerCountDrop}>{player.count}</Text>
@@ -77,11 +112,33 @@ const TrendingPlayers = ({navigation}) => {
 
   return ( 
     <View style={styles.container}> 
+      <StatusBar
+        animated={true}
+        backgroundColor={DARK_BLACK}
+        barStyle="light-content"
+      />
+      <View style={styles.header}>
+        <View style={styles.navigationButtonContainer}>
+          <TouchableOpacity style={styles.toggleButton} onPress={() => navigation.toggleDrawer()}>
+            <Entypo name="menu" size={24} color="#C6C6C6" />
+          </TouchableOpacity>
+        </View>
+        <View style={{alignItems:'center',flex:1, padding:10}}>
+        <View style={{ padding:5, borderRadius: 5, backgroundColor: '#15191C', width:200, flexDirection:'row', alignItems:'center'}}>
+            <FontAwesome name="search" style={{paddingLeft:5,paddingRight:10}} size={17} color="#C1C1C1" />
+            <TextInput
+                value={searchText}
+                onChangeText={text => setSearchText(text)}
+                style={{width:150, color:'#FCFCFC'}}
+                placeholder='Pesquisar...'
+                placeholderTextColor={'#C1C1C1'}
+            />
+        </View>
+      </View>
+      </View>
       <ScrollView>
-      <View style={styles.navigationButtonContainer}>
-        <TouchableOpacity style={styles.toggleButton} onPress={() => navigation.toggleDrawer()}>
-          <Entypo name="menu" size={24} color="#C6C6C6" />
-        </TouchableOpacity>
+      <View style={{flex:1}}>
+        <SearchPlayers searchPlayers={searchPlayers} />
       </View>
       <View style={styles.boxContainer}>
         <Text style={styles.title}>Trending up</Text>
@@ -134,7 +191,7 @@ const styles = StyleSheet.create({
     
   },
   title: {
-    fontSize:24,
+    fontSize:18,
     color:WHITE,
     fontWeight:'bold'
   },
@@ -193,5 +250,9 @@ const styles = StyleSheet.create({
   },
   navigationButtonContainer: {
     marginTop:10,
+  },
+  header: {
+    flexDirection:'row',
+    
   }
 })

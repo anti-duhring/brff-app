@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Image, ImageBackground } from "react-native";
 import { DrawerContentScrollView, DrawerItemList, DrawerItem } from "@react-navigation/drawer";
 import { AuthContext } from '../../components/Context';
 import { UserDataContext } from "../UserDataContext";
-import { AntDesign } from '@expo/vector-icons';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { WHITE, DARK_GREEN, DARKER_GRAY } from "../Variables";
 
 const CustomDrawer = (props) => {
@@ -33,7 +33,7 @@ const CustomDrawer = (props) => {
             <DrawerItem
                 label="Sair"
                 icon={({color}) => (
-                    <AntDesign name="logout"  size={17} color={color} />
+                    <FontAwesome5 name="sign-out-alt"  size={17} color={color} />
                 )}
                 labelStyle={{marginLeft:-25, fontFamily: 'Roboto-Medium', fontSize:15}}
                 activeTintColor={WHITE}
