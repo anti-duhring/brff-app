@@ -37,6 +37,7 @@ const MyTeam = ({navigation, route}) => {
 
     const [starters, setStarters] = useState(null)
     const [bench, setBench] = useState(null)
+    const [userInfos, setUserInfos] = useState(null)
     const [isLoading, setIsLoading] = useState(true)
 
     const { allPlayers } = useContext(AllPlayersContext)
@@ -63,6 +64,7 @@ const MyTeam = ({navigation, route}) => {
                         setStarters(null)
                         setBench(null)
                     }
+                    setUserInfos(roster.settings)
                     setIsLoading(false);
                 }
             })
@@ -117,7 +119,7 @@ const MyTeam = ({navigation, route}) => {
             }}>
                 <View style={styles.playerNameContainer}>
                     <View style={{flexDirection:'row', alignItems:'flex-end',paddingRight:10}}>
-                        <ProgressiveImage style={[styles.imagePlayer, {backgroundColor:(typePlayer == 'TEAM') ? 'transparent' : DARK_BLACK}]} uri={(typePlayer == 'TEAM') ? `https://sleepercdn.com/images/team_logos/nfl/${player.team.toLowerCase()}.png` : `https://sleepercdn.com/content/nfl/players/thumb/${player.player_id}.jpg`} resizeMode='cover'/>
+                        <ProgressiveImage style={[styles.imagePlayer, {borderRadius:(typePlayer == 'TEAM') ? 0 : 50,backgroundColor:(typePlayer == 'TEAM') ? 'transparent' : DARK_BLACK}]} uri={(typePlayer == 'TEAM') ? `https://sleepercdn.com/images/team_logos/nfl/${player.team.toLowerCase()}.png` : `https://sleepercdn.com/content/nfl/players/thumb/${player.player_id}.jpg`} resizeMode='cover'/>
                         {player.team && typePlayer == 'PLAYER' &&  <Image style={{width:26,height:26,marginLeft:-25,marginBottom:-5}} source={{uri: `https://sleepercdn.com/images/team_logos/nfl/${player.team.toLowerCase()}.png`}} resizeMode='cover' />}
                     </View>
                     <Text style={styles.playerName}>{(player.player_id) ? `${allPlayers[player.player_id].first_name} ${allPlayers[player.player_id].last_name}` : player.name}</Text>
@@ -139,11 +141,62 @@ const MyTeam = ({navigation, route}) => {
     </View>
     )
 
+    const InformationPlaceholder = () => (
+        <SkeletonPlaceholder highlightColor="#303840" backgroundColor="#262D33">
+            <View style={{ width: 100, height: 20, borderRadius: 4 }} />
+        </SkeletonPlaceholder>
+    )
+
+    const InformationPlayer = () => (
+        <ViewLightDark title='Informações' titleSize={18}>
+            <View style={styles.informationView}>
+                <Text style={styles.informationTitle}>Pontos</Text>
+                {userInfos ?
+                    <Text style={styles.informationValue}>      {userInfos.fpts}{userInfos.fpts_decimal && '.'+userInfos.fpts_decimal}
+                    </Text>
+                    : 
+                    <InformationPlaceholder />}
+            </View>
+            <View style={styles.informationView}>
+                <Text style={styles.informationTitle}>Vitórias</Text>
+                {userInfos ?
+                    <Text style={[styles.informationValue, {color:'rgba(0, 128, 55, 1)'}]}>      {userInfos.wins}
+                    </Text>
+                    : 
+                    <InformationPlaceholder />}
+            </View>
+            <View style={styles.informationView}>
+                <Text style={styles.informationTitle}>Derrotas</Text>
+                {userInfos ?
+                    <Text style={[styles.informationValue,{color:'red'}]}>      {userInfos.losses}
+                    </Text>
+                    : 
+                    <InformationPlaceholder />}
+            </View>
+            <View style={styles.informationView}>
+                <Text style={styles.informationTitle}>Empates</Text>
+                {userInfos ?
+                    <Text style={styles.informationValue}>      {userInfos.ties}
+                    </Text>
+                    : 
+                    <InformationPlaceholder />}
+            </View>
+            <View style={styles.informationView}>
+                <Text style={styles.informationTitle}>Posição no waiver</Text>
+                {userInfos ?
+                    <Text style={styles.informationValue}>      {userInfos.waiver_position}
+                    </Text>
+                    : 
+                    <InformationPlaceholder />}
+            </View>
+        </ViewLightDark>
+    )
+
     if(isLoading) {
         return (
             <HeaderLeagueContextProvider leagueObject={league}>
             <TabTopLeague leagueDraftSettings={leagueDraftSettings} isAble={true} activeButton={route.params?.active} leagueObject={league} />
-
+            <InformationPlayer />
             <ViewLightDark title='Titulares' titleSize={18}>
                 {
                 roster.map((position, index) => {     
@@ -171,7 +224,7 @@ const MyTeam = ({navigation, route}) => {
     return ( 
         <HeaderLeagueContextProvider leagueObject={league}>
             <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueUsers={leagueUsers} />
-
+            <InformationPlayer />
                 <ViewLightDark title='Titulares' titleSize={18}>
                 {
                         roster.map((position, index) => {
@@ -270,5 +323,20 @@ const styles = StyleSheet.create({
         borderRadius:50,
         backgroundColor: DARK_BLACK,
         marginRight: 10,
+    },
+    informationTitle:{
+        fontSize:15,
+        color:'#656668',
+        flex:3
+    },
+    informationValue:{
+        fontSize:15,
+        flex:1,
+        textAlign:'right',
+        color: '#C6C6C6',
+    },
+    informationView: {
+        flexDirection:'row',
+        paddingVertical:10
     }
 })

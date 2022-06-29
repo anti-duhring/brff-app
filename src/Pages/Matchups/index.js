@@ -409,7 +409,7 @@ const Matchups = ({navigation, route}) => {
                         
                         navigation.navigate('PlayerStats', {playerObject: allPlayers[props.player.player_id]})
                     }}>
-                        <Text style={styles.playerMatchupLeft}>{(player.player_id) ? `${allPlayers[props.player.player_id].first_name} ${allPlayers[props.player.player_id].last_name}` : player.name}</Text>   
+                        <Text style={styles.playerMatchupLeft}>{(props.player.player_id) ? `${allPlayers[props.player.player_id].first_name} ${allPlayers[props.player.player_id].last_name}` : props.player.name}</Text>   
                     </TouchableOpacity>
                     <Points />
                     

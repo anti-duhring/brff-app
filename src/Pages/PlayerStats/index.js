@@ -335,9 +335,40 @@ const PlayerStats = ({route}) => {
             </TableStatsContainer>
     )
 
-    const TableStatsPlaceholder = ({index}) => (
+    const TableStatsTotal = ({index, item}) => {
+        let totalValues = new Array(statsToShow[player.position].length).fill(0);
+        let playedGames = 0;
+
+       item.map((itemWeek, index) => {
+            if(!itemWeek[1]) return
+            if(itemWeek[1].stats) playedGames++
+
+            statsToShow[player.position]?.map((stat, i) => {
+                if(itemWeek[1].stats[stat]) {
+                    totalValues[i] += itemWeek[1].stats[stat];
+                }
+            });
+        });
+        console.log(totalValues);
+
+        return (
+            <TableStatsContainer index={index}>
+                <Text style={styles.columnValue}>Total</Text>
+                <Text style={styles.columnValue}>-</Text>
+                {
+                    totalValues.map((stat, i) => {
+                       return(
+                        <Text key={i} style={styles.columnValue}>{(statsToShow[player.position][i].indexOf('rtg')!=-1 || statsToShow[player.position][i].indexOf('pct')!=-1) ? (stat / playedGames).toFixed(1) : (stat - Math.floor(stat) != 0) ? stat.toFixed(1) : stat}</Text>
+                       ) 
+                    })
+                }
+            </TableStatsContainer>
+        )
+    }
+        
+    const TableStatsPlaceholder = ({index, isLast}) => (
         <TableStatsContainer index={index}>
-            <Text style={styles.columnValue}>{index + 1}</Text>
+            <Text style={styles.columnValue}>{(isLast) ? 'Total' :index + 1}</Text>
             <Text style={styles.columnValue}>-</Text>
             {
                 new Array(statsToShow[player.position].length).fill(0).map((stat, i) => {
@@ -400,7 +431,15 @@ const PlayerStats = ({route}) => {
 
                 {(playerSeasonStats) ? 
                     Object.entries(playerSeasonStats).map((item, index) => {
-                        //if(!item[1]) return
+
+                        if(index + 1 == Object.entries(playerSeasonStats).length) {
+                            return (
+                                <View key={index} >
+                                    <TableStats item={item} index={index} />
+                                    <TableStatsTotal index={index + 1} item={Object.entries(playerSeasonStats)} />
+                                </View>
+                            )
+                        }
 
                         return (
                             <TableStats key={index} item={item} index={index} />
@@ -408,6 +447,14 @@ const PlayerStats = ({route}) => {
                         
                      }) :
                      new Array(18).fill(0).map((item, index) => {
+                        if(index==17) {
+                            return (
+                                <View key={index}>
+                                    <TableStatsPlaceholder index={index} />
+                                    <TableStatsPlaceholder isLast={true} index={index + 1} />
+                                </View>
+                            )
+                        }
                         return (
                             <TableStatsPlaceholder key={index} index={index} />
                         )
