@@ -40,6 +40,7 @@ const PlayerProfileHeader = ({children, playerObject}) => {
           barStyle="light-content"
          />
         <HeaderImageScrollView
+            useNativeDriver={true}
             maxHeight={200}
             minHeight={55}
             minOverlayOpacity={0}

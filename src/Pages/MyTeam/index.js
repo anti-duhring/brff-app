@@ -195,7 +195,7 @@ const MyTeam = ({navigation, route}) => {
     if(isLoading) {
         return (
             <HeaderLeagueContextProvider leagueObject={league}>
-            <TabTopLeague leagueDraftSettings={leagueDraftSettings} isAble={true} activeButton={route.params?.active} leagueObject={league} />
+            <TabTopLeague leagueDraftSettings={leagueDraftSettings} isAble={true} activeButton={route.params?.active} leagueRosters={route.params?.leagueRosters} leagueObject={league} leagueUsers={route.params?.leagueUsers} />
             <InformationPlayer />
             <ViewLightDark title='Titulares' titleSize={18}>
                 {

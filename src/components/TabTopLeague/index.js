@@ -11,13 +11,13 @@ const COLOR = LIGHT_GREEN
 const GREEN2 = LIGHT_BLACK //'rgba(0, 206, 78,  .1)'
 const COLORTEXT = DARK_BLACK;
 
-const TabTopLeague = ({activeButton, isAble, leagueDraftSettings, leagueObject, leagueUsers}) => {
+const TabTopLeague = ({activeButton, isAble, leagueDraftSettings, leagueObject, leagueUsers, leagueRosters, opacity}) => {
     const navigation = useNavigation();
     const { week } = useContext(NFLStatusContext)
 
 
     return(
-        <View style={{flexDirection:'row',padding:10,justifyContent:'center',alignContent:'center'}}>
+        <View style={{flexDirection:'row',padding:10,justifyContent:'center',alignContent:'center',opacity:(opacity) ? opacity : 1}}>
             <View style={(activeButton=='Players'||!activeButton) ? styles.activeTab : styles.inactiveTab}>
                 <TouchableOpacity style={styles.buttonContent} onPress={() => {
                     if(!isAble) return
@@ -25,7 +25,8 @@ const TabTopLeague = ({activeButton, isAble, leagueDraftSettings, leagueObject, 
                         active: 'Players',
                         leagueObject: leagueObject,
                         leagueDraftSettings: leagueDraftSettings,
-                        leagueUsers: leagueUsers
+                        leagueUsers: leagueUsers,
+                        leagueRosters: leagueRosters
                     })
                 }}>
                     {(activeButton=='Players'||!activeButton) ? 
@@ -45,7 +46,8 @@ const TabTopLeague = ({activeButton, isAble, leagueDraftSettings, leagueObject, 
                         week: week,
                         leagueObject: leagueObject,
                         leagueDraftSettings: leagueDraftSettings,
-                        leagueUsers: leagueUsers
+                        leagueUsers: leagueUsers,
+                        leagueRosters: leagueRosters
                     })
                 }}>
                     {(activeButton=='Matchups') ? 
@@ -64,7 +66,8 @@ const TabTopLeague = ({activeButton, isAble, leagueDraftSettings, leagueObject, 
                         active: 'PlayoffBracket',
                         leagueObject: leagueObject,
                         leagueDraftSettings: leagueDraftSettings,
-                        leagueUsers: leagueUsers
+                        leagueUsers: leagueUsers,
+                        leagueRosters: leagueRosters
                     })
                 }}>
                     {(activeButton=='PlayoffBracket') ? 
@@ -84,7 +87,8 @@ const TabTopLeague = ({activeButton, isAble, leagueDraftSettings, leagueObject, 
                         active: 'Informations',
                         leagueObject: leagueObject,
                         leagueDraftSettings: leagueDraftSettings,
-                        leagueUsers: leagueUsers
+                        leagueUsers: leagueUsers,
+                        leagueRosters: leagueRosters
                     })
                 }}>
                     {(activeButton=='Informations') ? 
@@ -103,7 +107,8 @@ const TabTopLeague = ({activeButton, isAble, leagueDraftSettings, leagueObject, 
                         active: 'Team',
                         leagueObject: leagueObject,
                         leagueDraftSettings: leagueDraftSettings,
-                        leagueUsers: leagueUsers
+                        leagueUsers: leagueUsers,
+                        leagueRosters: leagueRosters
                     })
                 }}>
                 {(activeButton=='Team') ? 

@@ -22,6 +22,7 @@ const Matchups = ({navigation, route}) => {
     const leagueScoringSettings = league.scoring_settings;
     const leagueDraftSettings = route.params?.leagueDraftSettings;
     const leagueUsers = route.params?.leagueUsers;
+    const leagueRosters = route.params?.leagueRosters;
     const scoring_type = leagueDraftSettings[0].metadata.scoring_type;
     const roster = league.roster_positions;
     const roster_bench = roster.filter((item) => {
@@ -29,9 +30,9 @@ const Matchups = ({navigation, route}) => {
     });
     const { allPlayers } = useContext(AllPlayersContext)
     const { userData } = useContext(UserDataContext)
+
     const userID = userData.user_id;
     const [allProjectedPoints, setAllProjectedPoints] = useState(null);
-    const [leagueRosters, setLeagueRosters] = useState(null);
     const [hasMatchup, setHasMatchup] = useState(true);
     const [week, setWeek] = useState((route.params?.week<=0) ? 1 : route.params?.week);
 
@@ -65,7 +66,7 @@ const Matchups = ({navigation, route}) => {
     const signal = controller.signal;
 
     useEffect(() => {
-        getPlayersProjectedPoints(week, 'regular', scoring_type)
+       getPlayersProjectedPoints(week, 'regular', scoring_type)
 
         setTotalPoints(null)
         setOpponentTotalPoints(null)
@@ -79,11 +80,13 @@ const Matchups = ({navigation, route}) => {
         setOpponentData(null)
         setHasMatchup(true)
 
-        if(!leagueRosters) {
+        getMatchup(leagueID, week, leagueRosters);
+
+        /*if(!leagueRosters) {
             getLeagueRosters(userID,leagueID)
         } else {
             getMatchup(playerRosterID, leagueID, week, leagueRosters);
-        }
+        }*/
 
     },[week])
     
@@ -106,10 +109,18 @@ const Matchups = ({navigation, route}) => {
         })
     }
 
-    const getMatchup = async(_roster_id, _league_id, _week, _league_rosters) => {
+    const getMatchup = async(_league_id, _week, _league_rosters) => {
         const URL = `https://api.sleeper.app/v1/league/${_league_id}/matchups/${_week}`
+        let user_roster_id;
         let matchup_id;
         let opponent_roster_id;
+
+        leagueRosters.map((roster, index) => {
+            if(roster.owner_id==userID && roster.players) {
+                user_roster_id = roster.roster_id;
+            }
+        })
+
         fetch(URL)
         .then(response => response.json())
         .then(data => {
@@ -119,7 +130,7 @@ const Matchups = ({navigation, route}) => {
             } 
             data.map((roster, index) => {
 
-                if(roster.roster_id==_roster_id) {
+                if(roster.roster_id==user_roster_id) {
                     matchup_id = roster.matchup_id
                     const benchs = (roster.starters) ? roster.players.filter((item) => {
                         return roster.starters.indexOf(item) === -1;
@@ -136,7 +147,7 @@ const Matchups = ({navigation, route}) => {
             })
 
             data.map((roster, index) => {
-                if(roster.matchup_id == matchup_id && roster.roster_id != _roster_id) {
+                if(roster.matchup_id == matchup_id && roster.roster_id != user_roster_id) {
                     const benchs = (roster.starters) ? roster.players.filter((item) => {
                         return roster.starters.indexOf(item) === -1;
                     }) : null;
@@ -152,7 +163,7 @@ const Matchups = ({navigation, route}) => {
                 }
             })
 
-            getUsersData(leagueID, _roster_id, opponent_roster_id, _league_rosters)
+            getUsersData(leagueID, user_roster_id, opponent_roster_id, _league_rosters)
         }).catch((e) => {
             console.log('Erro gm:',e)
             controller.abort()
@@ -404,8 +415,8 @@ const Matchups = ({navigation, route}) => {
         if(props.position=='left') {
             return(
                 <View style={styles.matchupPlayerContainer}>
-                    <TouchableOpacity style={{flex:3}} onPress={() => {
-                        if(!props.player_player_id) return
+                    <TouchableOpacity style={styles.matchupPlayerContainer} onPress={() => {
+                        if(!props.player.player_id) return
                         
                         navigation.navigate('PlayerStats', {playerObject: allPlayers[props.player.player_id]})
                     }}>
@@ -426,8 +437,8 @@ const Matchups = ({navigation, route}) => {
                 </View> :
                 <Points />
             }
-            <TouchableOpacity style={{flex:3}} onPress={() => {
-                if(!props.player_player_id) return
+            <TouchableOpacity style={styles.matchupPlayerContainer} onPress={() => {
+                if(!props.player.player_id) return
                 
                 navigation.navigate('PlayerStats', {playerObject: allPlayers[props.player.player_id]})
             }}>
@@ -494,7 +505,7 @@ const Matchups = ({navigation, route}) => {
         return (
             <View style={{flex:1,backgroundColor:'#0B0D0F'}}>
             <HeaderLeagueContextProvider leagueObject={league}>
-                <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueUsers={leagueUsers} />
+                <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueRosters={leagueRosters} leagueUsers={leagueUsers} />
                 <ViewLightDark>
                     <Text style={{color: WHITE, textAlign:'center'}}>A temporada regular da liga ainda não começou.</Text>
                 </ViewLightDark>
@@ -507,7 +518,7 @@ const Matchups = ({navigation, route}) => {
         return (
             <View style={{flex:1,backgroundColor:'#0B0D0F'}}>
             <HeaderLeagueContextProvider leagueObject={league}>
-                <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueUsers={leagueUsers} />
+                <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueUsers={leagueUsers} leagueRosters={route.params?.leagueRosters} />
                 <WeekSelect />
                 <ViewLightDark>
                     <Text style={{color: WHITE, textAlign:'center'}}>A liga não possui matchup para a semana {week}.</Text>
@@ -715,6 +726,7 @@ const styles = StyleSheet.create({
     matchupPlayerContainer: {
         flex:3,
         flexDirection:'row',
-        alignItems:'center'
+        alignItems:'center',
+        justifyContent:'center'
     }
 })

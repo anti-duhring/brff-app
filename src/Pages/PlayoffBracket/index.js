@@ -266,7 +266,7 @@ const PlayoffBracket = ({route}) => {
     return ( 
         <View style={{flex:1,backgroundColor:'#0B0D0F',}}>
             <HeaderLeagueContextProvider leagueObject={leagueObject}>
-                <TabTopLeague activeButton={route.params?.active} isAble={true} leagueDraftSettings={leagueDraftSettings} leagueObject={route.params?.leagueObject} leagueUsers={leagueUsers}  />
+                <TabTopLeague activeButton={route.params?.active} isAble={true} leagueDraftSettings={leagueDraftSettings} leagueObject={route.params?.leagueObject} leagueRosters={route.params?.leagueRosters} leagueUsers={leagueUsers}  />
 
                 <View style={{marginTop:20,marginLeft:10,marginRight:20,flexDirection:'row'}}>
                     <RoundSelect />

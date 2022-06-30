@@ -30,7 +30,6 @@ export const AllPlayersContextProvider = ({children}) => {
               backgroundColor="#0B0D0F"
               barStyle="light-content"
             />
-            <Text style={{color:'#008037'}}>Carregando jogadores...</Text>
             <ActivityIndicator size="large" color="#008037" />
           </View>
         )

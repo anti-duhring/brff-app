@@ -5,6 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { NFLStatusContext } from '../../components/NFLStatusContext'
 import { scaleAnimation } from '../../animations/scale'
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+import { DARK_BLACK } from '../../components/Variables';
 
 const Stack = createStackNavigator()
 
@@ -144,10 +145,8 @@ useEffect(() => {
             </View>
             )}
             renderItem={({item, index}) => {
-              let NEWavatar = `https://brffootball.com.br/wp-content/uploads/2022/02/cropped-logo.png`;
-              if(item.avatar!=null) { 
-                NEWavatar = `https://sleepercdn.com/avatars/${item.avatar}`
-              }
+              const avatar = (item.avatar) ? {uri: `https://sleepercdn.com/avatars/${item.avatar}`} : require('../../../assets/Images/cropped-logo_2.png');
+
               return <Animated.View
                 style={{ borderRadius:12,marginBottom:10,padding:10,
                 shadowColor:'#000',
@@ -173,8 +172,9 @@ useEffect(() => {
               })}}>
                   <View style={{flexDirection:'row'}}>
                   <Image 
-                    source={{uri:NEWavatar}} 
-                    style={{width:70,height:70,borderRadius:12,marginRight:10}}
+                    source={avatar} 
+                    style={{width:70,height:70,borderRadius:12,marginRight:10,backgroundColor:DARK_BLACK}}
+                    resizeMode='contain'
                   />
                   
                 

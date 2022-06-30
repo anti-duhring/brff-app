@@ -137,6 +137,7 @@ const PlayerStatsHeader = ({children, player}) => {
           barStyle="light-content"
          />
         <HeaderImageScrollView
+            useNativeDriver={true}
             maxHeight={200}
             minHeight={55}
             minOverlayOpacity={0}

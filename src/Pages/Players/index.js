@@ -10,6 +10,7 @@ const Players = ({navigation, route}) => {
     const leagueId = route.params?.leagueObject.league_id;
     const leagueObject = route.params?.leagueObject;
     const [leagueDraftSettings, setLeagueDraftSettings] = useState(null)
+    const [leagueRosters, setLeagueRosters] = useState(null);
 
     const [isLoading, setIsLoading] = useState(true)
     const [players, setPlayers] = useState([])
@@ -17,8 +18,12 @@ const Players = ({navigation, route}) => {
     const animateX = useRef(new Animated.Value(1)).current;
     const [itemAnimate, setItemAnimate] = useState(null);
 
+    const [errorMessage, setErrorMessage] = useState(null)
+    const controller = new AbortController();
+    const signal = controller.signal;
+
     const getInfos = async() => {
-            fetch(`https://api.sleeper.app/v1/league/${leagueId}/users`)
+            fetch(`https://api.sleeper.app/v1/league/${leagueId}/users`,{signal})
             .then(response => response.json())
             .then((data) => {
                 setPlayers(data)
@@ -37,13 +42,15 @@ const Players = ({navigation, route}) => {
             })
             .catch((error) => {
               console.log('Erro:',error)
+              controller.abort()
+              setErrorMessage(error)
             })
           
     }
 
     const getDraftSettings = async() => {
       const URL = `https://api.sleeper.app/v1/league/${leagueId}/drafts`;
-      fetch(URL)
+      fetch(URL,{signal})
       .then(response => response.json())
       .then(data => {
         setLeagueDraftSettings(data)
@@ -51,18 +58,34 @@ const Players = ({navigation, route}) => {
       })
       .catch((error) => {
         console.log('Erro:',error)
+        controller.abort()
+        setErrorMessage(error)
       })
     }
+
+    const getLeagueRosters = async() => {
+      fetch(`https://api.sleeper.app/v1/league/${leagueObject.league_id}/rosters`,{signal})
+      .then(response => response.json())
+      .then((data) => {
+          setLeagueRosters(data);
+          console.log('done')
+      }).catch((e) => {
+          console.log('Error:',e)
+          controller.abort()
+          setErrorMessage(e)
+      })
+  }
 
 useEffect(() => {
     getInfos();
     getDraftSettings();
+    getLeagueRosters();
 },[])
 
     return ( 
     <View style={{flex:1,backgroundColor:'#0B0D0F',}}>
       <HeaderLeagueContextProvider leagueObject={leagueObject}>
-      <TabTopLeague activeButton={route.params?.active} isAble={(leagueDraftSettings && players) ? true : false} leagueUsers={players} leagueDraftSettings={leagueDraftSettings} leagueObject={leagueObject}  />
+      <TabTopLeague activeButton={route.params?.active} isAble={(leagueDraftSettings && players && leagueRosters) ? true : false} leagueRosters={leagueRosters} leagueUsers={players} leagueDraftSettings={leagueDraftSettings} leagueObject={leagueObject} opacity={(leagueDraftSettings && players && leagueRosters) ? 1 : 0.5}  />
           {isLoading ?
           <View style={{flex:1,padding:10,}}>
       <SkeletonPlaceholder>

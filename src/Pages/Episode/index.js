@@ -1,10 +1,10 @@
-import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Dimensions, Animated, ImageBackground, StatusBar } from "react-native";
-import { useRef, useState, useEffect } from "react";
+import { View, Text, StyleSheet, Dimensions, Animated, ImageBackground } from "react-native";
+import { useRef } from "react";
 import HeaderImageScrollView, { TriggeringView } from 'react-native-image-header-scroll-view'
 import MusicPlayer from "../../components/MusicPlayer";
 import { LinearGradient } from 'expo-linear-gradient';
-import { useFocusEffect } from "@react-navigation/native";
 import ViewLightDark from "../../components/ViewLightDark";
+import { DARK_BLACK } from "../../components/Variables";
 
 const MAX_HEIGHT = 200;
 const MIN_HEIGHT = 55;
@@ -42,6 +42,7 @@ const Episode = ({navigation, route}) => {
     return ( 
         <View style={styles.episodeBody}>
         <HeaderImageScrollView
+            useNativeDriver={true}
             maxHeight={MAX_HEIGHT}
             minHeight={MIN_HEIGHT}
             maxOverlayOpacity={0.7}
@@ -71,7 +72,7 @@ const Episode = ({navigation, route}) => {
               )}
             renderHeader={() => (
                 <ImageBackground blurRadius={0} imageStyle={{resizeMode:'cover'}} style={styles.imageHeader} source={episodeImage}>
-                    <LinearGradient locations={[0.3, 0.99]} colors={['transparent', 'black' ]} style={styles.episodeContainer}>
+                    <LinearGradient locations={[0.3, 0.99]} colors={['transparent', DARK_BLACK ]} style={styles.episodeContainer}>
 
                     </LinearGradient>
                  </ImageBackground>
@@ -81,7 +82,7 @@ const Episode = ({navigation, route}) => {
         
             <TriggeringView onDisplay={() => fadeOut()} onBeginHidden={() => {fadeIn()}}>
                 <View style={styles.titleContainer}>
-                    <LinearGradient locations={[0,1]} style={styles.episodeGradient} colors={['transparent', 'black']}>
+                    <LinearGradient locations={[0,1]} style={styles.episodeGradient} colors={['transparent', DARK_BLACK]}>
                         <Text style={styles.imageTitle}>
                         {(episode.title.indexOf('-')!=-1) ? episode.title.split('- ')[1] : episode.title}
                         </Text>
@@ -107,7 +108,7 @@ export default Episode;
 const styles = StyleSheet.create({
     episodeBody: {
         flex:1,
-        backgroundColor:'black'
+        backgroundColor:DARK_BLACK
     },  
     imageHeader: {
         height: MAX_HEIGHT,
@@ -123,7 +124,7 @@ const styles = StyleSheet.create({
     },
     section: {
         padding: 10,
-        backgroundColor:'black',
+        backgroundColor:DARK_BLACK,
         paddingHorizontal: 20,
     },
     navTitle: {
@@ -139,10 +140,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingTop: 0,
         opacity: 0,
-        paddingHorizontal:30,
+        paddingHorizontal:50,
     },
     sectionLarge: {
-        height: 600,
+        height: 650,
     },
     imageTitle: {
         color: 'white',

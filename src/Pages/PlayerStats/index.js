@@ -75,7 +75,7 @@ const PlayerStats = ({route}) => {
             .replace(/\bidp_sack\b/g,'Sacks totais')
             .replace(/\boff_snp\b/g,'Snaps')
             .replace(/\bpass_yd\b/g,'Jardas passadas').replace(/\bpass_td\b/g,'TDs passados')
-            .replace(/\bpass_att\b/g,'Passes tentados').replace(/\bcomp_pct\b/g,'Porcentagem (%) de passes completos')
+            .replace(/\bpass_att\b/g,'Passes tentados').replace(/\bcmp_pct\b/g,'Porcentagem (%) de passes completos')
             .replace(/\bpass_int\b/g,'Interceptações')
             .replace(/\bpass_rz_att\b/g,'Tentativas de passe na RZ')
             .replace(/\brush_yd\b/g,'Jardas corridas')
@@ -237,10 +237,9 @@ const PlayerStats = ({route}) => {
     )
 
     const StatsRowTitle = (props) => (
-        <Pressable onPress={() => setTip(props.index)}>
-            <TooltipMessage index={props.index} position='top' message={props.message} hasBackground={true}>
+        <Pressable onPress={() => showToast(props.message) /*setTip(props.index)*/}>
+            
                 <Text style={[styles.columnTitle,{color:(showTip==props.index) ? WHITE: DARK_GRAY}]}>{props.name}</Text>
-            </TooltipMessage>
         </Pressable>
     )
 
@@ -363,7 +362,7 @@ const PlayerStats = ({route}) => {
                             statsToShow[player.fantasy_positions[0]][i].indexOf('pct')!=-1 || 
                             statsToShow[player.fantasy_positions[0]][i].indexOf('ypa')!=-1 || 
                             statsToShow[player.fantasy_positions[0]][i].indexOf('ypc')!=-1 || 
-                            statsToShow[player.fantasy_positions[0]][i].indexOf('ypt')!=-1) ? (stat / playedGames).toFixed(1) : (stat - Math.floor(stat) != 0) ? stat.toFixed(1) : stat}</Text>
+                            statsToShow[player.fantasy_positions[0]][i].indexOf('ypt')!=-1) ? ((stat!=0) ?stat / playedGames : 0).toFixed(1) : (stat - Math.floor(stat) != 0) ? stat.toFixed(1) : stat}</Text>
                        ) 
                     })
                 }
@@ -387,23 +386,11 @@ const PlayerStats = ({route}) => {
 
     const LegendTipButton = () => (
         <View style={{flex:1,justifyContent:'center',alignItems:'flex-end',marginRight:20}}>
-            <Tooltip
-                isVisible={showLegendTip}
-                content={
-                    <View>
-                        <Text style={{color:WHITE}}>Clique no nome de uma das estatísticas e aguarde o balão surgir para mostrar o seu significado</Text>
-                    </View>
-                }
-
-                onClose={() => setShowLegendTip(false)}
-                placement='left'
-                useReactNativeModal={true}
-                contentStyle={{backgroundColor:getColorTeam(player.team)}}
-            >
-                <TouchableOpacity onPress={() => { showToast('Clique no nome de uma das estatísticas e aguarde o balão surgir para mostrar o seu significado'); /*setShowLegendTip((showLegendTip) ? false : true); */}}>
+          
+                <TouchableOpacity onPress={() => { showToast('Clique no nome de uma das estatísticas para mostrar o seu significado'); /*setShowLegendTip((showLegendTip) ? false : true); */}}>
                     <AntDesign name="questioncircleo" size={20} color={LIGHT_GRAY} />
                 </TouchableOpacity>
-            </Tooltip>
+            
          </View>
     )
 
