@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, StatusBar, TextInput, Dimensions } from 'react-native'
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, StatusBar, TextInput, Dimensions, ActivityIndicator } from 'react-native'
 import { useState, useEffect, useContext } from 'react'
 import { DARK_BLACK, LIGHT_GRAY, DARK_GRAY, WHITE, LIGHT_BLACK, BORDER_RADIUS, LIGHT_GREEN } from '../../components/Variables'
 import { AllPlayersContext } from '../../components/AllPlayersContext'
@@ -14,8 +14,10 @@ const WIDTH = Dimensions.get('window').width;
 const TrendingPlayers = ({navigation}) => {
   const [trendingAdd, setTrendingAdd] = useState(null)
   const [trendingDrop, setTrendingDrop] = useState(null)
+
   const [searchText, setSearchText] = useState('')
   const [searchPlayers, setSearchPlayers] = useState(null)
+  const [isSearchLoading, setIsSearchLoading] = useState(false)
 
   const { allPlayers } = useContext(AllPlayersContext)
 
@@ -42,25 +44,44 @@ const TrendingPlayers = ({navigation}) => {
     })
   }
 
+  const getRandomPlayers = () => {
+    const allPlayerslength = Object.entries(allPlayers).length;
+    let players = [
+      allPlayers[Math.floor(Math.random() * allPlayerslength)],
+      allPlayers[Math.floor(Math.random() * allPlayerslength)],
+      allPlayers[Math.floor(Math.random() * allPlayerslength)],
+      allPlayers[Math.floor(Math.random() * allPlayerslength)],
+      allPlayers[Math.floor(Math.random() * allPlayerslength)],
+      allPlayers[Math.floor(Math.random() * allPlayerslength)]
+    ];
+
+    setSearchPlayers(players)
+  }
+
   useEffect(() => {
     getTrendingPlayers('add');
     getTrendingPlayers('drop')
+    getRandomPlayers();
 
   }, [])
 
-  useEffect(() => {
-    if(searchText=='' || !searchText) return
+  const handleSearchSubmit = (event) => {
+    setIsSearchLoading(true);
+    if(event.text=='' || !event.text) {
+      setIsSearchLoading(false)
+      return
+    }
 
     let count = 0;
     let players = [];
-    console.log('Yeah')
+
 
     Object.entries(allPlayers).map((player, index) => {
       if(count > 5) return
       if(!player[1]) return
       if(!player[1].search_full_name) return
 
-      if(player[1].search_full_name.indexOf(searchText.toLowerCase().replace(/ /g,'')) != -1) {
+      if(player[1].search_full_name.indexOf(event.text.toLowerCase().replace(/ /g,'')) != -1) {
 
         players.push(player[1])
         count++
@@ -69,7 +90,9 @@ const TrendingPlayers = ({navigation}) => {
     console.log(players.length);
 
     setSearchPlayers(players)
-  },[searchText])
+    setIsSearchLoading(false)
+
+  }
 
   const PlayerPlaceholder = () => (
     <View style={styles.playerContainer}>
@@ -92,11 +115,11 @@ const TrendingPlayers = ({navigation}) => {
 
   const Player = ({id, avatar, player, type}) => (
     <View style={styles.playerContainer}>
-      <TouchableOpacity style={{flex:2,flexDirection:'row',}} onPress={() => navigation.navigate('PlayerStats', {
+      <TouchableOpacity style={{flex:2,flexDirection:'row',alignItems:'center'}} onPress={() => navigation.navigate('PlayerStats', {
         playerObject: allPlayers[id],
         goTo: 'TrendingPlayers'
       })}>
-        <ProgressiveImage style={styles.imagePlayer} uri={avatar} resizeMode='contain'/>
+        <ProgressiveImage style={styles.imagePlayer} uri={avatar} resizeMode='cover'/>
         <View style={styles.playerNameContainer}>
           <Text style={styles.playerName}>{allPlayers[id].full_name}</Text>
           <Text style={styles.playerPosition}>{allPlayers[id].position} - {(allPlayers[id].team) ? allPlayers[id].team : 'Free Agent'}</Text>
@@ -117,6 +140,8 @@ const TrendingPlayers = ({navigation}) => {
         backgroundColor={DARK_BLACK}
         barStyle="light-content"
       />
+
+      <ScrollView>
       <View style={styles.header}>
         <View style={styles.navigationButtonContainer}>
           <TouchableOpacity style={styles.toggleButton} onPress={() => navigation.toggleDrawer()}>
@@ -125,57 +150,67 @@ const TrendingPlayers = ({navigation}) => {
         </View>
         <View style={{alignItems:'center',flex:1, padding:10}}>
         <View style={{ padding:5, borderRadius: 5, backgroundColor: '#15191C', width:200, flexDirection:'row', alignItems:'center'}}>
-            <FontAwesome name="search" style={{paddingLeft:5,paddingRight:10}} size={17} color="#C1C1C1" />
+            {isSearchLoading ? 
+              <ActivityIndicator size={17} style={{paddingLeft:5,paddingRight:10}} color="#C1C1C1" /> :
+              <FontAwesome name="search" style={{paddingLeft:5,paddingRight:10}} size={17} color="#C1C1C1" />
+            }
             <TextInput
                 value={searchText}
-                onChangeText={text => setSearchText(text)}
+                onChangeText={text => {setSearchText(text)}}
                 style={{width:150, color:'#FCFCFC'}}
                 placeholder='Pesquisar...'
                 placeholderTextColor={'#C1C1C1'}
+                onSubmitEditing={({nativeEvent}) => {handleSearchSubmit(nativeEvent);}}
             />
         </View>
       </View>
       </View>
-      <ScrollView>
       <View style={{flex:1}}>
-        <SearchPlayers searchPlayers={searchPlayers} />
+        <SearchPlayers navigation={navigation} searchPlayers={searchPlayers} />
       </View>
-      <View style={styles.boxContainer}>
-        <Text style={styles.title}>Trending up</Text>
-        <View style={styles.playersList}>
-        {(trendingAdd) ? trendingAdd.map(player => {
-          const id = player.player_id;
-          const avatar = `https://sleepercdn.com/content/nfl/players/thumb/${id}.jpg`;
+      <ScrollView contentContainerStyle={{marginTop:20}} horizontal={true} pagingEnabled={true}         decelerationRate={0} snapToInterval={WIDTH - 60} snapToAlignment={"center"} contentInset={{
+          top: 0,
+          left: 30,
+          bottom: 0,
+          right: 30,
+        }}>
+        <View style={styles.scrollHorizontalView1}>
+          <Text style={styles.title}>Trending up</Text>
+          <View style={styles.playersList}>
+          {(trendingAdd) ? trendingAdd.map(player => {
+            const id = player.player_id;
+            const avatar = `https://sleepercdn.com/content/nfl/players/thumb/${id}.jpg`;
 
-          return (
-            <Player key={id} id={id} avatar={avatar} player={player} type='add' />
-          )
-        }) :
-        new Array(25).fill(0).map((player, index) => {
-          return (
-            <PlayerPlaceholder key={index} />
-          )
-        })}
+            return (
+              <Player key={id} id={id} avatar={avatar} player={player} type='add' />
+            )
+          }) :
+          new Array(25).fill(0).map((player, index) => {
+            return (
+              <PlayerPlaceholder key={index} />
+            )
+          })}
+          </View>
         </View>
-      </View>
-      <View style={styles.boxContainer}>
-        <Text style={styles.title}>Trending down</Text>
-        <View style={styles.playersList}>
-        {(trendingDrop) ? trendingDrop.map(player => {
-          const id = player.player_id;
-          const avatar = `https://sleepercdn.com/content/nfl/players/thumb/${id}.jpg`;
+        <View style={styles.scrollHorizontalView2}>
+          <Text style={styles.title}>Trending down</Text>
+          <View style={styles.playersList}>
+          {(trendingDrop) ? trendingDrop.map(player => {
+            const id = player.player_id;
+            const avatar = `https://sleepercdn.com/content/nfl/players/thumb/${id}.jpg`;
 
-          return (
-            <Player key={id} id={id} avatar={avatar} player={player} type='drop' />
-          )
-        }) :
-        new Array(25).fill(0).map((player, index) => {
-          return (
-            <PlayerPlaceholder key={index} />
-          )
-        })}
+            return (
+              <Player key={id} id={id} avatar={avatar} player={player} type='drop' />
+            )
+          }) :
+          new Array(25).fill(0).map((player, index) => {
+            return (
+              <PlayerPlaceholder key={index} />
+            )
+          })}
+          </View>
         </View>
-      </View>
+      </ScrollView>
       </ScrollView>
     </View>
    );
@@ -195,12 +230,24 @@ const styles = StyleSheet.create({
     color:WHITE,
     fontWeight:'bold'
   },
-  boxContainer: {
+  scrollHorizontalView1: {
+    width: WIDTH - 60,
     backgroundColor: LIGHT_BLACK,
     padding: 10,
-    paddingTop:15,
+    marginRight: 10,
+    borderRadius: BORDER_RADIUS
+  },
+  scrollHorizontalView2: {
+    width: WIDTH - 60,
+    backgroundColor: LIGHT_BLACK,
+    padding: 10,
+    borderRadius: BORDER_RADIUS
+  },
+  boxContainer: {
+    //backgroundColor: LIGHT_BLACK,
+    padding: 10,
     borderRadius: BORDER_RADIUS,
-    marginTop:20,
+    //marginTop:20,
   },
   playerPosition: {
     color: DARK_GRAY,
@@ -211,9 +258,9 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   imagePlayer: {
-    width: 40,
-    height: 40,
-    borderRadius:20,
+    width: 50,
+    height: 50,
+    borderRadius:50,
     backgroundColor: DARK_BLACK
   },
   playerContainer: {

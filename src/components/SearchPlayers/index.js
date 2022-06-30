@@ -1,25 +1,30 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useState } from "react";
 import ProgressiveImage from "../ProgressiveImage";
 import { DARK_BLACK, DARK_GRAY, WHITE } from "../Variables";
 import ViewLightDark from '../ViewLightDark'
 
-const SearchPlayers = ({searchPlayers}) => {
+const SearchPlayers = ({navigation, searchPlayers}) => {
 
     const Player = ({player}) => {
         return (
         <View style={styles.playerContainer}>
-            <ProgressiveImage style={styles.imagePlayer} uri={`https://sleepercdn.com/content/nfl/players/thumb/${player.player_id}.jpg`} resizeMode='contain' />
+            <TouchableOpacity style={{flexDirection:'row',alignItems:'center'}} onPress={() => navigation.navigate('PlayerStats', {
+            playerObject: player,
+            goTo: 'TrendingPlayers'
+            })}>
+            <ProgressiveImage style={styles.imagePlayer} uri={`https://sleepercdn.com/content/nfl/players/thumb/${player.player_id}.jpg`} resizeMode='cover' />
             <View style={styles.playerNameContainer}>
                 <Text style={styles.playerName}>{player.full_name}</Text>
-                <Text style={styles.playerPosition}>QB - NE</Text>
+                <Text style={styles.playerPosition}>{player.position} - {(player.team) ? player.team : 'Free Agent'}</Text>
             </View>
+            </TouchableOpacity>
         </View>
         )
     }
 
     return ( 
-        <ViewLightDark containerStyle={{margin:0,marginTop:10}}>
+        <ViewLightDark title='Buscar jogadores' titleSize={18} containerStyle={{margin:0,marginTop:10}}>
             {
                 searchPlayers?.map((player, index) => {
                     return (
@@ -35,9 +40,9 @@ export default SearchPlayers;
 
 const styles = StyleSheet.create({
     imagePlayer: {
-        width: 40,
-        height: 40,
-        borderRadius:20,
+        width: 50,
+        height: 50,
+        borderRadius:50,
         backgroundColor: DARK_BLACK
     },
     playerPosition: {
@@ -51,6 +56,7 @@ const styles = StyleSheet.create({
     playerContainer: {
         flexDirection:'row',
         alignItems:'center',
+        marginTop:20,
     },
     playerNameContainer: {
         flex: 1,

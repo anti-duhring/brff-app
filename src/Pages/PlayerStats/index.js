@@ -36,7 +36,7 @@ const PlayerStats = ({route}) => {
 
     useEffect(() => {
         getPlayerStats(player.player_id, 'regular', season);
-        //console.log(player.player_id, player.position)
+        //console.log(player.player_id, player.fantasy_positions[0])
     }, [])
 
     const statsToShowName = (position) => {
@@ -314,7 +314,7 @@ const PlayerStats = ({route}) => {
                 <Text style={styles.columnValue}>{item[0]}</Text>
                 {(item[1]) ? <View style={{flex:1,width:80,alignItems:'center'}}><Image source={{uri: `https://sleepercdn.com/images/team_logos/nfl/${item[1].opponent.toLowerCase()}.png`}} style={{width:25, height:25}} resizeMode='contain' /></View> :     <Text style={styles.columnValue}>-</Text>}
                 { 
-                    statsToShow[player.position]?.map((stat, i) => {
+                    statsToShow[player.fantasy_positions[0]]?.map((stat, i) => {
 
                         if(!item[1]) {
                             return (
@@ -336,14 +336,14 @@ const PlayerStats = ({route}) => {
     )
 
     const TableStatsTotal = ({index, item}) => {
-        let totalValues = new Array(statsToShow[player.position].length).fill(0);
+        let totalValues = new Array(statsToShow[player.fantasy_positions[0]].length).fill(0);
         let playedGames = 0;
 
        item.map((itemWeek, index) => {
             if(!itemWeek[1]) return
             if(itemWeek[1].stats) playedGames++
 
-            statsToShow[player.position]?.map((stat, i) => {
+            statsToShow[player.fantasy_positions[0]]?.map((stat, i) => {
                 if(itemWeek[1].stats[stat]) {
                     totalValues[i] += itemWeek[1].stats[stat];
                 }
@@ -359,11 +359,11 @@ const PlayerStats = ({route}) => {
                     totalValues.map((stat, i) => {
                        return(
                         <Text key={i} style={styles.columnValue}>{(
-                            statsToShow[player.position][i].indexOf('rtg')!=-1 || 
-                            statsToShow[player.position][i].indexOf('pct')!=-1 || 
-                            statsToShow[player.position][i].indexOf('ypa')!=-1 || 
-                            statsToShow[player.position][i].indexOf('ypc')!=-1 || 
-                            statsToShow[player.position][i].indexOf('ypt')!=-1) ? (stat / playedGames).toFixed(1) : (stat - Math.floor(stat) != 0) ? stat.toFixed(1) : stat}</Text>
+                            statsToShow[player.fantasy_positions[0]][i].indexOf('rtg')!=-1 || 
+                            statsToShow[player.fantasy_positions[0]][i].indexOf('pct')!=-1 || 
+                            statsToShow[player.fantasy_positions[0]][i].indexOf('ypa')!=-1 || 
+                            statsToShow[player.fantasy_positions[0]][i].indexOf('ypc')!=-1 || 
+                            statsToShow[player.fantasy_positions[0]][i].indexOf('ypt')!=-1) ? (stat / playedGames).toFixed(1) : (stat - Math.floor(stat) != 0) ? stat.toFixed(1) : stat}</Text>
                        ) 
                     })
                 }
@@ -376,7 +376,7 @@ const PlayerStats = ({route}) => {
             <Text style={styles.columnValue}>{(isLast) ? 'Total' :index + 1}</Text>
             <Text style={styles.columnValue}>-</Text>
             {
-                new Array(statsToShow[player.position].length).fill(0).map((stat, i) => {
+                new Array(statsToShow[player.fantasy_positions[0]].length).fill(0).map((stat, i) => {
                     return (
                     <Text key={i} style={styles.columnValue}>-</Text>
                     )
@@ -427,9 +427,9 @@ const PlayerStats = ({route}) => {
                         <StatsRowTitle index={1} message={`Semana em que o jogo ocorreu`} name='semana' />
                         <StatsRowTitle index={2} message={`Time contra o qual o jogador performou as estatísticas`} name='opp' />
                         {
-                            statsToShow[player.position]?.map((stat, i) => {
+                            statsToShow[player.fantasy_positions[0]]?.map((stat, i) => {
 
-                                return (<StatsRowTitle key={i} index={i+3} message={statsToShowName(player.position)[i]} name={stat.replace(/idp_/g,'').replace(/\bfgm_yds_over_30\b/g,'fgm_30_39')} />)
+                                return (<StatsRowTitle key={i} index={i+3} message={statsToShowName(player.fantasy_positions[0])[i]} name={stat.replace(/idp_/g,'').replace(/\bfgm_yds_over_30\b/g,'fgm_30_39')} />)
                             })
                         }
                     </View>

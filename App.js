@@ -17,6 +17,7 @@ import { AllPlayersContextProvider } from "./src/components/AllPlayersContext";
 import { PlayerContextProvider } from "./src/components/PlayerContext";
 import TrackPlayer, { Capability } from "react-native-track-player";
 import { FontAwesome5 } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { WHITE, DARK_GREEN, DARKER_GRAY, DARK_BLACK } from "./src/components/Variables";
 import AboutUs from "./src/Pages/AboutUs";
 
@@ -217,9 +218,10 @@ export default function App() {
             )}} />
           <Drawer.Screen name="TrendingPlayers" options={{
             headerShown: false,
-            drawerLabel:'Trending Players' ,
+            swipeEnabled: false,
+            drawerLabel:'Jogadores' ,
             drawerIcon: ({color}) => (
-            <FontAwesome5 name="chart-line"  size={17} color={color} />
+              <MaterialCommunityIcons name="football-helmet"  size={22} color={color} />
           )}} component={TrendingPlayers}/>
           <Drawer.Screen name="Podcast" options={{
             headerShown: false,
