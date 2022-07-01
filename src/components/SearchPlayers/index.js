@@ -27,6 +27,8 @@ const SearchPlayers = ({navigation, searchPlayers}) => {
         <ViewLightDark title='Buscar jogadores' titleSize={18} containerStyle={{margin:0,marginTop:10}}>
             {
                 searchPlayers?.map((player, index) => {
+                    if(!player.full_name) return
+                    
                     return (
                         <Player key={index} player={player} />
                     )

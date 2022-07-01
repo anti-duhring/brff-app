@@ -6,8 +6,13 @@ import { DARK_GREEN } from '../Variables';
 const PlayerProfileHeader = ({children, playerObject}) => {
     let avatar = `https://sleepercdn.com/avatars/${playerObject.avatar}`;
     const opacity = useRef(new Animated.Value(0)).current;
+    const firstRender = useRef(true);
 
     const fadeIn = () => {
+        if(firstRender.current) {
+            firstRender.current = false;
+            return
+        }
         Animated.timing(opacity,{
             toValue: 1,
             duration: 200,
@@ -25,20 +30,10 @@ const PlayerProfileHeader = ({children, playerObject}) => {
 
     if(playerObject.avatar==null) avatar = `https://brffootball.com.br/wp-content/uploads/2022/02/cropped-logo.png`
 
-        /*        <StatusBar
-          animated={true}
-          backgroundColor="transparent"
-          translucent={true}
-          barStyle="light-content"
-         />*/
+
 
     return(
         <View style={{flex:1}}>
-        <StatusBar
-          animated={true}
-          backgroundColor={DARK_GREEN}
-          barStyle="light-content"
-         />
         <HeaderImageScrollView
             useNativeDriver={true}
             maxHeight={200}

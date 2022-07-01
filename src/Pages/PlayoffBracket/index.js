@@ -276,9 +276,9 @@ const PlayoffBracket = ({route}) => {
                 <View>
                     {(leagueRostersData && leagueUsersData && playoffData) ?
                     
-                    
-                    playoffData.map((matchup, index) => {
-                        if(matchup.r != round) return
+                    playoffData.filter((matchup, index) => {
+                        return matchup.r == round
+                    }).map((matchup, index) => {
 
                         let player1;
                         let player2;
@@ -385,6 +385,10 @@ const styles = StyleSheet.create({
     roundSelectContainer: {
         width:150,
         height:40,
+        padding: 0,
+        justifyContent:'center',
+        alignContent:'center',
+        alignItems:'center'
     },
     title: {
         fontSize:19,

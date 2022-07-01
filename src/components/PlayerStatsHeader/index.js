@@ -7,8 +7,13 @@ import ProgressiveImage from '../ProgressiveImage'
 const PlayerStatsHeader = ({children, player}) => {
     const typePlayer = (isNaN(new Number(player.player_id))) ? 'TEAM' : 'PLAYER';
     const opacity = useRef(new Animated.Value(0)).current;
+    const firstRender = useRef(true);
 
     const fadeIn = () => {
+        if(firstRender.current) {
+            firstRender.current = false;
+            return
+        }
         Animated.timing(opacity,{
             toValue: 1,
             duration: 200,

@@ -25,7 +25,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.antiduhring.sleeperapp"
+      "package": "com.antiduhring.sleeperapp",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png"

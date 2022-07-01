@@ -369,15 +369,15 @@ const Matchups = ({navigation, route}) => {
                 <TouchableOpacity 
                     disabled={(week==1) ? true : false}
                     onPress={() => setWeek(week - 1)} 
-                    style={{flex:1,opacity:(week==1) ? 0.2 : 1}}
+                    style={{flex:1,justifyContent:'center',alignItems:'center',alignContent:'center',opacity:(week==1) ? 0.2 : 1}}
                 >
                     <Entypo name="chevron-left" style={{textAlign:'center'}} size={24} color="#C6C6C6" />
                 </TouchableOpacity>
                 
-                <Text style={{color:LIGHT_GRAY,flex:3,textAlign:'center'}}>Semana {week}</Text>
+                <Text style={{color:LIGHT_GRAY,flex:3,textAlign:'center',justifyContent:'center',alignItems:'center',alignContent:'center'}}>Semana {week}</Text>
                 <TouchableOpacity 
                     onPress={() => setWeek(week + 1)} 
-                    style={{flex:1}}
+                    style={{flex:1,justifyContent:'center',alignItems:'center',alignContent:'center'}}
                 >
                     <Entypo name="chevron-right" style={{textAlign:'center'}} size={24} color="#C6C6C6" />
                 </TouchableOpacity>
@@ -519,7 +519,10 @@ const Matchups = ({navigation, route}) => {
             <View style={{flex:1,backgroundColor:'#0B0D0F'}}>
             <HeaderLeagueContextProvider leagueObject={league}>
                 <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueUsers={leagueUsers} leagueRosters={route.params?.leagueRosters} />
-                <WeekSelect />
+                <View style={{marginTop:20,marginLeft:10,marginRight:20,flexDirection:'row'}}>
+                    <WeekSelect />
+                    {starters && opponentStarters && <TooltipButton setTip={setTip} showTip={showTip} />}
+                </View>
                 <ViewLightDark>
                     <Text style={{color: WHITE, textAlign:'center'}}>A liga não possui matchup para a semana {week}.</Text>
                 </ViewLightDark>
