@@ -502,6 +502,7 @@ const Matchups = ({navigation, route}) => {
     )
 
     if(league.status!='in_season') {
+        
         return (
             <View style={{flex:1,backgroundColor:'#0B0D0F'}}>
             <HeaderLeagueContextProvider leagueObject={league}>
