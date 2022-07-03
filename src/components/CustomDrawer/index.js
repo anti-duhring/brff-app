@@ -1,17 +1,52 @@
-import { useContext } from "react";
-import { View, Text, StyleSheet, Image, ImageBackground } from "react-native";
+import { useContext, useState, useEffect } from "react";
+import { View, Text, StyleSheet, Image, ImageBackground, Pressable, ActivityIndicator } from "react-native";
 import { DrawerContentScrollView, DrawerItemList, DrawerItem } from "@react-navigation/drawer";
 import { AuthContext } from '../../components/Context';
 import { UserDataContext } from "../UserDataContext";
 import { FontAwesome5 } from '@expo/vector-icons';
-import { WHITE, DARK_GREEN, DARKER_GRAY } from "../Variables";
+import { WHITE, DARK_GREEN, DARKER_GRAY, DARK_BLACK } from "../Variables";
+import TrackPlayer, { State, usePlaybackState, Event } from "react-native-track-player";
+import { FontAwesome } from '@expo/vector-icons';
 
 const CustomDrawer = (props) => {
-        const { signOut } = useContext(AuthContext)
-        const { userData } = useContext(UserDataContext)
-        const username = userData.username;
-        const displayName = userData.display_name;
-        const userAvatar = userData.avatar;
+    const { signOut } = useContext(AuthContext)
+    const { userData } = useContext(UserDataContext)
+    const username = userData.username;
+    const displayName = userData.display_name;
+    const userAvatar = userData.avatar;
+    
+    const [currentEpisode, setCurrentEpisode] = useState(null);
+    const playbackState = usePlaybackState();
+
+    const getCurrentTrack = async() => {
+        let currentTrack = await TrackPlayer.getCurrentTrack();
+        let currentTrackObject = await TrackPlayer.getTrack(currentTrack);
+
+        setCurrentEpisode(currentTrackObject);
+    }
+
+    const togglePlayer = () => {
+        if(playbackState == State.Playing) {
+            TrackPlayer.pause();
+        } else if(playbackState == State.Paused) {
+            TrackPlayer.play();
+        }
+    }
+
+    useEffect(() => {
+        getCurrentTrack();
+    },[playbackState]);
+
+    const MiniPlayer = () => (
+        <View style={{backgroundColor:DARK_BLACK,height:300,justifyContent:'flex-start',alignItems:'center'}}>
+            <ImageBackground source={{uri:currentEpisode.artwork}} imageStyle={{resizeMode:'cover',borderRadius:5}} style={{width:120,height:120,borderRadius:5,justifyContent:'center',alignItems:'center'}}>
+                <Pressable style={{width:50,height:50, borderRadius:50,backgroundColor:'rgba(0,0,0,0.7)',justifyContent:'center',alignItems:'center'}} onPress={() => {togglePlayer();}}>
+                    {playbackState == State.Buffering || playbackState == State.Connecting ? <ActivityIndicator size={24} color="white" /> : <FontAwesome name={playbackState == State.Playing ?  "pause" : "play" } size={24} color="white"  />}
+                    </Pressable>
+            </ImageBackground>
+            
+        </View>
+    )
 
     return (
     <View style={{flex:1}}>
@@ -42,6 +77,8 @@ const CustomDrawer = (props) => {
                 onPress={() => signOut()}
             />
         </DrawerContentScrollView>
+        {currentEpisode && <MiniPlayer />}
+        
     </View>
     );
 }

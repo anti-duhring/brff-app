@@ -39,7 +39,7 @@ const EpisodeList = ({navigation}) => {
                 })
               )
 
-            setPlaylistPodcast(data.items)
+            //setPlaylistPodcast(data.items)
             setDATA(
                 data.items.map((episode, index) => {
                   return {
@@ -49,6 +49,7 @@ const EpisodeList = ({navigation}) => {
                   }
                 })
               )
+              setIsLoading(false)
         } catch(e) {
             console.log('Erro:',e)
         } 
@@ -108,7 +109,7 @@ const EpisodeList = ({navigation}) => {
                 url: 'https://'+episode.enclosures[0].url.split('https%3A%2F%2F')[1].replace(/%2F/g,'/'),
                 title: episode.title,
                 artist: episode.authors[0].name,
-                artwork: 'https://brffootball.com.br/wp-content/uploads/2022/02/cropped-logo.png',
+                artwork: episode.itunes.image,
                 duration: (Number(episode.enclosures[0].length) / 1000).toFixed(0)
             })
         })

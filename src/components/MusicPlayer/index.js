@@ -1,7 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import { View, Text, Pressable, TouchableOpacity, ActivityIndicator, StyleSheet, Dimensions } from "react-native";
-import TrackPlayer, { Capability, Event, RepeatMode, State, usePlaybackState, useProgress, useTrackPlayerEvents } from "react-native-track-player";
-import { LinearGradient } from 'expo-linear-gradient';
+import TrackPlayer, { State } from "react-native-track-player";
 import { FontAwesome } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import MultiSlider from "@ptomasroos/react-native-multi-slider";

@@ -20,12 +20,13 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { WHITE, DARK_GREEN, DARKER_GRAY, DARK_BLACK } from "./src/components/Variables";
 import AboutUs from "./src/Pages/AboutUs";
+import * as rssParser from 'react-native-rss-parser'
 
 const Drawer = createDrawerNavigator();
 
-changeNavigationBarColor(DARK_BLACK);
 
 export default function App() {
+  changeNavigationBarColor(DARK_BLACK);
   //const [isLoading, setIsLoading] = useState(true)
   //const [userToken, setUserToken] = useState(null)
 
@@ -38,11 +39,13 @@ export default function App() {
                 Capability.Play,
                 Capability.Pause,
                 Capability.Stop,
+                Capability.SeekTo
             ],
             compactCapabilities: [
               Capability.Play,
               Capability.Pause,
               Capability.Stop,
+              Capability.SeekTo
             ]
         })
         console.log('Track Player loaded!')
@@ -51,6 +54,34 @@ export default function App() {
         console.log('Erro:',e)
     } 
     
+}
+
+const getPodcasts = async() => {
+  const RSS_URL = `https://anchor.fm/s/dea812c/podcast/rss`;
+  try {
+      const response = await fetch(RSS_URL)
+      const responseData = await response.text()
+      const data = await rssParser.parse(responseData)
+      setPlaylistPodcast(data.items)
+  } catch(e) {
+      console.log('Erro:',e)
+  } 
+}
+
+const setPlaylistPodcast = async(episodesData) => {
+  let playlist = []
+  episodesData.map((episode, index) => { 
+      playlist.push({
+          url: 'https://'+episode.enclosures[0].url.split('https%3A%2F%2F')[1].replace(/%2F/g,'/'),
+          title: episode.title,
+          artist: episode.authors[0].name,
+          artwork: episode.itunes.image,
+          duration: (Number(episode.enclosures[0].length) / 1000).toFixed(0)
+      })
+  })
+
+  await TrackPlayer.add(playlist);
+  console.log(playlist.length,'episodes tracked')
 }
 
   const initialLoginState = {
@@ -158,7 +189,8 @@ export default function App() {
 
   useEffect(() => {
     setupPlayer();
-    getToken()
+    getToken();
+    getPodcasts();
   },[])
 
   if(loginState.isLoading){

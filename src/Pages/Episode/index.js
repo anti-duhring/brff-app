@@ -16,13 +16,16 @@ const Episode = ({navigation, route}) => {
     const episodeID = route.params?.episodeID
     const episodeDescription = episode.description.replace(/<p>/g,'').replace(/<br>/g,``).replace(/<\/p>/g,'').replace(/--/g,``)
     const trackLength = route.params?.trackLength
-    let episodeImage = {uri: episode.itunes.image};
-
-    if(episode.itunes.image == 'https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded_nologo400/2234723/2234723-1645583930433-8a8b649a48b9d.jpg') episodeImage = require('../../../assets/Images/leagueHeader2.png')
+    let episodeImage = (episode.itunes.image == 'https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded_nologo400/2234723/2234723-1645583930433-8a8b649a48b9d.jpg') ? require('../../../assets/Images/leagueHeader2.png') : {uri: episode.itunes.image};
 
     const opacity = useRef(new Animated.Value(0)).current;
+    const firstRender = useRef(true);
 
     const fadeIn = () => {
+        if(firstRender.current) {
+            firstRender.current = false;
+            return
+        }
         Animated.timing(opacity,{
             toValue: 1,
             duration: 200,
@@ -56,7 +59,7 @@ const Episode = ({navigation, route}) => {
                                 url: 'https://'+episode.enclosures[0].url.split('https%3A%2F%2F')[1].replace(/%2F/g,'/'),
                                 title: episodeName,
                                 artist: episode.authors[0].name,
-                                artwork: 'https://brffootball.com.br/wp-content/uploads/2022/02/cropped-logo.png',
+                                artwork: episode.itunes.image,
                                 duration: (Number(episode.enclosures[0].length) / 1000).toFixed(0)
                             }} />
 
@@ -143,7 +146,7 @@ const styles = StyleSheet.create({
         paddingHorizontal:50,
     },
     sectionLarge: {
-        height: 650,
+        minHeight: 700,
     },
     imageTitle: {
         color: 'white',
@@ -165,6 +168,6 @@ const styles = StyleSheet.create({
         color:'rgba(255, 255, 255, 0.7)'
     },
     foregroundContainer: {
-        marginTop: 70,
+        marginTop: 80,
     },
 })
