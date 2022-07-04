@@ -1,4 +1,4 @@
-package com.antiduhring.sleeperapp;
+package com.antiduhring.brffapp;
 
 import android.os.Build;
 import android.os.Bundle;

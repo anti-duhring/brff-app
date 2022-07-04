@@ -1,4 +1,4 @@
-package com.antiduhring.sleeperapp.newarchitecture.components;
+package com.antiduhring.brffapp.newarchitecture.components;
 
 import com.facebook.jni.HybridData;
 import com.facebook.proguard.annotations.DoNotStrip;

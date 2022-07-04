@@ -1,4 +1,4 @@
-package com.antiduhring.sleeperapp.newarchitecture;
+package com.antiduhring.brffapp.newarchitecture;
 
 import android.app.Application;
 import androidx.annotation.NonNull;
@@ -19,9 +19,9 @@ import com.facebook.react.fabric.CoreComponentsRegistry;
 import com.facebook.react.fabric.EmptyReactNativeConfig;
 import com.facebook.react.fabric.FabricJSIModuleProvider;
 import com.facebook.react.uimanager.ViewManagerRegistry;
-import com.antiduhring.sleeperapp.BuildConfig;
-import com.antiduhring.sleeperapp.newarchitecture.components.MainComponentsRegistry;
-import com.antiduhring.sleeperapp.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
+import com.antiduhring.brffapp.BuildConfig;
+import com.antiduhring.brffapp.newarchitecture.components.MainComponentsRegistry;
+import com.antiduhring.brffapp.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
 import java.util.ArrayList;
 import java.util.List;
 

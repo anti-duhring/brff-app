@@ -50,10 +50,6 @@ const EpisodeList = ({navigation}) => {
             //setPlaylistPodcast(data.items)
             setDATA(
                 data.items.map((episode, index) => {
-                    if(index==0) {
-                        console.log(episode);
-                        console.log(Number(episode.enclosures[0].length));
-                    }
                   return {
                     key: episode.id,
                     episodeObject: {
@@ -120,23 +116,6 @@ const EpisodeList = ({navigation}) => {
         var mDisplay = m > 0 ? m + (m == 1 ? "min" : "mins") : "";
         var sDisplay = s > 0 ? s + (s == 1 ? "s" : "s") : "";
         return hDisplay + mDisplay; 
-    }
-
-    const setPlaylistPodcast = async(episodesData) => {
-        let playlist = []
-        episodesData.map((episode, index) => { 
-            playlist.push({
-                url: 'https://'+episode.enclosures[0].url.split('https%3A%2F%2F')[1].replace(/%2F/g,'/'),
-                title: episode.title,
-                artist: episode.authors[0].name,
-                artwork: episode.itunes.image,
-                duration: (Number(episode.enclosures[0].length) / 1000).toFixed(0)
-            })
-        })
-
-        await TrackPlayer.add(playlist);
-        console.log(playlist.length,'episodes tracked')
-        setIsLoading(false)
     } 
 
     useEffect(() => {

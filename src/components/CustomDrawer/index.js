@@ -1,13 +1,16 @@
 import { useContext, useState, useEffect } from "react";
-import { View, Text, StyleSheet, Image, ImageBackground, Pressable, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, Image, ImageBackground, Pressable, ActivityIndicator, Dimensions } from "react-native";
 import { DrawerContentScrollView, DrawerItemList, DrawerItem } from "@react-navigation/drawer";
 import { AuthContext } from '../../components/Context';
 import { UserDataContext } from "../UserDataContext";
 import { FontAwesome5 } from '@expo/vector-icons';
 import { WHITE, DARK_GREEN, DARKER_GRAY, DARK_BLACK, LIGHT_BLACK, LIGHT_GRAY } from "../Variables";
-import TrackPlayer, { State, usePlaybackState } from "react-native-track-player";
+import TrackPlayer, { State, usePlaybackState, useProgress } from "react-native-track-player";
 import { FontAwesome } from '@expo/vector-icons';
-import TextTicker from 'react-native-text-ticker'
+import TextTicker from 'react-native-text-ticker';
+import MultiSlider from "@ptomasroos/react-native-multi-slider";
+
+const WIDTH = Dimensions.get('window').width;
 
 const CustomDrawer = (props) => {
     const { signOut } = useContext(AuthContext)
@@ -18,6 +21,7 @@ const CustomDrawer = (props) => {
     
     const [currentEpisode, setCurrentEpisode] = useState(null);
     const playbackState = usePlaybackState();
+    const { position, duration } = useProgress();
 
     const getCurrentTrack = async() => {
         let currentTrack = await TrackPlayer.getCurrentTrack();
@@ -41,44 +45,41 @@ const CustomDrawer = (props) => {
         //console.log(playbackState, State);
     },[playbackState]);
 
-    const MiniPlayer = () => (
-        <View style={{backgroundColor:DARK_BLACK,flexDirection:'row',marginHorizontal:10}}>
-            <View style={{flex:1}}>
-            <Pressable onPress={async() =>                       
-                props.navigation.navigate('Podcast',{
-                    screen: 'Episode',
-                    params: {
-                        episodeObject: currentEpisode,
-                        episodeName: currentEpisode.title,
-                        episodeID: await TrackPlayer.getCurrentTrack(),
-                    }
-                })}>
-                <ImageBackground source={{uri:currentEpisode.artwork}} imageStyle={{resizeMode:'cover',borderBottomLeftRadius:5,borderTopLeftRadius:5}} style={{height:70,justifyContent:'center',alignItems:'center'}}>
+    const MiniPlayerImage = () => (
+        <Pressable onPress={() => togglePlayer()}>
+            <ImageBackground source={{uri:currentEpisode.artwork}} imageStyle={{resizeMode:'cover',borderBottomLeftRadius:5,borderTopLeftRadius:5}} style={{height:70,justifyContent:'center',alignItems:'center'}}>
 
-                    <Pressable style={{width:50,height:50, borderRadius:50,backgroundColor:'rgba(0,0,0,0.7)',justifyContent:'center',alignItems:'center'}} onPress={() => {togglePlayer();}}>
+                <View style={{width:45,height:45, borderRadius:45,backgroundColor:'rgba(0,0,0,0.7)',justifyContent:'center',alignItems:'center'}}>
 
-                    {playbackState == State.Buffering || playbackState == State.Connecting ? <ActivityIndicator size={24} color="white" /> : <FontAwesome name={playbackState == State.Playing ?  "pause" : "play" } size={24} color="white"  />}
+                {playbackState != State.Playing && playbackState != State.Paused && playbackState != State.Ready ? <ActivityIndicator size={24} color="white" /> : <FontAwesome name={playbackState == State.Playing ?  "pause" : "play" } size={24} color="white"  />}
 
-                    </Pressable>
-                </ImageBackground>
-            </Pressable>
-            </View>
-            <View style={{flex:3,backgroundColor:LIGHT_BLACK,height:70,borderBottomRightRadius:5,borderTopRightRadius:5,paddingHorizontal:10,paddingVertical:5}}>
-                <TextTicker
-                    style={{ color:WHITE }}
-                    duration={150 * currentEpisode.title.replace(/[0-9]x[0-9][0-9] /g,'').replace('- ','').length}
-                    loop
-                    bounce
-                    scrollSpeed={100}
-                >
-                {currentEpisode.title.replace(/[0-9]x[0-9][0-9] /g,'').replace('- ','')}
-                </TextTicker>
-            </View>
+                </View>
+            </ImageBackground>
+        </Pressable>
+    )
+
+    const MiniPlayerDuration = () => (
+        <View style={{flexDirection:'row',justifyContent:'space-between'}}>
+            <Text style={{ color:WHITE,fontSize:12 }}>{new Date(position * 1000).toISOString().substring(12, 19)}</Text>
+            <Text style={{ color:WHITE,fontSize:12 }}>{new Date((duration - position) * 1000).toISOString().substring(12, 19)}</Text>
         </View>
     )
 
+    const MiniPlayerSlider = () => (
+        <MultiSlider 
+            trackStyle={{height:2,backgroundColor:'rgba(0,0,0,1)',borderRadius:10}}
+            markerStyle={{backgroundColor:'white',display:'none'}}
+            containerStyle={{height:20,}}
+            selectedStyle={{backgroundColor:'white'}}
+            sliderLength={(WIDTH / 3) * 1.3}
+            values={[position]}
+            min={0}
+            max={duration > 0 && isNaN(duration) == false ? duration : 100}
+            />
+    )
+
     return (
-    <View style={{flex:1}}>
+    <View style={{flex:1,backgroundColor:DARK_BLACK}}>
         <ImageBackground /*blurRadius={2}*/ imageStyle={{resizeMode:'cover'}} style={styles.userContainer} source={require('../../../assets/Images/leagueHeader2.png')}>
             <View style={styles.drawerUser}>
                 <View style={styles.drawerImage}>
@@ -105,9 +106,35 @@ const CustomDrawer = (props) => {
                 activeBackgroundColor={DARK_GREEN}
                 onPress={() => signOut()}
             />
-            {currentEpisode && <MiniPlayer />}
         </DrawerContentScrollView>
-        
+        {currentEpisode &&         
+            <View style={styles.miniPlayerContainer}>
+                <View style={{flex:1}}>
+                    <MiniPlayerImage />
+                </View>
+                <View style={styles.miniPlayerSliderContainer}>
+                    <Pressable onPress={async() =>                       
+                    props.navigation.navigate('Podcast',{
+                        screen: 'Episode',
+                        params: {
+                            episodeObject: currentEpisode,
+                            episodeName: currentEpisode.title,
+                            episodeID: await TrackPlayer.getCurrentTrack(),
+                        }
+                    })}>
+                    <TextTicker
+                        style={{ color:WHITE }}
+                        duration={150 * currentEpisode.title.replace(/[0-9]x[0-9][0-9] /g,'').replace('- ','').length}
+                        loop
+                        bounce 
+                    >
+                    {currentEpisode.title.replace(/[0-9]x[0-9][0-9] /g,'').replace('- ','')}
+                    </TextTicker>
+                    <MiniPlayerSlider />
+                    <MiniPlayerDuration />
+                    </Pressable>
+                </View>
+            </View>}
     </View>
     );
 }
@@ -162,5 +189,20 @@ const styles = StyleSheet.create({
       text: {
         textAlign:'center',
         color:'#C6C6C6'
+      },
+      miniPlayerContainer: {
+        backgroundColor:DARK_BLACK,
+        flexDirection:'row',
+        marginHorizontal:10,
+        marginBottom:40
+      },
+      miniPlayerSliderContainer: {
+        flex:3,
+        backgroundColor:LIGHT_BLACK,
+        height:70,
+        borderBottomRightRadius:5,
+        borderTopRightRadius:5,
+        paddingHorizontal:10,
+        paddingVertical:5
       }
 })

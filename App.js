@@ -1,7 +1,7 @@
 import { React, useEffect, useMemo, useReducer } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import { View, ActivityIndicator, Vibration, StatusBar } from "react-native";
+import { View, ActivityIndicator, Vibration, StatusBar, Dimensions } from "react-native";
 import changeNavigationBarColor from "react-native-navigation-bar-color";
 import StackScreens from "./src/screens/StackScreens";
 import SignIn from './src/Pages/SignIn';
@@ -18,12 +18,12 @@ import { PlayerContextProvider } from "./src/components/PlayerContext";
 import TrackPlayer, { Capability } from "react-native-track-player";
 import { FontAwesome5 } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { WHITE, DARK_GREEN, DARKER_GRAY, DARK_BLACK } from "./src/components/Variables";
+import { WHITE, DARK_GREEN, DARKER_GRAY, DARK_BLACK, LIGHT_BLACK } from "./src/components/Variables";
 import AboutUs from "./src/Pages/AboutUs";
 import * as rssParser from 'react-native-rss-parser'
 
 const Drawer = createDrawerNavigator();
-
+const WIDTH = Dimensions.get('window').width;
 
 export default function App() {
   changeNavigationBarColor(DARK_BLACK);
@@ -225,12 +225,12 @@ const setPlaylistPodcast = async(episodesData) => {
         <Drawer.Navigator 
           useLegacyImplementation
           screenOptions={{
-            drawerActiveBackgroundColor:DARK_GREEN,//'#15191C',
+            drawerActiveBackgroundColor:LIGHT_BLACK,//'#15191C',
             drawerActiveTintColor:WHITE,
             drawerInactiveTintColor:DARKER_GRAY,
             drawerType: 'front',
             drawerLabelStyle: {marginLeft:-25, fontFamily: 'Roboto-Medium', fontSize:15},
-            drawerStyle: {display: (loginState.userToken) ? 'flex' : 'none'}
+            drawerStyle: {width:(WIDTH / 3) * 2,display: (loginState.userToken) ? 'flex' : 'none'}
           }}
           
           drawerContent={(props) => { 
