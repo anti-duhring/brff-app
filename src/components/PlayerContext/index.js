@@ -20,7 +20,7 @@ export const PlayerContextProvider = ({children}) => {
         }
 
         if(currentTrack != null) {
-            if(playbackState == State.Paused) {
+            if(playbackState == State.Paused || playbackState == State.Ready) {
                 await TrackPlayer.play();
             } else {
                 await TrackPlayer.pause();

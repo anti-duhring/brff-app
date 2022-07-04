@@ -76,7 +76,9 @@ const setPlaylistPodcast = async(episodesData) => {
           title: episode.title,
           artist: episode.authors[0].name,
           artwork: episode.itunes.image,
-          duration: (Number(episode.enclosures[0].length) / 1000).toFixed(0)
+          duration: episode.itunes.duration, //(Number(episode.enclosures[0].length) / 1000).toFixed(0),
+          description: episode.description,
+          date: episode.published
       })
   })
 

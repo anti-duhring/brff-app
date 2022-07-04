@@ -9,8 +9,10 @@ import { HEADER_BUTTON_BG } from "../Variables";
 
 const WIDTH = Dimensions.get('window').width;
 
-const MusicPlayer = ({track, trackIndex, isThePlayerInEpisodePage}) => { 
+const MusicPlayer = ({track, trackIndex, navigation}) => { 
     const [currentTrack, setCurrentTrack] = useState(null)
+    const [prevEpisode, setPrevEpisode] = useState(null);
+    const [nextEpisode, setNextEpisode] = useState(null);
     const { 
         playbackState,
         position,
@@ -23,109 +25,104 @@ const MusicPlayer = ({track, trackIndex, isThePlayerInEpisodePage}) => {
         setCurrentTrack(index)
     }
 
+    const getPrevAndNextEpisode = async() => {
+        const prevTrack = await TrackPlayer.getTrack((trackIndex > 0) ? trackIndex - 1 : 0);
+        const nextTrack = await TrackPlayer.getTrack(trackIndex + 1);
+
+        setPrevEpisode(prevTrack);
+        setNextEpisode(nextTrack);
+    }
+
     useEffect(() => {
-        getCurrentTrack()
-    },[])
-    if(isThePlayerInEpisodePage) {
+        getCurrentTrack();
+        getPrevAndNextEpisode();
+    },[trackIndex])
+
+    const NextAndPrevButton = ({action}) => {
+        const conditional = (action=='prev') ? !prevEpisode || trackIndex<=0 : !nextEpisode;
+        const params = (action=='prev') ? {
+            episodeObject: prevEpisode,
+            episodeName: prevEpisode.title,
+            episodeID: trackIndex - 1,
+        } : {
+            episodeObject: nextEpisode,
+            episodeName: nextEpisode.title,
+            episodeID: trackIndex + 1,
+        }
+
         return (
-            <View>
-            <View style={{flexDirection:'row', justifyContent:'center', alignItems:'center'}}>
-                <View style={{marginRight:30,}}>
-                    <View style={styles.prevNextButton}>
-                        <Pressable onPress={() => {alert('Prev!!')}}>
-                        <MaterialIcons name="skip-previous" size={24} color="white" />
-                        </Pressable>
-                    </View>
-                </View>
-                <View>
-                    <View style={styles.playerButton}>
-                        <Pressable onPress={() => {togglePlayback(playbackState, track, trackIndex); setCurrentTrack(trackIndex)}}>
-                            {playbackState == State.Buffering || playbackState == State.Connecting ? <ActivityIndicator size={24} color="white" /> : <FontAwesome name={playbackState == State.Playing &&  currentTrack == trackIndex ?  "pause" : "play" } size={24} color="white"  />}
-                        </Pressable>
-                    </View>
-                </View>
-                <View style={{marginLeft:30,}}>
-                    <View style={styles.prevNextButton}>
-                        <Pressable onPress={() => {alert('Prev!!')}}>
-                        <MaterialIcons name="skip-next" size={24} color="white" />
-                        </Pressable>
-                    </View>
-                </View>
-            </View>
-            <View style={{ justifyContent:'center', alignItems:'center',marginHorizontal:20,}}>
-                <MultiSlider 
-                    trackStyle={{backgroundColor:'rgba(0,0,0,0.1)'}}
-                    markerStyle={{backgroundColor:'white'}}
-                    containerStyle={{height:20}}
-                    selectedStyle={{backgroundColor:'white'}}
-                    values={currentTrack == trackIndex ? [position] : [0]}
-                    min={0}
-                    sliderLength={WIDTH - 40}
-                    max={duration > 0 && currentTrack == trackIndex && isNaN(duration) == false ? duration : 100}
-                    onValuesChangeFinish={async(values) => {
-                        await TrackPlayer.seekTo(values[0])
-                    }}
-                />
-                <View style={{flexDirection:'row', width:'100%', justifyContent:'space-between'}}>
-                    <Text style={{color:'white'}} >
-                        {
-                            currentTrack == trackIndex ?
-                            new Date(position * 1000).toISOString().substring(12, 19) :
-                            '0:00:00'
-                        }
-                    </Text>
-                    <Text style={{color:'white'}} >
-                        {
-                            currentTrack == trackIndex ?
-                            new Date((duration - position) * 1000).toISOString().substring(12, 19) : 
-                            '0:00:00'
-                        }
-                    </Text>
-                </View>
-            </View>
-            </View>
+            <Pressable onPress={() => { 
+                if(conditional) return
+
+                navigation.navigate('Episode', params)
+            }}>
+            <MaterialIcons name={(action=='prev') ? `skip-previous` : `skip-next`} size={30} color="white" />
+            </Pressable>
         )
     }
-    return ( 
+
+    const PlayPauseButton = () => {
+        return (
+            <Pressable onPress={() => {togglePlayback(playbackState, track, trackIndex); setCurrentTrack(trackIndex)}}>
+
+            {playbackState == State.Buffering || playbackState == State.Connecting ? <ActivityIndicator size={30} color="white" /> : <FontAwesome name={playbackState == State.Playing &&  currentTrack == trackIndex ?  "pause" : "play" } size={30} color="white"  />}
+
+            </Pressable>
+        )
+    }
+
+    return (
         <View>
-                <View style={{flexDirection:'row'}}>
-                    <View style={{ paddingRight: 5,flex:1, justifyContent:'center', alignItems:'center'}}>
-                        <TouchableOpacity onPress={() => {togglePlayback(playbackState, track, trackIndex); setCurrentTrack(trackIndex)}}>
-                            {playbackState == State.Buffering || playbackState == State.Connecting ? <ActivityIndicator size={24} color="white" /> : <FontAwesome name={playbackState == State.Playing &&  currentTrack == trackIndex ?  "pause" : "play" } size={24} color="white" />}
-                        </TouchableOpacity>
-                    </View>
-                    <View style={{padding:5, flex:7, justifyContent:'center', alignContent:'flex-start'}}>
-                        <View>
-                            <MultiSlider 
-                                trackStyle={{backgroundColor:'rgba(0,0,0,0.1)'}}
-                                markerStyle={{backgroundColor:'white'}}
-                                containerStyle={{height:20}}
-                                selectedStyle={{backgroundColor:'white'}}
-                                values={currentTrack == trackIndex ? [position] : [0]}
-                                min={0}
-                                sliderLength={280}
-                                max={duration > 0 && currentTrack == trackIndex && isNaN(duration) == false ? duration : 100}
-                                onValuesChangeFinish={async(values) => {
-                                    await TrackPlayer.seekTo(values[0])
-                                }}
-                            />
-                        </View>
-                        <View style={{flexDirection:'row', width:'100%', justifyContent:'space-between'}}>
-                            <Text style={{color:'white'}} >{
-                                currentTrack == trackIndex ?
-                                new Date(position * 1000).toISOString().substring(12, 19) :
-                                '0:00:00'
-                            }</Text>
-                            <Text style={{color:'white'}} >{
-                                currentTrack == trackIndex ?
-                                new Date((duration - position) * 1000).toISOString().substring(12, 19) : 
-                                '0:00:00'
-                            }</Text>
-                        </View>
-                    </View>
+        <View style={{flexDirection:'row', justifyContent:'center', alignItems:'center'}}>
+            <View style={{marginRight:30,}}>
+                <View style={[styles.prevNextButton,{opacity:(!prevEpisode || trackIndex<=0)? 0.3 : 1}]}>
+                    {prevEpisode && <NextAndPrevButton action='prev' />}
                 </View>
+            </View>
+            <View>
+                <View style={styles.playerButton}>
+                    <PlayPauseButton />
+                </View>
+            </View>
+            <View style={{marginLeft:30,}}>
+                <View style={[styles.prevNextButton,{opacity:(!nextEpisode)? 0.3 : 1}]}>
+                    {nextEpisode && <NextAndPrevButton action='next' />}
+                </View>
+            </View>
         </View>
-     );
+        <View style={{ justifyContent:'center', alignItems:'center',marginHorizontal:20,}}>
+            <MultiSlider 
+                trackStyle={{height:2,backgroundColor:'rgba(0,0,0,0.3)',borderRadius:10}}
+                markerStyle={{backgroundColor:'white'}}
+                containerStyle={{height:20}}
+                selectedStyle={{backgroundColor:'white'}}
+                values={currentTrack == trackIndex ? [position] : [0]}
+                min={0}
+                sliderLength={WIDTH - 40}
+                max={duration > 0 && currentTrack == trackIndex && isNaN(duration) == false ? duration : 100}
+                onValuesChangeFinish={async(values) => {
+                    await TrackPlayer.seekTo(values[0])
+                }}
+            />
+            <View style={{flexDirection:'row', width:'100%', justifyContent:'space-between'}}>
+                <Text style={{color:'white'}} >
+                    {
+                        currentTrack == trackIndex ?
+                        new Date(position * 1000).toISOString().substring(12, 19) :
+                        '0:00:00'
+                    }
+                </Text>
+                <Text style={{color:'white'}} >
+                    {
+                        currentTrack == trackIndex ?
+                        new Date((duration - position) * 1000).toISOString().substring(12, 19) : 
+                        '0:00:00'
+                    }
+                </Text>
+            </View>
+        </View>
+        </View>
+    )
 }
  
 export default MusicPlayer;
@@ -133,10 +130,10 @@ export default MusicPlayer;
 const styles = StyleSheet.create({
     playerButton: {
         backgroundColor:HEADER_BUTTON_BG,
-        width:50,
-        height:50,
+        width:60,
+        height:60,
         alignItems:'center',
         justifyContent:'center',
-        borderRadius:50,
+        borderRadius:60,
     },
 })

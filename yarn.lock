@@ -5833,6 +5833,11 @@
   "resolved" "https://registry.npmjs.org/react-native-skeleton-placeholder/-/react-native-skeleton-placeholder-5.0.0.tgz"
   "version" "5.0.0"
 
+"react-native-text-ticker@^1.14.0":
+  "integrity" "sha512-8TNGTcW43dfnCqIuXVA7F1Ny8SKGrw0pIrNS5nM7eda+6AsuPTZh3JQ2CwmSRYfsrlnS4QFrpyo5ykpI8nvtCw=="
+  "resolved" "https://registry.npmjs.org/react-native-text-ticker/-/react-native-text-ticker-1.14.0.tgz"
+  "version" "1.14.0"
+
 "react-native-track-player@2.2.0-rc4":
   "integrity" "sha512-ojEEZbAv3P9RhTxkeQMrh3kpOp/bqV/F7VwKezSyMxtdZXZiyIXn0D3eMbrRLiamwVjDuMKYy1S9DxoCOL8eUQ=="
   "resolved" "https://registry.npmjs.org/react-native-track-player/-/react-native-track-player-2.2.0-rc4.tgz"

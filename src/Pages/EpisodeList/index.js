@@ -33,7 +33,15 @@ const EpisodeList = ({navigation}) => {
                 data.items.map((episode, index) => {
                     return {
                     key: episode.id,
-                    episodeObject: episode,
+                    episodeObject: {
+                        url: 'https://'+episode.enclosures[0].url.split('https%3A%2F%2F')[1].replace(/%2F/g,'/'),
+                        title: episode.title,
+                        artist: episode.authors[0].name,
+                        artwork: episode.itunes.image,
+                        duration: episode.itunes.duration, //(Number(episode.enclosures[0].length) / 1000).toFixed(0),
+                        description: episode.description,
+                        date: episode.published
+                    },
                     episodeID: index
                     }
                 })
@@ -42,9 +50,21 @@ const EpisodeList = ({navigation}) => {
             //setPlaylistPodcast(data.items)
             setDATA(
                 data.items.map((episode, index) => {
+                    if(index==0) {
+                        console.log(episode);
+                        console.log(Number(episode.enclosures[0].length));
+                    }
                   return {
                     key: episode.id,
-                    episodeObject: episode,
+                    episodeObject: {
+                        url: 'https://'+episode.enclosures[0].url.split('https%3A%2F%2F')[1].replace(/%2F/g,'/'),
+                        title: episode.title,
+                        artist: episode.authors[0].name,
+                        artwork: episode.itunes.image,
+                        duration: episode.itunes.duration, //(Number(episode.enclosures[0].length) / 1000).toFixed(0),
+                        description: episode.description,
+                        date: episode.published
+                    },
                     episodeID: index
                   }
                 })
@@ -185,16 +205,15 @@ const EpisodeList = ({navigation}) => {
                     trackLength: DATA.length
                 })
               })}}>
-                <ImageBackground imageStyle={{borderRadius:12,resizeMode:'center'}} style={styles.imageBackground} source={{uri: item.episodeObject.itunes.image}}>
+                <ImageBackground imageStyle={{borderRadius:12,resizeMode:'center'}} style={styles.imageBackground} source={{uri: item.episodeObject.artwork}}>
                     <LinearGradient locations={[0, 0.8]} colors={['transparent', 'rgba(0, 128, 55, .6)']} style={styles.episodeContainer}>
                             <View style={{height:'100%',flexDirection:'row',paddingBottom:5}}>
                                 <View style={{flex:7, justifyContent:'flex-end'}}>
                                     <Text style={{fontSize:17,fontWeight:'700',color:'white'}}>{
-                                        (item.episodeObject.title.indexOf('-')!=-1) ? item.episodeObject.title.split('- ')[1] : 
-                                        item.episodeObject.title
+                                        item.episodeObject.title.replace(/[0-9]x[0-9][0-9] /g,'').replace('- ','')
                                     }</Text>
-                                    <Text style={{fontSize:12,color:'rgba(255,255,255,0.6)',}}>{weekDay(item.episodeObject.published)}</Text>
-                                    <Text  style={{fontSize:12,color:'rgba(255,255,255,0.6)',}}>{secondsToHms(item.episodeObject.itunes.duration)}</Text>
+                                    <Text style={{fontSize:12,color:'rgba(255,255,255,0.6)',}}>{weekDay(item.episodeObject.date)}</Text>
+                                    <Text  style={{fontSize:12,color:'rgba(255,255,255,0.6)',}}>{secondsToHms(item.episodeObject.duration)}</Text>
                                 </View>
                                 <View style={{flex:1, justifyContent:'flex-end',padding:10}}>
                                     <AntDesign name="play" size={36} color="white" />

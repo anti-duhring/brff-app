@@ -31,7 +31,8 @@ const closeConfig = {
   }
 }
 
-const PodcastScreens = ({navigation,route, initialRoute}) => {
+const PodcastScreens = ({navigation,route}) => {
+  const initialRoute = route.params?.initialRoute;
 
   const onShare = async(episodeTitle, episodeLink) => {
     try {
@@ -55,7 +56,7 @@ Ouça você também! ${episodeLink}`
   }
 
     return ( 
-        <Stack.Navigator initialRouteName='EpisodeList' screenOptions={{
+        <Stack.Navigator initialRouteName={'EpisodeList'} screenOptions={{
             animation:'slide_from_bottom',
             presentation:'card'
           }}>

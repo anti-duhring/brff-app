@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Dimensions, Animated, ImageBackground } from "react-native";
+import { View, Text, StyleSheet, Dimensions, Animated, ImageBackground, StatusBar } from "react-native";
 import { useRef } from "react";
 import HeaderImageScrollView, { TriggeringView } from 'react-native-image-header-scroll-view'
 import MusicPlayer from "../../components/MusicPlayer";
@@ -14,9 +14,8 @@ const Episode = ({navigation, route}) => {
     const episode = route.params?.episodeObject
     const episodeName = route.params?.episodeName
     const episodeID = route.params?.episodeID
-    const episodeDescription = episode.description.replace(/<p>/g,'').replace(/<br>/g,``).replace(/<\/p>/g,'').replace(/--/g,``)
-    const trackLength = route.params?.trackLength
-    let episodeImage = (episode.itunes.image == 'https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded_nologo400/2234723/2234723-1645583930433-8a8b649a48b9d.jpg') ? require('../../../assets/Images/leagueHeader2.png') : {uri: episode.itunes.image};
+    const episodeDescription = episode.description.replace(/(<([^>]+)>)/ig,'').replace(/&nbsp;/ig,'')
+    let episodeImage = (episode.artwork == 'https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded_nologo400/2234723/2234723-1645583930433-8a8b649a48b9d.jpg') ? require('../../../assets/Images/leagueHeader2.png') : {uri: episode.artwork};
 
     const opacity = useRef(new Animated.Value(0)).current;
     const firstRender = useRef(true);
@@ -44,6 +43,11 @@ const Episode = ({navigation, route}) => {
 
     return ( 
         <View style={styles.episodeBody}>
+        <StatusBar
+          animated={true}
+          backgroundColor={DARK_BLACK}
+          barStyle="light-content"
+         />
         <HeaderImageScrollView
             useNativeDriver={true}
             maxHeight={MAX_HEIGHT}
@@ -51,17 +55,13 @@ const Episode = ({navigation, route}) => {
             maxOverlayOpacity={0.7}
             minOverlayOpacity={0}
             fadeOutForeground={true}
-            contentContainerStyle={{backgroundColor:'transparent',top:-30}}
+            contentContainerStyle={{backgroundColor:'transparent',top:-10}}
             scrollViewBackgroundColor={'transparent'}
             renderForeground={() => (
                     <View style={styles.foregroundContainer}>
-                        <MusicPlayer isThePlayerInEpisodePage={true} trackIndex={episodeID} track={{
-                                url: 'https://'+episode.enclosures[0].url.split('https%3A%2F%2F')[1].replace(/%2F/g,'/'),
-                                title: episodeName,
-                                artist: episode.authors[0].name,
-                                artwork: episode.itunes.image,
-                                duration: (Number(episode.enclosures[0].length) / 1000).toFixed(0)
-                            }} />
+                        <MusicPlayer isThePlayerInEpisodePage={true} 
+                        navigation={navigation}
+                        trackIndex={episodeID} track={episode} />
 
                     </View>
               )}
@@ -87,16 +87,16 @@ const Episode = ({navigation, route}) => {
                 <View style={styles.titleContainer}>
                     <LinearGradient locations={[0,1]} style={styles.episodeGradient} colors={['transparent', DARK_BLACK]}>
                         <Text style={styles.imageTitle}>
-                        {(episode.title.indexOf('-')!=-1) ? episode.title.split('- ')[1] : episode.title}
+                            {episode.title.replace(/[0-9]x[0-9][0-9] /g,'').replace('- ','')}
                         </Text>
                     </LinearGradient>
                     <View style={[styles.section, styles.sectionLarge]}>
-                        <ViewLightDark containerStyle={{margin:0}}>
-                            <Text style={styles.sectionText}>{episodeDescription.replace(/(<([^>]+)>)/ig,'').replace(/&nbsp;/ig,'')}</Text>
+                        <ViewLightDark containerStyle={{margin:0,minHeight:400}}>
+                            <Text style={styles.sectionText}>
+                                {episodeDescription}
+                            </Text>
                         </ViewLightDark>
-                        <View>
-                            <Text style={styles.sectionInfo}>Publicado em: {episode.published}</Text>
-                        </View>
+                        <Text style={styles.sectionInfo}>Publicado em: {episode.date}</Text>
                     </View>
                     </View>
             </TriggeringView>
@@ -168,6 +168,6 @@ const styles = StyleSheet.create({
         color:'rgba(255, 255, 255, 0.7)'
     },
     foregroundContainer: {
-        marginTop: 80,
+        marginTop: 70,
     },
 })

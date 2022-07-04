@@ -68,7 +68,6 @@ const Players = ({navigation, route}) => {
       .then(response => response.json())
       .then((data) => {
           setLeagueRosters(data);
-          console.log('done')
       }).catch((e) => {
           console.log('Error:',e)
           controller.abort()
