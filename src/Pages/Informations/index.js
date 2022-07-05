@@ -1,10 +1,10 @@
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
 import TabTopLeague from '../../components/TabTopLeague'
 import { useState, useEffect, useContext } from "react";
 import { NFLStatusContext } from "../../components/NFLStatusContext";
 import { HeaderLeagueContextProvider } from "../../components/HeaderLeagueContext";
 import ViewLightDark from '../../components/ViewLightDark'
-import { LIGHT_GREEN } from "../../components/Variables";
+import { DARK_BLACK, LIGHT_BLACK, LIGHT_GREEN } from "../../components/Variables";
 
 const Informations = ({navigation, route}) => {
     const league = route.params?.leagueObject;
@@ -13,8 +13,11 @@ const Informations = ({navigation, route}) => {
     const leagueUsers = route.params?.leagueUsers;
     const leagueID = league.league_id;
     const [scoringSettings, setScoringSettings] = useState([])
+
     const [generalInformations, setGeneralInformations] = useState([])
-    const {season} = useContext(NFLStatusContext)
+    const [activeTab, setActiveTab] = useState('informations');
+
+    const {season, week} = useContext(NFLStatusContext)
     const [errorMessage, setErrorMessage] = useState(null)
 
     const objectToArray = (obj) => {
@@ -85,6 +88,15 @@ const Informations = ({navigation, route}) => {
         }
     }
 
+    const getTransactions = async() => {
+        const URL = `https://api.sleeper.app/v1/league/${leagueID}/transactions/${(week > 0) ? week : 1}`;
+        fetch(URL)
+        .then(response => response.json())
+        .then(data => {
+            //console.log(data);
+        });
+    }
+
     const getGeneralInfos = async() => {
         fetch(`https://api.sleeper.app/v1/league/${leagueID}/drafts`)
             .then(response => response.json())
@@ -136,13 +148,24 @@ const Informations = ({navigation, route}) => {
     useEffect(() => {
         getSettings();
         getGeneralInfos();
+        getTransactions();
         console.log(league.league_id)
     },[])
 
-    return ( 
-        <View style={{flex:1,backgroundColor:'#0B0D0F'}}>
-        <HeaderLeagueContextProvider leagueObject={league}>
-            <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueRosters={route.params?.leagueRosters} leagueUsers={leagueUsers} />
+    const InfoTab = () => (
+        <View style={{flex:1,justifyContent:'center',flexDirection:'row'}}>
+            <TouchableOpacity disabled={activeTab == 'informations' ? true : false} style={{paddingVertical:5, width:120,alignItems:'center',backgroundColor:LIGHT_GREEN,borderTopLeftRadius:5,borderBottomLeftRadius:5}} onPress={() => console.log('wow')}>
+                <Text style={{color: DARK_BLACK}}>Pontuação</Text>
+            </TouchableOpacity>
+            <TouchableOpacity disabled={activeTab == 'transactions' ? true : false} style={{paddingVertical:5, width:120,alignItems:'center',borderTopRightRadius:5,borderBottomRightRadius:5,backgroundColor:LIGHT_BLACK}} onPress={() => console.log('wow')}>
+                <Text style={{color: LIGHT_GREEN}}>Transações</Text>
+            </TouchableOpacity>
+        </View>
+    )
+
+    const GeneralInformations = () => {
+        return (
+            <>
             <ViewLightDark title='Configurações da liga' titleSize={18}>
                 {generalInformations.map((element, index) => {
                     if(element.season!=season) return
@@ -163,6 +186,16 @@ const Informations = ({navigation, route}) => {
             <ScoringContainer type='ATK' title='Ataque' />
             <ScoringContainer type='DEF' title='Defesa' />
             <ScoringContainer type='ST' title='Special Team' />
+            </>
+        )
+    }
+
+    return ( 
+        <View style={{flex:1,backgroundColor:'#0B0D0F'}}>
+        <HeaderLeagueContextProvider leagueObject={league}>
+            <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueRosters={route.params?.leagueRosters} leagueUsers={leagueUsers} />
+            <InfoTab />
+            <GeneralInformations />
         </HeaderLeagueContextProvider> 
         </View>
     );

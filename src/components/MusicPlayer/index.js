@@ -98,13 +98,13 @@ const MusicPlayer = ({track, trackIndex, navigation}) => {
                 selectedStyle={{backgroundColor:'white'}}
                 values={currentTrack == trackIndex ? [position] : [0]}
                 min={0}
-                sliderLength={WIDTH - 40}
+                sliderLength={WIDTH - 60}
                 max={duration > 0 && currentTrack == trackIndex && isNaN(duration) == false ? duration : 100}
                 onValuesChangeFinish={async(values) => {
                     await TrackPlayer.seekTo(values[0])
                 }}
             />
-            <View style={{flexDirection:'row', width:'100%', justifyContent:'space-between'}}>
+            <View style={{flexDirection:'row', width:'95%', justifyContent:'space-between'}}>
                 <Text style={{color:'white'}} >
                     {
                         currentTrack == trackIndex ?

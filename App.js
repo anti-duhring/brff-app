@@ -257,11 +257,12 @@ const setPlaylistPodcast = async(episodesData) => {
             drawerIcon: ({color}) => (
               <MaterialCommunityIcons name="football-helmet"  size={22} color={color} />
           )}} component={TrendingPlayers}/>
-          <Drawer.Screen name="Podcast" options={{
+          <Drawer.Screen name="Podcast" options={({navigation}) => ({
             headerShown: false,
+            swipeEnabled: true,
             drawerIcon: ({color}) => (
               <FontAwesome5 name="podcast" size={17} color={color} />
-            )}} component={PodcastScreens}/>
+            )})} component={PodcastScreens}/>
           <Drawer.Screen name="Sobre" options={{
             headerShown: false,
             drawerLabel:'Sobre nós' ,

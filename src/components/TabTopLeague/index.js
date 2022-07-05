@@ -18,107 +18,97 @@ const TabTopLeague = ({activeButton, isAble, leagueDraftSettings, leagueObject, 
 
     return(
         <View style={{flexDirection:'row',padding:10,justifyContent:'center',alignContent:'center',opacity:(opacity) ? opacity : 1}}>
-            <View style={(activeButton=='Players'||!activeButton) ? styles.activeTab : styles.inactiveTab}>
-                <TouchableOpacity style={styles.buttonContent} onPress={() => {
-                    if(!isAble) return
-                    navigation.navigate('Players',{
-                        active: 'Players',
-                        leagueObject: leagueObject,
-                        leagueDraftSettings: leagueDraftSettings,
-                        leagueUsers: leagueUsers,
-                        leagueRosters: leagueRosters
-                    })
-                }}>
-                    {(activeButton=='Players'||!activeButton) ? 
-                    <>
-                        <AntDesign name="team" size={20} color={COLORTEXT} />
-                        <Text style={styles.textActiveTab}>TIMES</Text>
-                    </> : 
-                    <AntDesign name="team" size={20} color={COLOR} />}
-                </TouchableOpacity>
-            </View>
-            <View style={(activeButton=='Matchups') ? styles.activeTab : styles.inactiveTab}>
-                <TouchableOpacity style={styles.buttonContent} onPress={() => {
-                    if(!isAble) return
+            <TouchableOpacity style={(activeButton=='Players'||!activeButton) ? styles.activeTab : styles.inactiveTab} onPress={() => {
+                if(!isAble) return
+                navigation.navigate('Players',{
+                    active: 'Players',
+                    leagueObject: leagueObject,
+                    leagueDraftSettings: leagueDraftSettings,
+                    leagueUsers: leagueUsers,
+                    leagueRosters: leagueRosters
+                })
+            }}>
+                {(activeButton=='Players'||!activeButton) ? 
+                <>
+                    <AntDesign name="team" size={20} color={COLORTEXT} />
+                    <Text style={styles.textActiveTab}>TIMES</Text>
+                </> : 
+                <AntDesign name="team" size={20} color={COLOR} />}
+            </TouchableOpacity>
+            <TouchableOpacity style={(activeButton=='Matchups') ? styles.activeTab : styles.inactiveTab} onPress={() => {
+                if(!isAble) return
 
-                    navigation.navigate('Matchups',{ 
-                        active: 'Matchups', 
-                        week: week,
-                        leagueObject: leagueObject,
-                        leagueDraftSettings: leagueDraftSettings,
-                        leagueUsers: leagueUsers,
-                        leagueRosters: leagueRosters
-                    })
-                }}>
-                    {(activeButton=='Matchups') ? 
-                    <>
-                        <Ionicons name="american-football-outline" size={20} color={COLORTEXT} />
-                        <Text style={styles.textActiveTab}>MATCHUPS</Text>
-                    </> : 
-                    <Ionicons name="american-football-outline" size={20} color={COLOR} />}
-                </TouchableOpacity>
-            </View>
-            <View style={(activeButton=='PlayoffBracket') ? styles.activeTab : styles.inactiveTab}>
-                <TouchableOpacity style={styles.buttonContent} onPress={() => {
-                    if(!isAble) return
+                navigation.navigate('Matchups',{ 
+                    active: 'Matchups', 
+                    week: week,
+                    leagueObject: leagueObject,
+                    leagueDraftSettings: leagueDraftSettings,
+                    leagueUsers: leagueUsers,
+                    leagueRosters: leagueRosters
+                })
+            }}>
+                {(activeButton=='Matchups') ? 
+                <>
+                    <Ionicons name="american-football-outline" size={20} color={COLORTEXT} />
+                    <Text style={styles.textActiveTab}>MATCHUPS</Text>
+                </> : 
+                <Ionicons name="american-football-outline" size={20} color={COLOR} />}
+            </TouchableOpacity>
+            <TouchableOpacity style={(activeButton=='PlayoffBracket') ? styles.activeTab : styles.inactiveTab} onPress={() => {
+                if(!isAble) return
 
-                    navigation.navigate('PlayoffBracket',{ 
-                        active: 'PlayoffBracket',
-                        leagueObject: leagueObject,
-                        leagueDraftSettings: leagueDraftSettings,
-                        leagueUsers: leagueUsers,
-                        leagueRosters: leagueRosters
-                    })
-                }}>
-                    {(activeButton=='PlayoffBracket') ? 
-                    <>
-                        <Ionicons name="trophy-outline" size={20} color={COLORTEXT} />
-                        <Text style={styles.textActiveTab}>PLAYOFFS</Text>
-                    </> : 
-                    <Ionicons name="trophy-outline" size={20} color={COLOR} />}
+                navigation.navigate('PlayoffBracket',{ 
+                    active: 'PlayoffBracket',
+                    leagueObject: leagueObject,
+                    leagueDraftSettings: leagueDraftSettings,
+                    leagueUsers: leagueUsers,
+                    leagueRosters: leagueRosters
+                })
+            }}>
+                {(activeButton=='PlayoffBracket') ? 
+                <>
+                    <Ionicons name="trophy-outline" size={20} color={COLORTEXT} />
+                    <Text style={styles.textActiveTab}>PLAYOFFS</Text>
+                </> : 
+                <Ionicons name="trophy-outline" size={20} color={COLOR} />}
 
-                </TouchableOpacity>
-            </View>
-            <View style={(activeButton=='Informations') ? styles.activeTab : styles.inactiveTab}>
-                <TouchableOpacity style={styles.buttonContent} onPress={() => {
-                    if(!isAble) return
+            </TouchableOpacity>
+            <TouchableOpacity style={(activeButton=='Informations') ? styles.activeTab : styles.inactiveTab} onPress={() => {
+                if(!isAble) return
 
-                    navigation.navigate('Informations',{ 
-                        active: 'Informations',
-                        leagueObject: leagueObject,
-                        leagueDraftSettings: leagueDraftSettings,
-                        leagueUsers: leagueUsers,
-                        leagueRosters: leagueRosters
-                    })
-                }}>
-                    {(activeButton=='Informations') ? 
-                    <>
-                        <MaterialCommunityIcons name="information-outline" size={20} color={COLORTEXT} />
-                        <Text style={styles.textActiveTab}>INFOS</Text>
-                    </> : 
-                    <MaterialCommunityIcons name="information-outline" size={20} color={COLOR} />}
+                navigation.navigate('Informations',{ 
+                    active: 'Informations',
+                    leagueObject: leagueObject,
+                    leagueDraftSettings: leagueDraftSettings,
+                    leagueUsers: leagueUsers,
+                    leagueRosters: leagueRosters
+                })
+            }}>
+                {(activeButton=='Informations') ? 
+                <>
+                    <MaterialCommunityIcons name="information-outline" size={20} color={COLORTEXT} />
+                    <Text style={styles.textActiveTab}>INFOS</Text>
+                </> : 
+                <MaterialCommunityIcons name="information-outline" size={20} color={COLOR} />}
 
-                </TouchableOpacity>
-            </View>
-            <View style={(activeButton=='Team') ? styles.activeTab : styles.inactiveTab}>
-                <TouchableOpacity style={styles.buttonContent} onPress={() => {
-                    if(!isAble) return
-                    navigation.navigate('Team',{ 
-                        active: 'Team',
-                        leagueObject: leagueObject,
-                        leagueDraftSettings: leagueDraftSettings,
-                        leagueUsers: leagueUsers,
-                        leagueRosters: leagueRosters
-                    })
-                }}>
-                {(activeButton=='Team') ? 
-                    <>
-                        <MaterialCommunityIcons name="football-helmet" size={20} color={COLORTEXT} />
-                        <Text style={styles.textActiveTab}>MEU TIME</Text>
-                    </> : 
-                    <MaterialCommunityIcons name="football-helmet" size={20} color={COLOR} />}
-                </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
+            <TouchableOpacity style={(activeButton=='Team') ? styles.activeTab : styles.inactiveTab} onPress={() => {
+                if(!isAble) return
+                navigation.navigate('Team',{ 
+                    active: 'Team',
+                    leagueObject: leagueObject,
+                    leagueDraftSettings: leagueDraftSettings,
+                    leagueUsers: leagueUsers,
+                    leagueRosters: leagueRosters
+                })
+            }}>
+            {(activeButton=='Team') ? 
+                <>
+                    <MaterialCommunityIcons name="football-helmet" size={20} color={COLORTEXT} />
+                    <Text style={styles.textActiveTab}>MEU TIME</Text>
+                </> : 
+                <MaterialCommunityIcons name="football-helmet" size={20} color={COLOR} />}
+            </TouchableOpacity>
         </View>
     )
     

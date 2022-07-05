@@ -58,7 +58,7 @@ Ouça você também! ${episodeLink}`
     return ( 
         <Stack.Navigator initialRouteName={'EpisodeList'} screenOptions={{
             animation:'slide_from_bottom',
-            presentation:'card'
+            presentation:'card',
           }}>
 
             <Stack.Screen  name="EpisodeList"  options={{ 
