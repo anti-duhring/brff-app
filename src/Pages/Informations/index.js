@@ -1,10 +1,16 @@
-import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
+import { Text, View, StyleSheet, TouchableOpacity, ScrollView, Dimensions } from "react-native";
 import TabTopLeague from '../../components/TabTopLeague'
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { NFLStatusContext } from "../../components/NFLStatusContext";
 import { HeaderLeagueContextProvider } from "../../components/HeaderLeagueContext";
 import ViewLightDark from '../../components/ViewLightDark'
-import { DARK_BLACK, LIGHT_BLACK, LIGHT_GREEN } from "../../components/Variables";
+import { DARK_BLACK, DARK_GRAY, LIGHT_BLACK, LIGHT_GRAY, LIGHT_GREEN, WHITE } from "../../components/Variables";
+import SelectDropdown from "react-native-select-dropdown";
+import { FontAwesome } from '@expo/vector-icons'; 
+import { Ionicons } from '@expo/vector-icons';
+import { Entypo } from '@expo/vector-icons';
+
+const WIDTH = Dimensions.get('window').width;
 
 const Informations = ({navigation, route}) => {
     const league = route.params?.leagueObject;
@@ -12,10 +18,14 @@ const Informations = ({navigation, route}) => {
     const scoringLeague = league.scoring_settings;
     const leagueUsers = route.params?.leagueUsers;
     const leagueID = league.league_id;
-    const [scoringSettings, setScoringSettings] = useState([])
 
+    const [scoringSettings, setScoringSettings] = useState([])
+    const [leagueTransactions, setLeagueTransactions] = useState(null)
+
+    const scrollHorizontal = useRef(null);
     const [generalInformations, setGeneralInformations] = useState([])
     const [activeTab, setActiveTab] = useState('informations');
+    const [dropdownTransactionsOption, setDropdownTransactionsOption] = useState('Troca')
 
     const {season, week} = useContext(NFLStatusContext)
     const [errorMessage, setErrorMessage] = useState(null)
@@ -93,7 +103,7 @@ const Informations = ({navigation, route}) => {
         fetch(URL)
         .then(response => response.json())
         .then(data => {
-            //console.log(data);
+            setLeagueTransactions(data)
         });
     }
 
@@ -107,6 +117,13 @@ const Informations = ({navigation, route}) => {
                 setErrorMessage(e)
             })
     }
+
+    useEffect(() => {
+        getSettings();
+        getGeneralInfos();
+        getTransactions();
+        console.log(league.league_id)
+    },[])
 
     const InformationContainer = (props) => {
         return (
@@ -145,27 +162,101 @@ const Informations = ({navigation, route}) => {
         )
     }
 
-    useEffect(() => {
-        getSettings();
-        getGeneralInfos();
-        getTransactions();
-        console.log(league.league_id)
-    },[])
-
-    const InfoTab = () => (
-        <View style={{flex:1,justifyContent:'center',flexDirection:'row'}}>
-            <TouchableOpacity disabled={activeTab == 'informations' ? true : false} style={{paddingVertical:5, width:120,alignItems:'center',backgroundColor:LIGHT_GREEN,borderTopLeftRadius:5,borderBottomLeftRadius:5}} onPress={() => console.log('wow')}>
-                <Text style={{color: DARK_BLACK}}>Pontuação</Text>
+    const InfoTab = () => {
+        const isInformationTabActive = activeTab == 'informations';
+        const isTransactionsTabActive = activeTab == 'transactions';
+        return (
+            <View style={{flex:1,justifyContent:'center',flexDirection:'row'}}>
+            <TouchableOpacity disabled={isInformationTabActive ? true : false} style={[styles.tabLeft, isInformationTabActive ? styles.activeTab : styles.inactiveTab]} onPress={() => {scrollHorizontal.current.scrollTo({ x:0, y:0,animated: true });setActiveTab('informations')}}>
+                <Ionicons name="settings-sharp" size={15} color={isInformationTabActive ? DARK_BLACK : LIGHT_GREEN} />
+                <Text style={{marginLeft:5,color: isInformationTabActive ? DARK_BLACK : LIGHT_GREEN}}>Pontuação</Text>
             </TouchableOpacity>
-            <TouchableOpacity disabled={activeTab == 'transactions' ? true : false} style={{paddingVertical:5, width:120,alignItems:'center',borderTopRightRadius:5,borderBottomRightRadius:5,backgroundColor:LIGHT_BLACK}} onPress={() => console.log('wow')}>
-                <Text style={{color: LIGHT_GREEN}}>Transações</Text>
+            <TouchableOpacity disabled={isTransactionsTabActive ? true : false} style={[styles.tabRight,isTransactionsTabActive ? styles.activeTab : styles.inactiveTab]} onPress={() => {scrollHorizontal.current.scrollToEnd({ animated: true }); setActiveTab('transactions');}}>
+                <FontAwesome name="exchange" size={15} color={isTransactionsTabActive ? DARK_BLACK : LIGHT_GREEN} />
+                <Text style={{marginLeft:5,color:isTransactionsTabActive ? DARK_BLACK : LIGHT_GREEN}}>Transações</Text>
             </TouchableOpacity>
         </View>
-    )
+        )
+    }
+
+    const TransactionsSelectDropDown = () => {
+        const data = ['Troca', 'Free Agent', 'Waiver', 'Todas']
+        return (
+            <SelectDropdown
+                data={data}
+                defaultButtonText={dropdownTransactionsOption}
+                onSelect={(selectedItem, index) => {
+                    console.log(selectedItem, index);
+                    setDropdownTransactionsOption(selectedItem);
+                }}
+                buttonTextAfterSelection={(selectedItem, index) => {
+                    return selectedItem;
+                }}
+                rowTextForSelection={(item, index) => {
+                    return item;
+                }}
+                renderDropdownIcon={isOpened => {
+                    return <Entypo name={isOpened ? 'chevron-up' : 'chevron-down'} color={LIGHT_GRAY} size={18} />;
+                }}
+                buttonStyle={{backgroundColor:LIGHT_BLACK,width:130,borderRadius:5,height:40}}
+                buttonTextStyle={{color:LIGHT_GRAY,fontSize:15}}
+                dropdownStyle={{backgroundColor:LIGHT_BLACK,borderRadius:5}}
+                rowTextStyle={{color:LIGHT_GRAY,}}
+                rowStyle={{borderBottomColor:'transparent'}}
+            />
+        )
+    }
+
+    const TransactionTrade = (props) => {
+        const tran = props.transaction;
+        return (
+            <View>
+                <Text style={{color: WHITE}}>{tran.status}</Text>
+            </View>
+        )
+    }
+
+    const TransactionsItem = (props) => {
+        return (
+            <ViewLightDark title={props.transaction.type.replace(/_/g,' ')}>
+                {props.transaction.type == 'trade' && <TransactionTrade transaction={props.transaction} />}
+            </ViewLightDark>
+        )
+    }
+
+    const TransactionsTab = () => {
+        return (
+            <View style={{width:WIDTH}}>
+                <View style={{flex:1,marginHorizontal:10,flexDirection:'row', justifyContent:'space-between',alignItems:'flex-end'}}>
+                    {leagueTransactions && <>
+                    <Text style={{color:DARK_GRAY}}>{ dropdownTransactionsOption!='Todas' ? `${leagueTransactions?.filter(transaction => {
+                        return transaction.type.replace(/trade/g,'Troca').replace(/waiver/g,'Waiver').replace(/free_agent/g,'Free Agent') == dropdownTransactionsOption
+                    }).length} transações` : `${leagueTransactions?.length} transações totais`}</Text>
+                    <TransactionsSelectDropDown />
+                    </>}
+                </View>
+                <View style={{flex:1,marginTop:10}}>
+                {
+                    leagueTransactions ? 
+                    leagueTransactions.map((transaction, index) => {
+                        if(dropdownTransactionsOption=='Troca' && transaction.type != 'trade') return
+                        if(dropdownTransactionsOption=='Free Agent' && transaction.type != 'free_agent') return
+                        if(dropdownTransactionsOption=='Waiver' && transaction.type != 'waiver') return
+
+                        return (
+                            <TransactionsItem transaction={transaction} key={index} />
+                        )
+                    }) :
+                    <Text style={{color: WHITE}}>A liga ainda não possui nenhuma transação</Text>
+                }
+                </View>
+            </View>
+        )
+    }
 
     const GeneralInformations = () => {
         return (
-            <>
+            <ScrollView contentContainerStyle={{width:WIDTH}}>
             <ViewLightDark title='Configurações da liga' titleSize={18}>
                 {generalInformations.map((element, index) => {
                     if(element.season!=season) return
@@ -186,7 +277,7 @@ const Informations = ({navigation, route}) => {
             <ScoringContainer type='ATK' title='Ataque' />
             <ScoringContainer type='DEF' title='Defesa' />
             <ScoringContainer type='ST' title='Special Team' />
-            </>
+            </ScrollView>
         )
     }
 
@@ -194,8 +285,23 @@ const Informations = ({navigation, route}) => {
         <View style={{flex:1,backgroundColor:'#0B0D0F'}}>
         <HeaderLeagueContextProvider leagueObject={league}>
             <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueRosters={route.params?.leagueRosters} leagueUsers={leagueUsers} />
-            <InfoTab />
-            <GeneralInformations />
+            <View style={{marginTop:20}}>
+                <InfoTab />
+                <ScrollView  ref={scrollHorizontal} horizontal={true} contentContainerStyle={{marginTop:20}} pagingEnabled={true} onMomentumScrollEnd={({nativeEvent}) => {
+                    if(nativeEvent.contentOffset.x > WIDTH / 2) {
+                        setActiveTab('transactions');
+                    } else if(nativeEvent.contentOffset.x < WIDTH / 2) {
+                        setActiveTab('informations')
+                    } else {
+                        console.log(nativeEvent.contentOffset.x, WIDTH);
+                    }
+
+                }}        decelerationRate={0} snapToInterval={WIDTH} removeClippedSubviews={true} snapToAlignment={"center"} >
+                    <GeneralInformations />
+                    <TransactionsTab />
+
+                </ScrollView>
+            </View>
         </HeaderLeagueContextProvider> 
         </View>
     );
@@ -236,5 +342,29 @@ const styles = StyleSheet.create({
     },
     informationConfig: {
         flex:2,
+    },
+    activeTab: {
+        paddingVertical:5, 
+        width:130,
+        alignItems:'center',
+        backgroundColor:LIGHT_GREEN,
+    },
+    inactiveTab: {
+        paddingVertical:5,
+        width:130,
+        alignItems:'center',
+        backgroundColor:LIGHT_BLACK
+    },
+    tabLeft: {
+        borderTopLeftRadius:5,
+        borderBottomLeftRadius:5,
+        flexDirection:'row',
+        justifyContent:'center'
+    },
+    tabRight: {
+        borderTopRightRadius:5,
+        borderBottomRightRadius:5,
+        flexDirection:'row',
+        justifyContent:'center'
     }
 })
