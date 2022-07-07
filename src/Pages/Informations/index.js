@@ -1,6 +1,6 @@
-import { Text, View, StyleSheet, ScrollView } from "react-native";
+import { Text, View, StyleSheet, Dimensions, FlatList, Animated, findNodeHandle } from "react-native";
 import TabTopLeague from '../../components/TabTopLeague'
-import { useState, useEffect, useContext, useRef } from "react";
+import React, { useState, useEffect, useContext, useRef, useCallback } from "react";
 import { NFLStatusContext } from "../../components/NFLStatusContext";
 import { HeaderLeagueContextProvider } from "../../components/HeaderLeagueContext";
 import ViewLightDark from '../../components/ViewLightDark'
@@ -9,25 +9,67 @@ import SelectDropdown from "react-native-select-dropdown";
 import { MaterialIcons } from '@expo/vector-icons'; 
 import { Ionicons } from '@expo/vector-icons';
 import { Entypo } from '@expo/vector-icons';
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import AnimatedTab from "../../components/AnimatedTab";
 
-const Tab = createMaterialTopTabNavigator();
+const {width} = Dimensions.get('screen');
+const dataTab = [
+    {
+        title: 'Configurações',
+        icon: <Ionicons name="settings-outline" size={20} color={LIGHT_GREEN} />,
+        key: 0,
+        ref: React.createRef()
+    },
+    {
+        title: 'Transações',
+        icon: <MaterialIcons name="published-with-changes" size={20} color={LIGHT_GREEN} />,
+        key: 1,
+        ref: React.createRef()
+    }
+]
 
 const Informations = ({navigation, route}) => {
+    // LEAGUE BASIC INFORMATION
     const league = route.params?.leagueObject;
-    const leagueDraftSettings = route.params?.leagueDraftSettings
+    const leagueDraftSettings = route.params?.leagueDraftSettings;
+    const leagueRosters = route.params?.leagueRosters;
     const scoringLeague = league.scoring_settings;
     const leagueUsers = route.params?.leagueUsers;
     const leagueID = league.league_id;
+    const {season, week} = useContext(NFLStatusContext)
 
+    // LEAGUE DATA TO FETCH
     const [scoringSettings, setScoringSettings] = useState([])
     const [leagueTransactions, setLeagueTransactions] = useState(null)
-
     const [generalInformations, setGeneralInformations] = useState([])
+    const [errorMessage, setErrorMessage] = useState(null);
     const [dropdownTransactionsOption, setDropdownTransactionsOption] = useState('Troca');
 
-    const {season, week} = useContext(NFLStatusContext)
-    const [errorMessage, setErrorMessage] = useState(null)
+    // ANIMATED TAB REF
+    const flatlistRef = useRef();
+    const scrollX = useRef(new Animated.Value(0)).current;
+    const onTabPress = useCallback(itemIndex => {
+        flatlistRef?.current?.scrollToOffset({
+            offset: itemIndex * width
+        });
+    });
+
+    class UserTransaction {
+        constructor(roster_id) {
+            this.roster = leagueRosters.filter(roster => {
+                return roster.roster_id == roster_id
+            })[0];
+            this.user_data = leagueUsers.filter(user => {
+                return user.user_id == this.roster.owner_id
+            })[0];
+        }
+    } 
+    
+    class UserTransactionNull {
+        constructor() {
+            this.roster = null;
+            this.user_data = null;
+        }
+    }
 
     const objectToArray = (obj) => {
         return Object.keys(obj).map((key) => {return [key, obj[key]]})
@@ -191,9 +233,13 @@ const Informations = ({navigation, route}) => {
 
     const TransactionTrade = (props) => {
         const tran = props.transaction;
+        const user1 = (tran?.roster_ids[0]) ? new UserTransaction(tran.roster_ids[0]) : new UserTransactionNull();
+        const user2 = (tran?.roster_ids[1]) ? new UserTransaction(tran.roster_ids[1]) : new UserTransactionNull();
+        console.log(user1.roster);
         return (
             <View>
                 <Text style={{color: WHITE}}>{tran.status}</Text>
+                <Text style={{color: WHITE}}>{user1.user_data.display_name} trocou com {user2.user_data.display_name}</Text>
             </View>
         )
     }
@@ -208,7 +254,7 @@ const Informations = ({navigation, route}) => {
 
     const TransactionsTab = () => {
         return (
-            <View style={{marginTop:20}}>
+            <View style={{marginTop:20, width}}>
                 <View style={{marginHorizontal:10,flexDirection:'row', justifyContent:'space-between',alignItems:'flex-end'}}>
                     {leagueTransactions && <>
                     <Text style={{color:DARK_GRAY}}>{ dropdownTransactionsOption!='Todas' ? `${leagueTransactions?.filter(transaction => {
@@ -221,7 +267,7 @@ const Informations = ({navigation, route}) => {
                 {
                     leagueTransactions ? 
                     leagueTransactions.map((transaction, index) => {
-                        if(transaction.type.replace(/trade/g,'Troca').replace(/waiver/g,'Waiver').replace(/free_agent/g,'Free Agent') != dropdownTransactionsOption) return
+                        if(transaction.type.replace(/trade/g,'Troca').replace(/waiver/g,'Waiver').replace(/free_agent/g,'Free Agent') != dropdownTransactionsOption && dropdownTransactionsOption != 'Todas') return
 
                         return (
                             <TransactionsItem transaction={transaction} key={index} />
@@ -236,7 +282,7 @@ const Informations = ({navigation, route}) => {
 
     const GeneralInformations = () => {
         return (
-            <View style={{marginTop:20}}>
+            <View style={{marginTop:20, width}}>
             <ViewLightDark title='Configurações da liga' titleSize={18}>
                 {generalInformations.map((element, index) => {
                     if(element.season!=season) return
@@ -263,37 +309,34 @@ const Informations = ({navigation, route}) => {
 
     return ( 
         <HeaderLeagueContextProvider leagueObject={league}>
-            <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueRosters={route.params?.leagueRosters} leagueUsers={leagueUsers} />
-            <View style={{flex:1,marginTop:20,height:2000}}>
-                <Tab.Navigator  
-                    initialRouteName="GeneralInformations"
-                    sceneContainerStyle={{backgroundColor:DARK_BLACK}}
-                    screenOptions={screenOptions}
-                    backBehavior='none'
-                >
-                    <Tab.Screen name="GeneralInformations" component={GeneralInformations} options={{tabBarLabel: 'Configurações',tabBarIcon:({color}) => (<Ionicons name="settings-outline" size={20} color={color} />)}} />
-                    <Tab.Screen name="TransactionsTab" component={TransactionsTab} options={{tabBarLabel: 'Transações',tabBarIcon:({color}) => (<MaterialIcons name="published-with-changes" size={20} color={color} />)}} />
-                </Tab.Navigator>
-            </View>
+            <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueRosters={leagueRosters} leagueUsers={leagueUsers} />
+            <AnimatedTab scrollX={scrollX} data={dataTab} onTabPress={onTabPress} />
+            <Animated.FlatList
+                ref={flatlistRef}
+                data={dataTab}
+                horizontal={true}
+                showsHorizontalScrollIndicator={false}
+                pagingEnabled
+                onScroll={Animated.event(
+                    [{nativeEvent: {contentOffset: {x: scrollX}}}],
+                    {useNativeDriver: false}
+                )}
+                keyExtractor={item => item.key}
+                renderItem={({item}) => {
+                    if(item.key==0) {
+                        return (
+                            <GeneralInformations />
+                        )
+                    } else {
+                        return (
+                            <TransactionsTab />
+                        )
+                    }
+                }}
+            />
         </HeaderLeagueContextProvider>
     );
 }
-
-
-/*       <View style={{flex:1,backgroundColor:'#0B0D0F'}}>
-        <HeaderLeagueContextProvider leagueObject={league}>
-            <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueRosters={route.params?.leagueRosters} leagueUsers={leagueUsers} />
-            <View>
-                <Tab.Navigator  
-                    initialRouteName="GeneralInformations"
-                >
-                    <Tab.Screen name="GeneralInformations" component={LoremIpsum} />
-                    <Tab.Screen name="TransactionsTab" component={LoremIpsum} />
-                </Tab.Navigator>
-            </View>
-           
-        </HeaderLeagueContextProvider>
-            </View>*/
  
 export default Informations;
 
@@ -356,36 +399,3 @@ const styles = StyleSheet.create({
         justifyContent:'center'
     }
 })
-
-const screenOptions = {
-    tabBarStyle: {
-        marginHorizontal:10,
-    },
-    tabBarContentContainerStyle: {
-        backgroundColor: 'transparent',//DARK_BLACK,
-        //height:20
-       
-    },
-    tabBarItemStyle: {
-        height:30,
-        flexDirection:'row',
-        alignItems: 'flex-start'
-    },
-    tabBarLabelStyle: {
-        marginTop:-5
-    },
-    tabBarIconStyle: {
-        marginTop:-8
-    },
-    tabBarIndicatorStyle: {
-        backgroundColor: LIGHT_GREEN,
-        height:'100%',
-        borderRadius:5,
-        
-    },
-    tabBarIndicatorContainerStyle: {
-        backgroundColor: DARK_BLACK,
-    },
-    tabBarInactiveTintColor: LIGHT_GREEN, //LIGHT_GRAY,
-    tabBarActiveTintColor: DARK_BLACK //LIGHT_GREEN
-}
