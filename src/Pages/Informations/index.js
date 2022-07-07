@@ -9,7 +9,9 @@ import SelectDropdown from "react-native-select-dropdown";
 import { MaterialIcons } from '@expo/vector-icons'; 
 import { Ionicons } from '@expo/vector-icons';
 import { Entypo } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 import AnimatedTab from "../../components/AnimatedTab";
+import { AllPlayersContext } from "../../components/AllPlayersContext";
 
 const {width} = Dimensions.get('screen');
 const dataTab = [
@@ -35,7 +37,10 @@ const Informations = ({navigation, route}) => {
     const scoringLeague = league.scoring_settings;
     const leagueUsers = route.params?.leagueUsers;
     const leagueID = league.league_id;
-    const {season, week} = useContext(NFLStatusContext)
+
+    // USE CONTEXT
+    const {season, week} = useContext(NFLStatusContext);
+    const { allPlayers } = useContext(AllPlayersContext);
 
     // LEAGUE DATA TO FETCH
     const [scoringSettings, setScoringSettings] = useState([])
@@ -210,7 +215,6 @@ const Informations = ({navigation, route}) => {
                 data={data}
                 defaultButtonText={dropdownTransactionsOption}
                 onSelect={(selectedItem, index) => {
-                    console.log(selectedItem, index);
                     setDropdownTransactionsOption(selectedItem);
                 }}
                 buttonTextAfterSelection={(selectedItem, index) => {
@@ -235,18 +239,56 @@ const Informations = ({navigation, route}) => {
         const tran = props.transaction;
         const user1 = (tran?.roster_ids[0]) ? new UserTransaction(tran.roster_ids[0]) : new UserTransactionNull();
         const user2 = (tran?.roster_ids[1]) ? new UserTransaction(tran.roster_ids[1]) : new UserTransactionNull();
-        console.log(user1.roster);
+
+
+        const TradeInfo = ({userRoster, userData}) => {
+            const adds = tran.adds;
+            const picks = tran.draft_picks;
+            if(tran.transaction_id=="834976578420191232") {
+                console.log(tran);
+            }
+            return (
+            <View style={{flex:1,alignItems:'center'}}>
+                <Text style={{color:WHITE}}>{userData.display_name}</Text>
+                <Text style={{color:DARK_GRAY}}>recebe</Text>
+                <View>
+                    { adds &&
+                        Object.entries(adds).map(item => {
+                            if(item[1]!=userRoster?.roster_id) return
+
+                            return (
+                                <Text style={{color:DARK_GRAY}}>{`${allPlayers[item[0]].first_name} ${allPlayers[item[0]].last_name}`}</Text>
+                            )
+                        })
+                    }
+                    {
+                        picks &&
+                        picks.map(pick => {
+                            if(pick.owner_id!=userRoster?.roster_id) return
+
+                            return (
+                                <Text style={{color:DARK_GRAY}}>{`pick round ${pick.round} de ${pick.season}`}</Text>
+                            )
+                        })
+                    }
+                </View>
+            </View>
+        )}
+
         return (
-            <View>
-                <Text style={{color: WHITE}}>{tran.status}</Text>
-                <Text style={{color: WHITE}}>{user1.user_data.display_name} trocou com {user2.user_data.display_name}</Text>
+            <View style={{flexDirection:'row'}}>
+                <TradeInfo userRoster={user1.roster} userData={user1.user_data} />
+                <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
+                    <FontAwesome name="exchange" size={24} color={LIGHT_GREEN} />
+                </View>
+                <TradeInfo userRoster={user2.roster} userData={user2.user_data} />
             </View>
         )
     }
 
     const TransactionsItem = (props) => {
         return (
-            <ViewLightDark title={props.transaction.type.replace(/_/g,' ')}>
+            <ViewLightDark>
                 {props.transaction.type == 'trade' && <TransactionTrade transaction={props.transaction} />}
             </ViewLightDark>
         )
