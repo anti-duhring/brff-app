@@ -17,7 +17,7 @@ const TabTopLeague = ({activeButton, isAble, leagueDraftSettings, leagueObject, 
 
 
     return(
-        <View style={{flexDirection:'row',padding:10,justifyContent:'center',alignContent:'center',opacity:(opacity) ? opacity : 1}}>
+        <View style={{flexDirection:'row',margin:5,marginTop:10,justifyContent:'center',alignContent:'center',opacity:(opacity) ? opacity : 1}}>
             <TouchableOpacity style={(activeButton=='Players'||!activeButton) ? styles.activeTab : styles.inactiveTab} onPress={() => {
                 if(!isAble) return
                 navigation.navigate('Players',{
