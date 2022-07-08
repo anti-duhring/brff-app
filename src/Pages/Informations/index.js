@@ -1,10 +1,10 @@
-import { Text, View, StyleSheet, Dimensions, FlatList, Animated, findNodeHandle } from "react-native";
+import { Text, View, StyleSheet, Dimensions, FlatList, Animated, findNodeHandle, TouchableOpacity } from "react-native";
 import TabTopLeague from '../../components/TabTopLeague'
 import React, { useState, useEffect, useContext, useRef, useCallback } from "react";
 import { NFLStatusContext } from "../../components/NFLStatusContext";
 import { HeaderLeagueContextProvider } from "../../components/HeaderLeagueContext";
 import ViewLightDark from '../../components/ViewLightDark'
-import { DARK_BLACK, DARK_GRAY, LIGHT_BLACK, LIGHT_GRAY, LIGHT_GREEN, WHITE } from "../../components/Variables";
+import { DARKER_GRAY, DARK_BLACK, DARK_GRAY, LIGHT_BLACK, LIGHT_GRAY, LIGHT_GREEN, WHITE } from "../../components/Variables";
 import SelectDropdown from "react-native-select-dropdown";
 import { MaterialIcons } from '@expo/vector-icons'; 
 import { Ionicons } from '@expo/vector-icons';
@@ -12,6 +12,7 @@ import { Entypo } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
 import AnimatedTab from "../../components/AnimatedTab";
 import { AllPlayersContext } from "../../components/AllPlayersContext";
+import ProgressiveImage from "../../components/ProgressiveImage";
 
 const {width} = Dimensions.get('screen');
 const dataTab = [
@@ -244,30 +245,53 @@ const Informations = ({navigation, route}) => {
         const TradeInfo = ({userRoster, userData}) => {
             const adds = tran.adds;
             const picks = tran.draft_picks;
-            if(tran.transaction_id=="834976578420191232") {
-                console.log(tran);
-            }
+            const waiver = tran.waiver_budget;
             return (
-            <View style={{flex:1,alignItems:'center'}}>
-                <Text style={{color:WHITE}}>{userData.display_name}</Text>
-                <Text style={{color:DARK_GRAY}}>recebe</Text>
-                <View>
+            <View style={{flex:2,alignItems:'center'}}>
+                <TouchableOpacity onPress={() => 
+                    navigation.navigate('PlayerProfile',{
+                    playerObject: userData,
+                    leagueID: leagueID,
+                    roster: league.roster_positions
+                })}>
+                    <ProgressiveImage style={{width:50,height:50,borderRadius:50}} uri={`https://sleepercdn.com/avatars/${userData.avatar}`} resizeMode='cover'/>
+                </TouchableOpacity>
+                <Text style={{color:DARK_GRAY}}>recebe:</Text>
+                <View style={{width:'100%',alignItems:'center'}}>
                     { adds &&
-                        Object.entries(adds).map(item => {
+                        Object.entries(adds).map((item, index) => {
                             if(item[1]!=userRoster?.roster_id) return
 
                             return (
-                                <Text style={{color:DARK_GRAY}}>{`${allPlayers[item[0]].first_name} ${allPlayers[item[0]].last_name}`}</Text>
+                                <TouchableOpacity 
+                                    key={index}
+                                    style={{marginTop:5}}
+                                    onPress={() => 
+                                        navigation.navigate('PlayerStats', {playerObject: allPlayers[item[0]]})
+                                }
+                                >
+                                <Text style={{color:WHITE,textAlign:'center'}}>{`${allPlayers[item[0]].first_name} ${allPlayers[item[0]].last_name}`}</Text>
+                                </TouchableOpacity>
                             )
                         })
                     }
                     {
                         picks &&
-                        picks.map(pick => {
+                        picks.map((pick, index) => {
                             if(pick.owner_id!=userRoster?.roster_id) return
 
                             return (
-                                <Text style={{color:DARK_GRAY}}>{`pick round ${pick.round} de ${pick.season}`}</Text>
+                                <Text key={index} style={{color:WHITE,marginTop:5}}>{`Pick round ${pick.round} de ${pick.season}`}</Text>
+                            )
+                        })
+                    }
+                                        {
+                        waiver &&
+                        waiver.map((item, index) => {
+                            if(item.receiver!=userRoster?.roster_id) return
+
+                            return (
+                                <Text key={index} style={{color:WHITE,marginTop:5}}>{`${item.amount}$ waiver cash`}</Text>
                             )
                         })
                     }
@@ -276,21 +300,75 @@ const Informations = ({navigation, route}) => {
         )}
 
         return (
-            <View style={{flexDirection:'row'}}>
+            <ViewLightDark title={`Status: ${tran.status}`} titleSize={15} titleAlign='center' style={{marginTop:10,flexDirection:'row'}}>
                 <TradeInfo userRoster={user1.roster} userData={user1.user_data} />
                 <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
                     <FontAwesome name="exchange" size={24} color={LIGHT_GREEN} />
                 </View>
                 <TradeInfo userRoster={user2.roster} userData={user2.user_data} />
+            </ViewLightDark>
+        )
+    }
+
+    const TransactionFreeAgent = (props) => {
+        const tran = props.transaction;
+        const drops = tran.drops;
+        const adds = tran.adds;
+        const user = (tran?.roster_ids[0]) ? new UserTransaction(tran.roster_ids[0]) : new UserTransactionNull();
+
+        return (
+            <View style={{margin:10,marginBottom:20}}>
+                <View style={{flexDirection:'row',alignItems:'center'}}>
+                    <TouchableOpacity onPress={() => 
+                        navigation.navigate('PlayerProfile',{
+                        playerObject: user.user_data,
+                        leagueID: leagueID,
+                        roster: league.roster_positions
+                    })}>
+                        <ProgressiveImage style={{width:50,height:50,borderRadius:50}} uri={`https://sleepercdn.com/avatars/${user.user_data.avatar}`} resizeMode='cover'/>
+                    </TouchableOpacity>
+                    <Text style={{color:WHITE}}>{user.user_data.display_name}</Text>
+                </View>
+                <View style={{marginTop:10,backgroundColor:LIGHT_BLACK,borderRadius:5,minHeight:100,elevation:10,flexDirection:'row'}}>
+                    <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
+                    {   drops && 
+                        Object.entries(drops).map((item, index) => {
+                            if(item[1] != user.roster.roster_id) return
+                            
+                            return (
+                                <View key={index} style={{flexDirection:'row'}}>
+                                    <ProgressiveImage style={{width:50,height:50,borderRadius:50,backgroundColor:DARK_BLACK}} uri={`https://sleepercdn.com/content/nfl/players/${allPlayers[item[0]].player_id}.jpg`} resizeMode='cover'/>
+                                    <FontAwesome name="minus-circle" size={20} color='red' style={{marginLeft:-15}} />
+                                </View>
+                            )
+                        })
+                    }
+                    </View>
+                    <View style={{flex:1}}>
+                    {   adds && 
+                        Object.entries(adds).map((item, index) => {
+                            if(item[1] != user.roster.roster_id) return
+                            
+                            return (
+                                <View key={index} style={{flexDirection:'row'}}>
+                                    <ProgressiveImage style={{width:50,height:50,borderRadius:50,backgroundColor:DARK_BLACK}} uri={`https://sleepercdn.com/content/nfl/players/${allPlayers[item[0]].player_id}.jpg`} resizeMode='cover'/>
+                                    <FontAwesome name="plus-circle" size={20} color={LIGHT_GREEN} style={{marginLeft:-15}} />
+                                </View>
+                            )
+                        })
+                    }
+                    </View>
+                </View>
             </View>
         )
     }
 
     const TransactionsItem = (props) => {
         return (
-            <ViewLightDark>
+            <View>
                 {props.transaction.type == 'trade' && <TransactionTrade transaction={props.transaction} />}
-            </ViewLightDark>
+                {props.transaction.type == 'free_agent' && <TransactionFreeAgent transaction={props.transaction} />}
+            </View>
         )
     }
 
