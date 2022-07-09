@@ -9,7 +9,7 @@ import { HEADER_BUTTON_BG } from "../Variables";
 
 const WIDTH = Dimensions.get('window').width;
 
-const MusicPlayer = ({track, trackIndex, navigation}) => { 
+const MusicPlayer = ({track, trackIndex, navigation, reRender}) => { 
     const [currentTrack, setCurrentTrack] = useState(null)
     const [prevEpisode, setPrevEpisode] = useState(null);
     const [nextEpisode, setNextEpisode] = useState(null);
@@ -17,7 +17,7 @@ const MusicPlayer = ({track, trackIndex, navigation}) => {
         playbackState,
         position,
         duration,
-        togglePlayback
+        togglePlayback,
     } = useContext(PlayerContext)
 
     const getCurrentTrack = async() => {
@@ -36,7 +36,7 @@ const MusicPlayer = ({track, trackIndex, navigation}) => {
     useEffect(() => {
         getCurrentTrack();
         getPrevAndNextEpisode();
-    },[trackIndex])
+    },[trackIndex,reRender])
 
     const NextAndPrevButton = ({action}) => {
         const conditional = (action=='prev') ? !prevEpisode || trackIndex<=0 : !nextEpisode;
@@ -63,7 +63,7 @@ const MusicPlayer = ({track, trackIndex, navigation}) => {
 
     const PlayPauseButton = () => {
         return (
-            <Pressable onPress={() => {togglePlayback(playbackState, track, trackIndex); setCurrentTrack(trackIndex)}}>
+            <Pressable onPress={() => {togglePlayback(trackIndex); setCurrentTrack(trackIndex)}}>
 
             {playbackState == State.Buffering || playbackState == State.Connecting ? <ActivityIndicator size={30} color="white" /> : <FontAwesome name={playbackState == State.Playing &&  currentTrack == trackIndex ?  "pause" : "play" } size={30} color="white"  />}
 

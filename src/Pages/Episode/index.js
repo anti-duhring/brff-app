@@ -1,24 +1,28 @@
 import { View, Text, StyleSheet, Dimensions, Animated, ImageBackground, StatusBar } from "react-native";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import HeaderImageScrollView, { TriggeringView } from 'react-native-image-header-scroll-view'
 import MusicPlayer from "../../components/MusicPlayer";
 import { LinearGradient } from 'expo-linear-gradient';
 import ViewLightDark from "../../components/ViewLightDark";
-import { DARK_BLACK } from "../../components/Variables";
+import { DARK_BLACK, LIGHT_GREEN } from "../../components/Variables";
+import ParsedText from "react-native-parsed-text";
+import TrackPlayer from "react-native-track-player";
+import * as Linking from 'expo-linking'
 
 const MAX_HEIGHT = 200;
 const MIN_HEIGHT = 55;
 const WIDTH = Dimensions.get('window').width;
 
 const Episode = ({navigation, route}) => {
-    const episode = route.params?.episodeObject
-    const episodeName = route.params?.episodeName
-    const episodeID = route.params?.episodeID
+    let episode = route.params?.episodeObject
+    let episodeName = route.params?.episodeName
+    let episodeID = route.params?.episodeID
     const episodeDescription = episode.description.replace(/(<([^>]+)>)/ig,'').replace(/&nbsp;/ig,'')
     let episodeImage = (episode.artwork == 'https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded_nologo400/2234723/2234723-1645583930433-8a8b649a48b9d.jpg') ? require('../../../assets/Images/leagueHeader2.png') : {uri: episode.artwork};
 
     const opacity = useRef(new Animated.Value(0)).current;
     const firstRender = useRef(true);
+    const [reRender, setReRender] = useState(0);
 
     const fadeIn = () => {
         if(firstRender.current) {
@@ -40,6 +44,46 @@ const Episode = ({navigation, route}) => {
         }).start()
     }
 
+    const handleTrackTo = async(name, matchIndex) => {
+        const currentTrack = await TrackPlayer.getCurrentTrack();
+
+        if(name.split(':').length==3) {
+            const hour = Number(name.split(':')[0]);
+            const minute = Number(name.split(':')[1]);
+            const second = Number(name.split(':')[2]);
+
+            const hToSeconds = hour * 3600;
+            const mToSeconds = minute * 60;
+            if(episodeID!=currentTrack) {
+                await TrackPlayer.skip(episodeID);
+                await TrackPlayer.play();
+            }
+
+            await TrackPlayer.seekTo(hToSeconds + mToSeconds + second);
+
+            setReRender(reRender + 1);
+        }
+        else if(name.split(':').length==2) {
+            const minute = Number(name.split(':')[1]);
+            const second = Number(name.split(':')[2]);
+
+            const mToSeconds = minute * 60;
+            if(episodeID!=currentTrack) {
+                await TrackPlayer.skip(episodeID)
+                await TrackPlayer.play();
+            }
+
+            await TrackPlayer.seekTo(mToSeconds + second);
+            setReRender(reRender + 1);
+        }
+    }
+
+    const handleUrlPress = (url, matchIndex /*: number*/) => {
+        Linking.openURL(url)
+    }
+    const handleEmailPress = (email, matchIndex /*: number*/) => {
+        Linking.openURL('mailto:'+email)
+    }
 
     return ( 
         <View style={styles.episodeBody}>
@@ -61,7 +105,7 @@ const Episode = ({navigation, route}) => {
                     <View style={styles.foregroundContainer}>
                         <MusicPlayer isThePlayerInEpisodePage={true} 
                         navigation={navigation}
-                        trackIndex={episodeID} track={episode} />
+                        trackIndex={episodeID} track={episode} reRender={reRender} />
 
                     </View>
               )}
@@ -92,9 +136,21 @@ const Episode = ({navigation, route}) => {
                     </LinearGradient>
                     <View style={[styles.section, styles.sectionLarge]}>
                         <ViewLightDark containerStyle={{margin:0,minHeight:400}}>
-                            <Text style={styles.sectionText}>
+                            <ParsedText style={styles.sectionText} 
+                                parse={[
+                                    {type: 'email',                     style: styles.trackTo, onPress: handleEmailPress},
+                                    {type: 'url',                       style: styles.trackTo, onPress: handleUrlPress},
+                                    {pattern: /[0-9][0-9]:[0-9][0-9]:[0-9][0-9]/g, style: styles.trackTo, onPress: handleTrackTo},
+                                    {type: 'url',                       style: styles.trackTo, onPress: handleUrlPress},
+                                    {pattern: /[0-9]:[0-9][0-9]:[0-9][0-9]/g, style: styles.trackTo, onPress: handleTrackTo},
+                                    {pattern: /[0-9][0-9]:[0-9][0-9]/g, style: styles.trackTo, onPress: handleTrackTo}
+                                ]}
+                            >
+                                {episodeDescription.replace(/--/g,'')}
+                            </ParsedText>
+                            {/*<Text style={styles.sectionText}>
                                 {episodeDescription}
-                            </Text>
+                            </Text*/}
                         </ViewLightDark>
                         <Text style={styles.sectionInfo}>Publicado em: {episode.date}</Text>
                     </View>
@@ -170,4 +226,7 @@ const styles = StyleSheet.create({
     foregroundContainer: {
         marginTop: 70,
     },
+    trackTo: {
+        color: LIGHT_GREEN
+    }
 })

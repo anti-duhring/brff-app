@@ -38,14 +38,16 @@ export default function App() {
             capabilities: [
                 Capability.Play,
                 Capability.Pause,
-                Capability.Stop,
-                Capability.SeekTo
+                Capability.SeekTo,
+                Capability.SkipToNext,
+                Capability.SkipToPrevious
             ],
             compactCapabilities: [
               Capability.Play,
               Capability.Pause,
-              Capability.Stop,
-              Capability.SeekTo
+              Capability.SeekTo,
+              Capability.SkipToNext,
+              Capability.SkipToPrevious
             ]
         })
         console.log('Track Player loaded!')
