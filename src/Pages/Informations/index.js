@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, Dimensions, FlatList, Animated, findNodeHandle, TouchableOpacity } from "react-native";
+import { Text, View, StyleSheet, Dimensions, FlatList, Animated, findNodeHandle, TouchableOpacity, ActivityIndicator } from "react-native";
 import TabTopLeague from '../../components/TabTopLeague'
 import React, { useState, useEffect, useContext, useRef, useCallback } from "react";
 import { NFLStatusContext } from "../../components/NFLStatusContext";
@@ -48,11 +48,14 @@ const Informations = ({navigation, route}) => {
     const [leagueTransactions, setLeagueTransactions] = useState(null)
     const [generalInformations, setGeneralInformations] = useState([])
     const [errorMessage, setErrorMessage] = useState(null);
-    const [dropdownTransactionsOption, setDropdownTransactionsOption] = useState('Troca');
+    const [dropdownTransactionsOption, setDropdownTransactionsOption] = useState('Trocas');
+    const [showItems, setShowItems] = useState(10)
+    const [isMoreLoading, setIsMoreLoading] = useState(false)
 
     // ANIMATED TAB REF
     const flatlistRef = useRef();
     const scrollX = useRef(new Animated.Value(0)).current;
+    const scrollY = useRef(new Animated.Value(0)).current;
     const onTabPress = useCallback(itemIndex => {
         flatlistRef?.current?.scrollToOffset({
             offset: itemIndex * width
@@ -172,6 +175,22 @@ const Informations = ({navigation, route}) => {
         console.log(league.league_id)
     },[])
 
+    const Footer = () => (
+        <View style={{flex:1,alignItems:'center',justifyContent:'center'}}>
+            {isMoreLoading? <ActivityIndicator size='large' color={LIGHT_GREEN} />
+             : <TouchableOpacity onPress={() => {setIsMoreLoading(true); setShowItems(showItems + 10)}} style={{flexDirection:'row',backgroundColor:LIGHT_GREEN,
+        width:170,
+        height:40,
+        justifyContent:'center',
+        alignItems:'center',
+        borderRadius:5,}}>
+                <Text style={{        marginLeft:5,
+        color:DARK_BLACK,
+        fontWeight:'600'}}>Carregar mais</Text>
+            </TouchableOpacity>}
+        </View>
+    )
+
     const InformationContainer = (props) => {
         return (
             <View style={styles.informationContent}>
@@ -210,7 +229,7 @@ const Informations = ({navigation, route}) => {
     }
 
     const TransactionsSelectDropDown = () => {
-        const data = ['Troca', 'Free Agent', 'Waiver', 'Todas']
+        const data = ['Trocas', 'Free Agency', 'Waiver', 'Todas']
         return (
             <SelectDropdown
                 data={data}
@@ -317,43 +336,49 @@ const Informations = ({navigation, route}) => {
         const user = (tran?.roster_ids[0]) ? new UserTransaction(tran.roster_ids[0]) : new UserTransactionNull();
 
         return (
-            <View style={{margin:10,marginBottom:20}}>
-                <View style={{flexDirection:'row',alignItems:'center'}}>
-                    <TouchableOpacity onPress={() => 
+            <View style={{backgroundColor:LIGHT_BLACK,borderRadius:12,margin:10,marginBottom:20,elevation:10,padding: 10}}>
+                <View style={{flex:1}}>
+                    <TouchableOpacity style={{flexDirection:'row',alignItems:'center'}} onPress={() => 
                         navigation.navigate('PlayerProfile',{
                         playerObject: user.user_data,
                         leagueID: leagueID,
                         roster: league.roster_positions
                     })}>
                         <ProgressiveImage style={{width:50,height:50,borderRadius:50}} uri={`https://sleepercdn.com/avatars/${user.user_data.avatar}`} resizeMode='cover'/>
+                        <Text style={{color:DARK_GRAY,marginLeft:10,flexWrap:'wrap',flexShrink:1}}><Text style={{color:WHITE,}}>{user.user_data.display_name}</Text> dispensou/contratou os seguintes jogadores:</Text>
                     </TouchableOpacity>
-                    <Text style={{color:WHITE}}>{user.user_data.display_name}</Text>
                 </View>
-                <View style={{marginTop:10,backgroundColor:LIGHT_BLACK,borderRadius:5,minHeight:100,elevation:10,flexDirection:'row'}}>
-                    <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
+                <View style={{flex:1,flexDirection:'row',padding:10}}>
+                    <View style={{flex:1,justifyContent:'center',marginLeft:10}}>
                     {   drops && 
                         Object.entries(drops).map((item, index) => {
                             if(item[1] != user.roster.roster_id) return
                             
                             return (
-                                <View key={index} style={{flexDirection:'row'}}>
-                                    <ProgressiveImage style={{width:50,height:50,borderRadius:50,backgroundColor:DARK_BLACK}} uri={`https://sleepercdn.com/content/nfl/players/${allPlayers[item[0]].player_id}.jpg`} resizeMode='cover'/>
-                                    <FontAwesome name="minus-circle" size={20} color='red' style={{marginLeft:-15}} />
-                                </View>
+                                <TouchableOpacity key={index} 
+                                onPress={() => 
+                                    navigation.navigate('PlayerStats', {playerObject: allPlayers[item[0]]})} 
+                                style={{flexDirection:'row'}}>
+                                    <ProgressiveImage style={{width:50,height:50,borderRadius:50,backgroundColor:DARK_BLACK,borderWidth:1,borderColor:'red'}} uri={`https://sleepercdn.com/content/nfl/players/${allPlayers[item[0]].player_id}.jpg`} resizeMode='cover'/>
+                                    <FontAwesome name="minus-circle" size={17} color='red' style={{marginLeft:-10}} />
+                                </TouchableOpacity>
                             )
                         })
                     }
                     </View>
-                    <View style={{flex:1}}>
+                    <View style={{flex:1,justifyContent:'center'}}>
                     {   adds && 
                         Object.entries(adds).map((item, index) => {
                             if(item[1] != user.roster.roster_id) return
                             
                             return (
-                                <View key={index} style={{flexDirection:'row'}}>
-                                    <ProgressiveImage style={{width:50,height:50,borderRadius:50,backgroundColor:DARK_BLACK}} uri={`https://sleepercdn.com/content/nfl/players/${allPlayers[item[0]].player_id}.jpg`} resizeMode='cover'/>
-                                    <FontAwesome name="plus-circle" size={20} color={LIGHT_GREEN} style={{marginLeft:-15}} />
-                                </View>
+                                <TouchableOpacity key={index} 
+                                onPress={() => 
+                                    navigation.navigate('PlayerStats', {playerObject: allPlayers[item[0]]})} 
+                                style={{flexDirection:'row'}}>
+                                    <ProgressiveImage style={{width:50,height:50,borderRadius:50,backgroundColor:DARK_BLACK,borderWidth:1,borderColor:LIGHT_GREEN}} uri={`https://sleepercdn.com/content/nfl/players/${allPlayers[item[0]].player_id}.jpg`} resizeMode='cover'/>
+                                    <FontAwesome name="plus-circle" size={17} color={LIGHT_GREEN} style={{marginLeft:-10}} />
+                                </TouchableOpacity>
                             )
                         })
                     }
@@ -363,11 +388,76 @@ const Informations = ({navigation, route}) => {
         )
     }
 
-    const TransactionsItem = (props) => {
+    const TransactionWaiver = (props) => {
+        const tran = props.transaction;
+        const drops = tran.drops;
+        const adds = tran.adds;
+        const user = (tran?.roster_ids[0]) ? new UserTransaction(tran.roster_ids[0]) : new UserTransactionNull();
+
+        return (
+            <View style={{backgroundColor:LIGHT_BLACK,borderRadius:12,margin:10,marginBottom:20,elevation:10,padding: 10}}>
+                <View style={{flex:1}}>
+                    <TouchableOpacity style={{flexDirection:'row',alignItems:'center'}} onPress={() => 
+                        navigation.navigate('PlayerProfile',{
+                        playerObject: user.user_data,
+                        leagueID: leagueID,
+                        roster: league.roster_positions
+                    })}>
+                        <ProgressiveImage style={{width:50,height:50,borderRadius:50}} uri={`https://sleepercdn.com/avatars/${user.user_data.avatar}`} resizeMode='cover'/>
+                        <Text style={{color:DARK_GRAY,marginLeft:10,flexWrap:'wrap',flexShrink:1}}><Text style={{color:WHITE,}}>{user.user_data.display_name}</Text> {tran.metadata.notes}</Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={{flex:1,flexDirection:'row',padding:10}}>
+                    <View style={{flex:1,justifyContent:'center',marginLeft:10}}>
+                    {   drops && 
+                        Object.entries(drops).map((item, index) => {
+                            if(item[1] != user.roster.roster_id) return
+                            
+                            return (
+                                <TouchableOpacity key={index} 
+                                onPress={() => 
+                                    navigation.navigate('PlayerStats', {playerObject: allPlayers[item[0]]})} 
+                                style={{flexDirection:'row'}}>
+                                    <ProgressiveImage style={{width:50,height:50,borderRadius:50,backgroundColor:DARK_BLACK,borderWidth:1,borderColor:'red'}} uri={`https://sleepercdn.com/content/nfl/players/${allPlayers[item[0]].player_id}.jpg`} resizeMode='cover'/>
+                                    <FontAwesome name="minus-circle" size={17} color='red' style={{marginLeft:-10}} />
+                                </TouchableOpacity>
+                            )
+                        })
+                    }
+                    </View>
+                    <View style={{flex:1,justifyContent:'center'}}>
+                    {   adds && 
+                        Object.entries(adds).map((item, index) => {
+                            if(item[1] != user.roster.roster_id) return
+                            
+                            return (
+                                <TouchableOpacity key={index} 
+                                onPress={() => 
+                                    navigation.navigate('PlayerStats', {playerObject: allPlayers[item[0]]})} 
+                                style={{flexDirection:'row'}}>
+                                    <ProgressiveImage style={{width:50,height:50,borderRadius:50,backgroundColor:DARK_BLACK,borderWidth:1,borderColor:LIGHT_GREEN}} uri={`https://sleepercdn.com/content/nfl/players/${allPlayers[item[0]].player_id}.jpg`} resizeMode='cover'/>
+                                    <FontAwesome name="plus-circle" size={17} color={LIGHT_GREEN} style={{marginLeft:-10}} />
+                                </TouchableOpacity>
+                            )
+                        })
+                    }
+                    </View>
+                </View>
+            </View>
+        )
+    }
+
+    const TransactionsItem = ({item, index}) => {
+        if(index > showItems) {
+            setIsMoreLoading(false);
+            return
+        }
+
         return (
             <View>
-                {props.transaction.type == 'trade' && <TransactionTrade transaction={props.transaction} />}
-                {props.transaction.type == 'free_agent' && <TransactionFreeAgent transaction={props.transaction} />}
+                {item.type == 'trade' && <TransactionTrade transaction={item} />}
+                {item.type == 'free_agent' && <TransactionFreeAgent transaction={item} />}
+                {item.type == 'waiver' && <TransactionWaiver transaction={item} />}
             </View>
         )
     }
@@ -378,24 +468,26 @@ const Informations = ({navigation, route}) => {
                 <View style={{marginHorizontal:10,flexDirection:'row', justifyContent:'space-between',alignItems:'flex-end'}}>
                     {leagueTransactions && <>
                     <Text style={{color:DARK_GRAY}}>{ dropdownTransactionsOption!='Todas' ? `${leagueTransactions?.filter(transaction => {
-                        return transaction.type.replace(/trade/g,'Troca').replace(/waiver/g,'Waiver').replace(/free_agent/g,'Free Agent') == dropdownTransactionsOption
+                        return transaction.type.replace(/trade/g,'Trocas').replace(/waiver/g,'Waiver').replace(/free_agent/g,'Free Agency') == dropdownTransactionsOption
                     }).length} transações` : `${leagueTransactions?.length} transações totais`}</Text>
                     <TransactionsSelectDropDown />
                     </>}
                 </View>
-                <View style={{flex:1,marginTop:10}}>
-                {
-                    leagueTransactions ? 
-                    leagueTransactions.map((transaction, index) => {
-                        if(transaction.type.replace(/trade/g,'Troca').replace(/waiver/g,'Waiver').replace(/free_agent/g,'Free Agent') != dropdownTransactionsOption && dropdownTransactionsOption != 'Todas') return
+                {leagueTransactions && 
+                <FlatList
+                    data={(dropdownTransactionsOption!='Todas')?
+                    leagueTransactions.filter((item, index) => {
+                        return item.type.replace(/trade/g,'Trocas').replace(/waiver/g,'Waiver').replace(/free_agent/g,'Free Agency') == dropdownTransactionsOption
+                    })
+                    : leagueTransactions
+                    }
+                    keyExtractor={item => item.transaction_id}
+                    contentContainerStyle={{marginTop:10,paddingBottom:50}}
+                    renderItem={TransactionsItem}
+                    nestedScrollEnabled={false}
+                    ListFooterComponent={<Footer />}
 
-                        return (
-                            <TransactionsItem transaction={transaction} key={index} />
-                        )
-                    }) :
-                    <Text style={{color: DARK_BLACK}}>A liga ainda não possui nenhuma transação</Text>
-                }
-                </View>
+                />}
             </View>
         )
     }
