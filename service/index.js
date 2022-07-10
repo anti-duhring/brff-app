@@ -7,11 +7,24 @@ module.exports = async function() {
 
     TrackPlayer.addEventListener('remote-pause', () => TrackPlayer.pause());
 
-    TrackPlayer.addEventListener('remote-stop', () => TrackPlayer.destroy());
+    /*TrackPlayer.addEventListener('remote-stop', async() => {
+        await TrackPlayer.seekTo(0)
+    });*/
 
-    TrackPlayer.addEventListener('remote-next', () => console.log('Next'));
+    TrackPlayer.addEventListener('remote-next', async() => {
+        const currentTrack = await TrackPlayer.getCurrentTrack();
+        const queue = await TrackPlayer.getQueue();
+        if(currentTrack < queue.length) {
+            TrackPlayer.skipToNext();
+        }
+    });
 
-    TrackPlayer.addEventListener('remote-previous', () => console.log('Prev'));
+    TrackPlayer.addEventListener('remote-previous', async() => {
+        const currentTrack = await TrackPlayer.getCurrentTrack();
+        if(currentTrack > 0) {
+            TrackPlayer.skipToPrevious();
+        }
+    });
     // ...
 
 };

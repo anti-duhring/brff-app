@@ -81,7 +81,7 @@ Ouça você também! ${episodeLink}`
             ),
             headerRight: () => (
               <TouchableOpacity style={[styles.barButtons,{marginRight:10,paddingRight:4}]} onPress={() => {
-                onShare(route.params?.episodeName, route.params?.episodeObject.links[0].url)
+                onShare(route.params?.episodeName, route.params?.episodeObject.url)
               }}>
                 <Entypo name="share" size={24} color="white" />
               </TouchableOpacity>

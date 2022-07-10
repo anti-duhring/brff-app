@@ -48,7 +48,8 @@ export default function App() {
               Capability.SeekTo,
               Capability.SkipToNext,
               Capability.SkipToPrevious
-            ]
+            ],
+            color: 'rgba(0, 206, 78,  1)'
         })
         console.log('Track Player loaded!')
     }
