@@ -1,13 +1,10 @@
 import { useContext, useState, useEffect, useRef } from 'react';
 import { StyleSheet, Text, View, Button, Image, Pressable, ActivityIndicator, ScrollView, FlatList, Animated } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createStackNavigator } from '@react-navigation/stack';
 import { NFLStatusContext } from '../../components/NFLStatusContext'
 import { scaleAnimation } from '../../animations/scale'
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
-import { DARK_BLACK } from '../../components/Variables';
-
-const Stack = createStackNavigator()
+import { DARK_BLACK, LIGHT_GREEN } from '../../components/Variables';
 
 const Leagues = ({navigation}) => {
     const { season } = useContext(NFLStatusContext)
@@ -182,13 +179,13 @@ useEffect(() => {
                   <Text style={{fontSize:15,fontWeight:'700',color:'#C6C6C6',width:250}}>{item.name}</Text>
                   <View style={{flexDirection:'row'}}>
                     <Text style={{
-                      fontSize:12,color:'rgba(0, 128, 55, 1)',fontWeight:'bold',
-                      textShadowColor: 'rgba(0, 128, 55, 1)',
+                      fontSize:12,color:LIGHT_GREEN,fontWeight:'bold',
+                      textShadowColor: LIGHT_GREEN,
                       textShadowOffset: {width: 0, height: 0},
-                      textShadowRadius: 10
+                      textShadowRadius: 5
                       }}>● </Text>
                       <Text style={{
-                        fontSize:12,color:'rgba(0, 128, 55, 1)',
+                        fontSize:12,color:LIGHT_GREEN,
                         }}>{item.status}</Text>
                     </View>
                 </View>

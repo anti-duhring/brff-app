@@ -8,6 +8,7 @@ import { AntDesign } from '@expo/vector-icons';
 import { DARK_BLACK, DARK_GRAY, DARK_GREEN, LIGHT_BLACK, LIGHT_GRAY, LIGHT_GREEN, WHITE } from "../../components/Variables";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import Tooltip from "react-native-walkthrough-tooltip";
 import TooltipButton from "../../components/TooltipButton";
@@ -149,6 +150,9 @@ const PlayoffBracket = ({route}) => {
     );
 
     const PlayerMatchup = ({player, position, winner, index}) => {
+        const Win = () => (
+            <Ionicons style={{marginHorizontal:5}} name="trophy-sharp" size={20} color={LIGHT_GREEN} />
+        )
         return (
             <View style={{flex:2}}>
                 <View style={[styles.playerMatchupContainer,{justifyContent: (position=='left') ? 'flex-start' : 'flex-end'}]}>
@@ -159,12 +163,18 @@ const PlayoffBracket = ({route}) => {
                             
                             {(index==0) ? <View style={{alignContent:'flex-start',marginLeft:15}}>
                                 <TooltipMessage hasBackground={true} position='top' message='Pontos de fantasy do time.'>
+                                    <View style={{flexDirection:'row',alignItems:'center'}}>
                                     <PlayerFantasyPoints player={player} position={position} />
+                                    {winner && <Win />}
+                                    </View>
                                 </TooltipMessage>
-                            </View> : <View style={{marginLeft:15}}><PlayerFantasyPoints player={player} position={position} /></View>}
+                            </View> : <View style={{marginLeft:15,flexDirection:'row', alignItems:'center'}}><PlayerFantasyPoints player={player} position={position} />
+                            {winner && <Win />}
+                            </View>}
                             
                         </> :
                         <>
+                            {winner && <Win />}
                             <PlayerFantasyPoints player={player} position={position} />
                             <PlayerAvatar player={player} />
                         </>

@@ -1,3 +1,5 @@
+import { API_URL_BASE } from "../../utils/constants";
+
 export const getColorPosition = (position) => {
     let colorPosition = '#a3bbd3';
     switch(position){
@@ -127,4 +129,13 @@ export const getPlayerProjectedPoints = (_player_stats, _league_scoring_settings
         //projected_points.push(item)
     })
     return points
+}
+
+export const getRosterFromLeague = async(leagueID, userID) => {
+   return fetch(`${API_URL_BASE}/league/${leagueID}/rosters`)
+    .then(rosterResponse => rosterResponse.json())
+    .then(roster => {
+        return roster.find(i => i.owner_id == userID)
+    })
+
 }

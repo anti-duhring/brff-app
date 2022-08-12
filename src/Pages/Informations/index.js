@@ -175,7 +175,10 @@ const Informations = ({navigation, route}) => {
         console.log(league.league_id)
     },[])
 
-    const Footer = () => (
+    const Footer = () => {
+        if(!leagueTransactions || leagueTransactions.length <= 0) return null
+
+        return (
         <View style={{flex:1,alignItems:'center',justifyContent:'center'}}>
             {isMoreLoading? <ActivityIndicator size='large' color={LIGHT_GREEN} />
              : <TouchableOpacity onPress={() => {setIsMoreLoading(true); setShowItems(showItems + 10)}} style={{flexDirection:'row',backgroundColor:LIGHT_GREEN,
@@ -185,11 +188,11 @@ const Informations = ({navigation, route}) => {
         alignItems:'center',
         borderRadius:5,}}>
                 <Text style={{        marginLeft:5,
-        color:DARK_BLACK,
+        color:'white',
         fontWeight:'600'}}>Carregar mais</Text>
             </TouchableOpacity>}
         </View>
-    )
+    )}
 
     const InformationContainer = (props) => {
         return (
@@ -540,6 +543,13 @@ const Informations = ({navigation, route}) => {
                             <GeneralInformations />
                         )
                     } else {
+                        if(!leagueTransactions) {
+                            return (
+                                <View style={{flex:1,alignItems:'center',justifyContent:'center'}}>
+                                <ActivityIndicator size='large' color={LIGHT_GREEN} />
+                                </View>
+                            )
+                        }
                         return (
                             <TransactionsTab />
                         )

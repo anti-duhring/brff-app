@@ -16,13 +16,8 @@ const SignIn = () => {
     return ( 
     <Pressable onPress={Keyboard.dismiss}  style={styles.container}>
       <View style={styles.titleContainer}>
-        <View style={styles.titleText}>
-          <Text style={styles.titleText1}>Brasil</Text>
-          <Text style={styles.titleText2}>Fantasy</Text>
-          <Text style={styles.titleText3}>Football</Text>
-        </View>
         <View style={styles.titleImageContainer}>
-          <Image style={styles.titleImage} source={{uri: 'https://brffootball.com.br/wp-content/uploads/2022/02/cropped-logo.png'}} />
+          <Image style={styles.titleImage} source={require('../../../assets/Images/cropped-logo_2.png')} />
         </View>
       </View>
       <View style={styles.login}> 
@@ -31,7 +26,7 @@ const SignIn = () => {
          <TouchableOpacity style={styles.buttonLogin} onPress={() => loginHandle(username)}>
            <Text style={styles.loginText}>Login</Text>
          </TouchableOpacity>
-         <TouchableOpacity style={styles.buttonRegister} onPress={() => Linking.openURL('https://sleeper.app/create')}>
+         <TouchableOpacity style={styles.buttonRegister} onPress={() => Linking.openURL('https://sleeper.app')}>
            <Text style={styles.text}>Não tem conta? Cadastrar</Text>
          </TouchableOpacity>
         </View>
@@ -117,8 +112,8 @@ const styles = StyleSheet.create({
     },
     titleImageContainer:{},
     titleImage:{
-      width:80,
-      height:80,
+      width:160,
+      height:160,
     },
     loginInput: {
       padding:10, 

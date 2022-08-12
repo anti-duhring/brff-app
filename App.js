@@ -20,6 +20,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { WHITE, DARK_GREEN, DARKER_GRAY, DARK_BLACK, LIGHT_BLACK } from "./src/components/Variables";
 import AboutUs from "./src/Pages/AboutUs";
+import Rostership from "./src/Pages/Rostership";
 import * as rssParser from 'react-native-rss-parser'
 
 const Drawer = createDrawerNavigator();
@@ -260,6 +261,12 @@ const setPlaylistPodcast = async(episodesData) => {
             drawerIcon: ({color}) => (
               <MaterialCommunityIcons name="football-helmet"  size={22} color={color} />
           )}} component={TrendingPlayers}/>
+          <Drawer.Screen name="Rostership" options={{
+            headerShown: false,
+            drawerLabel:'Rostership' ,
+            drawerIcon: ({color}) => (
+              <MaterialCommunityIcons name="football-helmet"  size={22} color={color} />
+          )}} component={Rostership}/>
           <Drawer.Screen name="Podcast" options={({navigation}) => ({
             headerShown: false,
             swipeEnabled: true,
