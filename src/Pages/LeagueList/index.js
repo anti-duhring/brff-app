@@ -1,10 +1,11 @@
 import { useContext, useState, useEffect, useRef } from 'react';
-import { StyleSheet, Text, View, Button, Image, Pressable, ActivityIndicator, ScrollView, FlatList, Animated } from 'react-native';
+import { StyleSheet, Text, View, Button, Image, Pressable, ActivityIndicator, ScrollView, FlatList, Animated, StatusBar } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NFLStatusContext } from '../../components/NFLStatusContext'
 import { scaleAnimation } from '../../animations/scale'
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import { DARK_BLACK, LIGHT_GREEN } from '../../components/Variables';
+import {colors} from '../../utils/colors'
 
 const Leagues = ({navigation}) => {
     const { season } = useContext(NFLStatusContext)
@@ -61,6 +62,7 @@ useEffect(() => {
 
     return ( 
         <View style={{flex:1,backgroundColor:'#0B0D0F',paddingTop:50}}>
+
           {isLoading ? 
       <View style={{flex:1,padding:10,}}>
             <View style={{padding:10,paddingTop:0,paddingLeft:0}}>

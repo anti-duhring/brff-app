@@ -8,6 +8,8 @@ import Players from '../../Pages/Players'
 import PlayerProfile from '../../Pages/PlayerProfile';
 import Matchups from '../../Pages/Matchups';
 import PlayoffBracket from '../../Pages/PlayoffBracket';
+import Rostership from '../../Pages/Rostership'
+import AdvancedStats from '../../Pages/AdvancedStats'
 
 import { Entypo } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
@@ -131,6 +133,17 @@ const StackScreens = ({route}) => {
                 <Ionicons name="close" size={24} color="white" />
               </TouchableOpacity>
             )})} component={PlayerStats} />
+
+            <Stack.Screen name="AdvancedStats" options={({navigation,route}) => ({
+              title: '',//route.params?.leagueName,
+              headerTransparent: true,
+              headerLeft: () => (
+                <TouchableOpacity style={[styles.barButtons,{marginLeft:10}]} onPress={() => navigation.navigate('Rostership')}>
+                  <Ionicons name="arrow-back" size={24} color="white" />
+                </TouchableOpacity>
+              ),
+              presentation:'modal'
+              })} component={AdvancedStats} />
             
         </Stack.Navigator>
      );
