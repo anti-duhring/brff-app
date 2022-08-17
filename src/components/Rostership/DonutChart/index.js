@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, View, Pressable } from 'react-native'
 import React, { useEffect } from 'react'
 import { Skia, Canvas, Path, Text, useValue, runTiming, Easing } from '@shopify/react-native-skia';
 import { colors } from '../../../utils/colors';
@@ -11,16 +11,17 @@ const DonutChart = ({
     percentageComplete,
     targetPercentage,
     color = colors.LIGHT_GREEN,
-    rerender
+    rerender,
+    legend = ''
 }) => {
-    const innerRadius = radius - strokeWidth / 2;
+    const innerRadius = radius - (strokeWidth / 2);
     const targetText = `${targetPercentage * 100}%`
 
     const path = Skia.Path.Make();
     path.addCircle(radius, radius, innerRadius)
 
     const width = font.getTextWidth(targetText)
-    const widthSmallerFont = smallerFont.getTextWidth('Rostership')
+    const widthSmallerFont = smallerFont.getTextWidth(legend)
 
     const animationState = useValue(0)
     const opacityState = useValue(0);
@@ -29,7 +30,7 @@ const DonutChart = ({
         animationState.current = 0;
 
         runTiming(animationState, percentageComplete, {
-            duration: 1250,
+            duration: 1600,
             easing: Easing.inOut(Easing.cubic),
         })
     }
@@ -37,7 +38,7 @@ const DonutChart = ({
         opacityState.current = 0;
 
         runTiming(opacityState, 1, {
-            duration: 1250,
+            duration: 1600,
             easing: Easing.inOut(Easing.cubic),
         })
     }
@@ -49,19 +50,33 @@ const DonutChart = ({
     },[rerender])
 
   return (
-    <View style={styles.container}>
+    <Pressable onPress={() => {
+        animateChart();
+        animateOpacity();
+    }} style={styles.container}>
       <Canvas style={styles.container}>
+        <Path 
+            path={path}
+            color={colors.DARKER_GRAY}
+            style="stroke"
+            strokeWidth={strokeWidth}
+            strokeCap='round'
+            start={animationState}
+            end={1}
+            
+        />
         <Path 
             path={path}
             color={color}
             style="stroke"
             strokeWidth={strokeWidth}
-            strokeCap="round"
+            strokeCap='round'
             start={0}
             end={animationState}
+            
         />
         <Text 
-            x={innerRadius - width / 2}
+            x={innerRadius - (width / 2)+ 10}
             y={radius + strokeWidth}
             text={targetText}
             font={font}
@@ -69,15 +84,15 @@ const DonutChart = ({
             color={color}
         />
         <Text 
-            x={innerRadius - (widthSmallerFont / 2)}
+            x={innerRadius - (widthSmallerFont / 2) + 10}
             y={radius + 45}
-            text={'Rostership'}
+            text={legend}
             font={smallerFont}
             opacity={opacityState}
             color={color}
         />
       </Canvas>
-    </View>
+    </Pressable>
   )
 }
 

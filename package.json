@@ -19,6 +19,7 @@
     "@react-navigation/stack": "^6.2.1",
     "@shopify/react-native-skia": "^0.1.142",
     "ansi-regex": "^6.0.1",
+    "d3": "^7.6.1",
     "expo": "^45.0.0",
     "expo-dev-client": "^1.0.0",
     "expo-linear-gradient": "~11.3.0",
