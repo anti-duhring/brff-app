@@ -1,10 +1,13 @@
-import { StyleSheet, Text, View, Dimensions } from 'react-native'
+import { StyleSheet, Text, View, Dimensions, PixelRatio, TouchableOpacity } from 'react-native'
 import React, {useEffect, useState} from 'react'
 import PlayerStatsHeader from '../../components/PlayerStatsHeader';
-import { colors } from '../../utils/colors';
-import {PieChart, BarChart} from 'react-native-chart-kit'
+import { colors, getColorTeam } from '../../utils/colors';
+import DonutChart from '../../components/Rostership/DonutChart';
+import {useFont} from '@shopify/react-native-skia'
 
 const WIDTH = Dimensions.get('window').width;
+const RADIUS = PixelRatio.roundToNearestPixel(130);
+const STROKE_WIDTH = 12;
 
 const AdvancedStats = ({route, navigation}) => {
     const {
@@ -14,79 +17,36 @@ const AdvancedStats = ({route, navigation}) => {
         allLeagues,
         rosters
     } = route.params;
+    const percentageComplete = Number((item.amount / rosters.length).toFixed(2));
+    const test = (item.amount / rosters.length).toFixed(2);
+    const font = useFont(require('../../../assets/fonts/Roboto-Light.ttf'), 60);
+    const smallerFont = useFont(require('../../../assets/fonts/Roboto-Light.ttf'), 25);
 
-    const data = [
-        {
-            name: `Rosters com o jogador`,
-            color: colors.LIGHT_GREEN,
-            population: leagues.length,
-            legendFontColor: "white",
-            legendFontSize: 10,
-            
-        },
-        {
-            name: `Outros rosters`,
-            color: colors.LIGHT_GREEN_TRANSPARENT,
-            population: rosters.length - leagues.length,
-            legendFontColor: colors.DARK_GRAY,
-        },
-    ]
 
-    const barData = {
-        labels: ["Vitórias com o jogador", "Vitórias sem o jogador"],
-        datasets: [
-          {
-            data: [3, 5]
-          }
-        ]
-      };
+    if(!font || !smallerFont) {
+        return <View />
+    }
 
-    const chartConfig = {
-        backgroundGradientFrom: "#FFFFFF",
-        backgroundGradientFromOpacity: 0,
-        backgroundGradientTo: "#08130D",
-        backgroundGradientToOpacity: 1,
-        color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
-        barPercentage: 1,
-        strokeWith: 50,
-        useShadowColorFromDataset: false, // optional
-    };
 
   return (
     <PlayerStatsHeader player={player}>
         <View>
-            <Text style={styles.text}>{player.first_name} {player.last_name}</Text>
-            <PieChart
-                data={data}
-                width={WIDTH - 40}
-                height={220}
-                chartConfig={chartConfig}
-                accessor={"population"}
-                backgroundColor={"transparent"}
-                paddingLeft={"0"}
-                center={[20, 0]}
-                style={{
-                    backgroundColor:colors.LIGHT_BLACK, 
-                    marginHorizontal: 20,
-                    borderRadius: 10,
-                }}
-            />
-            <BarChart
-                data={barData}
-                width={WIDTH - 40}
-                height={220}
-                //yAxisLabel="$"
-                showValuesOnTopOfBars
-                withHorizontalLabels={false}
-                chartConfig={chartConfig}
-                verticalLabelRotation={0}
-                style={{
-                    backgroundColor:colors.LIGHT_BLACK, 
-                    marginHorizontal: 20,
-                    borderRadius: 10,
-                    marginTop: 10,
-                }}
-            />
+            <TouchableOpacity onPress={() => console.log('Pressed')}>
+                <Text style={styles.text}>{test}</Text>
+            </TouchableOpacity>
+            
+            <View style={styles.donutChartContainer}>
+                <DonutChart 
+                    radius={RADIUS}
+                    strokeWidth={STROKE_WIDTH}
+                    percentageComplete={percentageComplete}
+                    targetPercentage={percentageComplete}
+                    //color={getColorTeam(player.team)}
+                    font={font}
+                    smallerFont={smallerFont}
+                    rerender={player}
+                />
+            </View>
         </View>
     </PlayerStatsHeader>
   )
@@ -97,5 +57,10 @@ export default AdvancedStats
 const styles = StyleSheet.create({
     text: {
         color: colors.WHITE
+    },
+    donutChartContainer: {
+        height: RADIUS * 2,
+        width: RADIUS * 2,
+        alignSelf:'center'
     }
 })

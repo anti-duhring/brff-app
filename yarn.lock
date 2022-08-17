@@ -1772,6 +1772,14 @@
     "component-type" "^1.2.1"
     "join-component" "^1.1.0"
 
+"@shopify/react-native-skia@^0.1.142":
+  "integrity" "sha512-4X6Cu+8iBf92GX1SGN7qnEud0oRm7kB9aFRl+sTvKvBjqRKHTOL2SQuptBdtS/d4RBh8IildhVjTN6PE/nMX1A=="
+  "resolved" "https://registry.npmjs.org/@shopify/react-native-skia/-/react-native-skia-0.1.142.tgz"
+  "version" "0.1.142"
+  dependencies:
+    "canvaskit-wasm" "^0.35.0"
+    "react-reconciler" "^0.26.2"
+
 "@sideway/address@^4.1.3":
   "integrity" "sha512-7vwq+rOHVWjyXxVlR76Agnvhy8I9rpzjosTESvmhNeXOXdZZB15Fl+TI9x1SiHZH5Jv2wTGduSxFDIaq0m3DUw=="
   "resolved" "https://registry.npmjs.org/@sideway/address/-/address-4.1.4.tgz"
@@ -1883,6 +1891,11 @@
   dependencies:
     "@urql/core" ">=2.3.1"
     "wonka" "^4.0.14"
+
+"@webgpu/types@^0.1.20":
+  "integrity" "sha512-pUrWq3V5PiSGFLeLxoGqReTZmiiXwY3jRkIG5sLLKjyqNxrwm/04b4nw7LSmGWJcKk59XOM/YRTUwOzo4MMlow=="
+  "resolved" "https://registry.npmjs.org/@webgpu/types/-/types-0.1.21.tgz"
+  "version" "0.1.21"
 
 "@xmldom/xmldom@~0.7.0":
   "integrity" "sha512-V3BIhmY36fXZ1OtVcI9W+FxQqxVLsPKcNjWigIaa81dLC9IolJl5Mt4Cvhmr0flUnjSpTdrbMTSbXqYqV5dT6A=="
@@ -2491,6 +2504,13 @@
   "integrity" "sha512-jUNz+a9blQTQVu4uFcn17uAD8IDizPzQkIKh3LCJfg9BkyIqExYYdyc/ZSlWUSKb8iYiXxKsxbv4zYSvkqjrxw=="
   "resolved" "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001340.tgz"
   "version" "1.0.30001340"
+
+"canvaskit-wasm@^0.35.0":
+  "integrity" "sha512-y/eTJ4xoIBkKzD37aQAvBL451LIp9YiB8Vs1e8J3Qwe7WcTHsAD00E5WocPzZo+0+XaSCkJ6cS/BxBDXTSnW1g=="
+  "resolved" "https://registry.npmjs.org/canvaskit-wasm/-/canvaskit-wasm-0.35.0.tgz"
+  "version" "0.35.0"
+  dependencies:
+    "@webgpu/types" "^0.1.20"
 
 "chalk@^2.0.0", "chalk@^2.0.1", "chalk@^2.4.2":
   "integrity" "sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ=="
@@ -5935,7 +5955,7 @@
   dependencies:
     "prop-types" "^15.7.x"
 
-"react-native-reanimated@>= 1.0.0", "react-native-reanimated@~2.8.0":
+"react-native-reanimated@>= 1.0.0", "react-native-reanimated@>=2.0.0", "react-native-reanimated@~2.8.0":
   "integrity" "sha512-kJvf/UWLBMaGCs9X66MKq5zdFMgwx8D0nHnolbHR7s8ZnbLdb7TlQ/yuzIXqn/9wABfnwtNRI3CyaP1aHWMmZg=="
   "resolved" "https://registry.npmjs.org/react-native-reanimated/-/react-native-reanimated-2.8.0.tgz"
   "version" "2.8.0"
@@ -6038,7 +6058,7 @@
     "escape-string-regexp" "2.0.0"
     "invariant" "2.2.4"
 
-"react-native@*", "react-native@^0.0.0-0 || 0.60 - 0.68 || 1000.0.0", "react-native@>= 0.50.0", "react-native@>=0.20.0", "react-native@>=0.50.0", "react-native@>=0.50.1", "react-native@>=0.55", "react-native@>=0.57", "react-native@>=0.60.0-rc.2", "react-native@0.68.2":
+"react-native@*", "react-native@^0.0.0-0 || 0.60 - 0.68 || 1000.0.0", "react-native@>= 0.50.0", "react-native@>=0.20.0", "react-native@>=0.50.0", "react-native@>=0.50.1", "react-native@>=0.55", "react-native@>=0.57", "react-native@>=0.60.0-rc.2", "react-native@>=0.63.0-rc.0 <1.0.x", "react-native@0.68.2":
   "integrity" "sha512-qNMz+mdIirCEmlrhapAtAG+SWVx6MAiSfCbFNhfHqiqu1xw1OKXdzIrjaBEPihRC2pcORCoCHduHGQe/Pz9Yuw=="
   "resolved" "https://registry.npmjs.org/react-native/-/react-native-0.68.2.tgz"
   "version" "0.68.2"
@@ -6076,6 +6096,15 @@
     "whatwg-fetch" "^3.0.0"
     "ws" "^6.1.4"
 
+"react-reconciler@^0.26.2":
+  "integrity" "sha512-nK6kgY28HwrMNwDnMui3dvm3rCFjZrcGiuwLc5COUipBK5hWHLOxMJhSnSomirqWwjPBJKV1QcbkI0VJr7Gl1Q=="
+  "resolved" "https://registry.npmjs.org/react-reconciler/-/react-reconciler-0.26.2.tgz"
+  "version" "0.26.2"
+  dependencies:
+    "loose-envify" "^1.1.0"
+    "object-assign" "^4.1.1"
+    "scheduler" "^0.20.2"
+
 "react-refresh@^0.4.0":
   "integrity" "sha512-Hwln1VNuGl/6bVwnd0Xdn1e84gT/8T9aYNL+HAKDArLCS7LWjwr7StE30IEYbIkx0Vi3vs+coQxe+SQDbGbbpA=="
   "resolved" "https://registry.npmjs.org/react-refresh/-/react-refresh-0.4.3.tgz"
@@ -6089,7 +6118,7 @@
     "object-assign" "^4.1.1"
     "react-is" "^16.12.0 || ^17.0.0"
 
-"react@*", "react@^16.0.0 || ^17.0.0", "react@^16.8.0 || ^17.0.0", "react@^17.0.0", "react@> 16.7.0", "react@>=0.14.8", "react@>=15.3.1", "react@>=16.8.6", "react@>=17.0.1", "react@16 || 17", "react@17.0.2":
+"react@*", "react@^16.0.0 || ^17.0.0", "react@^16.8.0 || ^17.0.0", "react@^17.0.0", "react@^17.0.2", "react@> 16.7.0", "react@>=0.14.8", "react@>=15.3.1", "react@>=16.8.1", "react@>=16.8.6", "react@>=17.0.1", "react@16 || 17", "react@17.0.2":
   "integrity" "sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA=="
   "resolved" "https://registry.npmjs.org/react/-/react-17.0.2.tgz"
   "version" "17.0.2"

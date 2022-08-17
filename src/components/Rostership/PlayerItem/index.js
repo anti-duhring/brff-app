@@ -1,5 +1,5 @@
 import { useState, memo } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Pressable } from "react-native";
 import ProgressiveImage from "../../ProgressiveImage";
 import { colors } from "../../../utils/colors";
 import { MaterialIcons } from '@expo/vector-icons'; 
@@ -7,9 +7,32 @@ import { MaterialIcons } from '@expo/vector-icons';
 const PlayerItem = (props) => {
   const [showMore, setShowMore] = useState(false)
 
-  const MoreInformations = () => {
     return (
-      <View style={styles.moreInfoContainer}>
+      <View style={styles.container}>
+        <TouchableOpacity onPress={() => setShowMore(prevShow => (prevShow? false : true))} style={styles.playerContainer}>
+            <View style={styles.playerProfile}>
+              <ProgressiveImage 
+                style={styles.imagePlayer} 
+                uri={`https://sleepercdn.com/content/nfl/players/thumb/${props.item.id}.jpg`} 
+                resizeMode='cover'
+              />
+              <View style={styles.playerInfo}>
+                <Text style={styles.text}>
+                  {props.player.first_name} {props.player.last_name}
+                </Text>
+                <Text style={styles.position}>
+                  {props.player.position} - {props.player.team}
+                </Text>
+              </View>
+            </View>
+          <View style={styles.rostership}>
+            <Text style={styles.rostershipText}>
+              {/*props.item.amount*/} {Math.floor(props.item.amount / props.rosters.length * 100)}%
+            </Text>
+            <MaterialIcons name={showMore? 'expand-less' : 'expand-more'} size={24} color={'white'} />
+          </View>
+        </TouchableOpacity>
+        <View style={[styles.moreInfoContainer, {display: showMore? 'flex' : 'none'}]}>
         <Text style={styles.text}>
           <Text>Você possui esse jogador em</Text> <Text style={styles.numberParsed}>{props.item.amount}</Text> <Text>dos seus</Text> <Text style={styles.numberParsed}>{props.rosters.length}</Text> <Text>rosters.</Text>
         </Text>
@@ -36,34 +59,6 @@ const PlayerItem = (props) => {
           </TouchableOpacity>
         </View>
       </View>
-    )
-  }
-    return (
-      <View style={styles.container}>
-        <TouchableOpacity onPress={() => setShowMore(prevShow => (prevShow? false : true))} style={styles.playerContainer}>
-            <View style={styles.playerProfile}>
-              <ProgressiveImage 
-                style={styles.imagePlayer} 
-                uri={`https://sleepercdn.com/content/nfl/players/thumb/${props.item.id}.jpg`} 
-                resizeMode='cover'
-              />
-              <View style={styles.playerInfo}>
-                <Text style={styles.text}>
-                  {props.player.first_name} {props.player.last_name}
-                </Text>
-                <Text style={styles.position}>
-                  {props.player.position} - {props.player.team}
-                </Text>
-              </View>
-            </View>
-          <View style={styles.rostership}>
-            <Text style={styles.rostershipText}>
-              {/*props.item.amount*/} {Math.floor(props.item.amount / props.rosters.length * 100)}%
-            </Text>
-            <MaterialIcons name={showMore? 'expand-less' : 'expand-more'} size={24} color={'white'} />
-          </View>
-        </TouchableOpacity>
-        {showMore && <MoreInformations />}
       </View>
     )
 }
