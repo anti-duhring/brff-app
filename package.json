@@ -17,6 +17,7 @@
     "@react-navigation/material-top-tabs": "^6.2.2",
     "@react-navigation/native": "^6.0.10",
     "@react-navigation/stack": "^6.2.1",
+    "@shopify/flash-list": "^1.2.1",
     "@shopify/react-native-skia": "^0.1.142",
     "ansi-regex": "^6.0.1",
     "d3": "^7.6.1",

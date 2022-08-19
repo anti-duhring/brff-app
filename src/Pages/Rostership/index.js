@@ -9,6 +9,7 @@ import {colors} from '../../utils/colors'
 import PlayerItem from '../../components/Rostership/PlayerItem'
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder'
 import { Entypo } from '@expo/vector-icons';
+import {FlashList} from '@shopify/flash-list'
  
 const Rostership = ({navigation}) => {
   const { userData } = useContext(UserDataContext)
@@ -90,11 +91,12 @@ const Rostership = ({navigation}) => {
       />
 
         {rosters? 
-          <FlatList
+          <FlashList
             data={playersSortedByAppearance}
             keyExtractor={item => item.id}
+            estimatedItemSize={70}
             renderItem={({item, index}) => {
-              if(index > 10) return
+              //if(index > 10) return
               return (
                 <PlayerItem 
                   player={allPlayers[item.id]} 
@@ -106,7 +108,7 @@ const Rostership = ({navigation}) => {
                 />
               )
             }}
-            initialNumToRender={5}
+            //initialNumToRender={5}
             ListHeaderComponent={() => <Header/>}
           /> :
           <>
