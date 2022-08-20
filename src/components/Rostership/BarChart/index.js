@@ -55,7 +55,7 @@ const BarChart = ({
             newPath.addRRect(roundedRect);
         })
         return newPath;
-    },[animationState])
+    },[animationState, rerender])
 
     const animate = () => {
         animationState.current = 0;
@@ -83,7 +83,7 @@ const BarChart = ({
                 const xLegend = index == 0 ? xChart(point.label) - GRAPH_BAR_WIDTH / 2 - (widthFont / 4) : xChart(point.label) - GRAPH_BAR_WIDTH / 2 + (widthFont / 7)
 
                 return (
-                    <>
+                    <React.Fragment key={index}>
                         <Text 
                             font={font}
                             x={x}
@@ -99,7 +99,7 @@ const BarChart = ({
                             color={color}
                             opacity={animationState}
                         />
-                    </>
+                    </React.Fragment>
                 )
             })}
             <Text 

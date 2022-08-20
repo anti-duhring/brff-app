@@ -10,6 +10,7 @@ export const NFLStatusContextProvider = ({children}) => {
     const [username, setUsername] = useState(null)
     const [displayName, setDisplayName] = useState(null)
     const [userAvatar, setUserAvatar] = useState(null)
+    const [NFLStatus, setNFLStatus] = useState(null);
 
     const getUserID = async() => {
         let userToken = null;
@@ -31,6 +32,7 @@ export const NFLStatusContextProvider = ({children}) => {
         .then((data) => {
             setSeason(data.league_season)
             setWeek(data.week)
+            setNFLStatus(data)
         }).catch((e) => {
             console.log('Erro:',e)
         })
@@ -57,7 +59,16 @@ export const NFLStatusContextProvider = ({children}) => {
     },[userID])
 
     return ( 
-        <NFLStatusContext.Provider value={{userID, season, week, userAvatar, username, displayName, setUserToken}}>
+        <NFLStatusContext.Provider value={{
+            userID,
+             season, 
+             week, 
+             userAvatar, 
+             username, 
+             displayName, 
+             setUserToken,
+             NFLStatus
+            }}>
         {children}
         </NFLStatusContext.Provider>
      );

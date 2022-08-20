@@ -62,7 +62,11 @@ useEffect(() => {
 
     return ( 
         <View style={{flex:1,backgroundColor:'#0B0D0F',paddingTop:50}}>
-
+     <StatusBar
+        animated={true}
+        backgroundColor={DARK_BLACK}
+        barStyle="light-content"
+      />
           {isLoading ? 
       <View style={{flex:1,padding:10,}}>
             <View style={{padding:10,paddingTop:0,paddingLeft:0}}>

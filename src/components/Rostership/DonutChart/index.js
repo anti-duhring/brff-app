@@ -57,7 +57,7 @@ const DonutChart = ({
       <Canvas style={styles.container}>
         <Path 
             path={path}
-            color={colors.DARKER_GRAY}
+            color={colors.DARK_BLACK}
             style="stroke"
             strokeWidth={strokeWidth}
             strokeCap='round'
