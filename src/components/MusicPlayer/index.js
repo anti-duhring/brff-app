@@ -4,7 +4,7 @@ import TrackPlayer, { State } from "react-native-track-player";
 import { FontAwesome } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import MultiSlider from "@ptomasroos/react-native-multi-slider";
-import { PlayerContext } from "../PlayerContext";
+import { TrackPlayerContext } from "../../context/TrackPlayerContext";
 import { HEADER_BUTTON_BG } from "../Variables";
 
 const WIDTH = Dimensions.get('window').width;
@@ -18,7 +18,7 @@ const MusicPlayer = ({track, trackIndex, navigation, reRender}) => {
         position,
         duration,
         togglePlayback,
-    } = useContext(PlayerContext)
+    } = useContext(TrackPlayerContext)
 
     const getCurrentTrack = async() => {
         const index = await TrackPlayer.getCurrentTrack()

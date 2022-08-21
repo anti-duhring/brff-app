@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import {useNavigation} from '@react-navigation/native'
-import { NFLStatusContext } from '../NFLStatusContext'
+import { NFLStatusContext } from "../../context/NFLStatusContext";
 import { useContext, useEffect } from "react";
 import { AntDesign } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -9,7 +9,7 @@ import { LIGHT_GREEN, DARK_BLACK, LIGHT_BLACK } from '../Variables';
 
 const COLOR = LIGHT_GREEN
 const GREEN2 = LIGHT_BLACK //'rgba(0, 206, 78,  .1)'
-const COLORTEXT = DARK_BLACK;
+const COLORTEXT = 'white';
 
 const TabTopLeague = ({activeButton, isAble, leagueDraftSettings, leagueObject, leagueUsers, leagueRosters, opacity}) => {
     const navigation = useNavigation();

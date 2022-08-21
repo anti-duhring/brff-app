@@ -1,14 +1,15 @@
 import { Text, View, StyleSheet, Image, TouchableOpacity } from "react-native";
 import TabTopLeague from '../../components/TabTopLeague'
 import { HeaderLeagueContextProvider } from "../../components/HeaderLeagueContext";
-import { UserDataContext } from "../../components/UserDataContext";
-import { AllPlayersContext } from "../../components/AllPlayersContext";
+import { AuthContext } from "../../context/AuthContext";
+import { AllPlayersContext } from "../../context/AllPlayersContext";
 import { useState, useEffect, useContext } from "react";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import { getColorPosition } from "../../functions/GetRoster";
 import ProgressiveImage from "../../components/ProgressiveImage";
 import ViewLightDark from '../../components/ViewLightDark'
 import { DARK_BLACK, WHITE } from "../../components/Variables";
+import { playerEmpty } from "../../utils/players";
 
 const MyTeam = ({navigation, route}) => {
     const league = route.params?.leagueObject;
@@ -22,17 +23,9 @@ const MyTeam = ({navigation, route}) => {
     const roster_starters = roster.filter((item) => {
         return item.indexOf('BN') == -1;
     });
-    const playerEmpty = {
-        index: null,
-        name: 'Vazio',
-        player_id: null,
-        position: null,
-        points: 0,
-        projected_points: 0,
-        team: null,
-    }
 
-    const { userData } = useContext(UserDataContext)
+    const { loginState } = useContext(AuthContext);
+    const userData = loginState.userData;
     const userID = userData.user_id;
 
     const [starters, setStarters] = useState(null)

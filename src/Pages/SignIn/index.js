@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Pressable, Keyboard, TouchableOpacity, TextInput, Image, Linking } from 'react-native';
 import { useState, useContext } from 'react';
-import { AuthContext } from '../../components/Context';
+import { AuthContext } from '../../context/AuthContext';
 import {BORDER_RADIUS, DARK_BLACK, DARK_GRAY, LIGHT_BLACK, LIGHT_GRAY, LIGHT_GREEN, WHITE} from '../../components/Variables'
 
 const SignIn = () => {

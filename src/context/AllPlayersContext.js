@@ -1,5 +1,7 @@
 import { useState, createContext, useEffect } from "react"
 import { View, Text, ActivityIndicator, StatusBar } from 'react-native'
+import { colors } from "../utils/colors"
+import { API_URL_BASE } from "../utils/constants"
 
 export const AllPlayersContext = createContext()
 
@@ -8,7 +10,7 @@ export const AllPlayersContextProvider = ({children}) => {
 
     const getAllPlayers = () => {
         console.log('Getting players...')
-        const URL = `https://api.sleeper.app/v1/players/nfl`;
+        const URL = `${API_URL_BASE}/players/nfl`;
         fetch(URL)
         .then(response => response.json())
         .then(data => {
@@ -24,13 +26,13 @@ export const AllPlayersContextProvider = ({children}) => {
 
     if(!allPlayers){
         return (
-          <View style={{flex:1,justifyContent:'center',alignItems:'center',backgroundColor:'#0B0D0F'}}>
+          <View style={{flex:1,justifyContent:'center',alignItems:'center',backgroundColor:colors.DARK_BLACK}}>
             <StatusBar
               animated={true}
-              backgroundColor="#0B0D0F"
+              backgroundColor={colors.DARK_BLACK}
               barStyle="light-content"
             />
-            <ActivityIndicator size="large" color="#008037" />
+            <ActivityIndicator size="large" color={colors.LIGHT_GREEN} />
           </View>
         )
       }

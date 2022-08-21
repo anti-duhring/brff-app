@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { useEffect, useState, useContext } from "react";
 import PlayerProfileHeader from "../../components/PlayerProfileHeader";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
-import { AllPlayersContext } from "../../components/AllPlayersContext";
+import { AllPlayersContext } from "../../context/AllPlayersContext";
 import { getColorPosition } from "../../functions/GetRoster";
 import ViewLightDark from "../../components/ViewLightDark";
 import { DARK_BLACK, WHITE } from "../../components/Variables";

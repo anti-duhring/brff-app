@@ -1,5 +1,6 @@
 import { useState, createContext, useRef, useEffect } from "react"
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_URL_BASE } from "../utils/constants";
 
 export const NFLStatusContext = createContext()
 
@@ -27,7 +28,7 @@ export const NFLStatusContextProvider = ({children}) => {
     }
 
     const getNFLSeasonInfo = async() => {
-        fetch(`https://api.sleeper.app/v1/state/nfl`)
+        fetch(`${API_URL_BASE}/state/nfl`)
         .then(response => response.json())
         .then((data) => {
             setSeason(data.league_season)
@@ -40,7 +41,7 @@ export const NFLStatusContextProvider = ({children}) => {
 
     const getUserInfo = async() => {
         if(!userID) return
-        fetch(`https://api.sleeper.app/v1/user/${userID}`)
+        fetch(`${API_URL_BASE}/user/${userID}`)
         .then(response => response.json())
         .then((data) => {
             setUsername(data.username)

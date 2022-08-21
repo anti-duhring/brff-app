@@ -1,10 +1,10 @@
 import { FlatList, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useContext, useEffect, useState } from 'react'
-import { UserDataContext } from '../../components/UserDataContext'
-import {NFLStatusContext} from '../../components/NFLStatusContext'
+import { AuthContext } from '../../context/AuthContext'
+import { NFLStatusContext } from '../../context/NFLStatusContext'
 import {API_URL_BASE} from '../../utils/constants'
 import { getRosterFromLeague } from '../../functions/GetRoster'
-import {AllPlayersContext} from '../../components/AllPlayersContext'
+import { AllPlayersContext } from '../../context/AllPlayersContext'
 import {colors} from '../../utils/colors'
 import PlayerItem from '../../components/Rostership/PlayerItem'
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder'
@@ -12,7 +12,8 @@ import { Entypo } from '@expo/vector-icons';
 import {FlashList} from '@shopify/flash-list'
  
 const Rostership = ({navigation}) => {
-  const { userData } = useContext(UserDataContext)
+  const { loginState } = useContext(AuthContext)
+  const userData = loginState.userData;
   const { season } = useContext(NFLStatusContext)
   const {allPlayers} = useContext(AllPlayersContext)
 

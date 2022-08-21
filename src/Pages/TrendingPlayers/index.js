@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, StatusBar, TextInput, Dimensions, ActivityIndicator } from 'react-native'
 import { useState, useEffect, useContext } from 'react'
 import { DARK_BLACK, LIGHT_GRAY, DARK_GRAY, WHITE, LIGHT_BLACK, BORDER_RADIUS, LIGHT_GREEN } from '../../components/Variables'
-import { AllPlayersContext } from '../../components/AllPlayersContext'
+import { AllPlayersContext } from '../../context/AllPlayersContext';
 import ProgressiveImage from '../../components/ProgressiveImage';
 import { Feather } from '@expo/vector-icons';
 import { Entypo } from '@expo/vector-icons';

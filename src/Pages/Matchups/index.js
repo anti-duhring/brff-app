@@ -1,7 +1,7 @@
 import { Text, View, StyleSheet, Image, TouchableOpacity } from "react-native";
 import TabTopLeague from '../../components/TabTopLeague'
 import { useState, useEffect, useContext } from "react";
-import { UserDataContext } from "../../components/UserDataContext";
+import { AuthContext } from "../../context/AuthContext";
 import { HeaderLeagueContextProvider } from "../../components/HeaderLeagueContext";
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
@@ -9,7 +9,7 @@ import Tooltip from 'react-native-walkthrough-tooltip'
 import { Dimensions } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
 import { getColorPosition, getPlayerPoints, getPlayerProjectedPoints } from "../../functions/GetRoster";
-import { AllPlayersContext } from "../../components/AllPlayersContext";
+import { AllPlayersContext } from "../../context/AllPlayersContext";
 import { LIGHT_GREEN, LIGHT_BLACK, LIGHT_GRAY, DARK_GRAY, DARKER_GRAY, WHITE, DARK_BLACK, DARK_GREEN } from '../../components/Variables'
 import ViewLightDark from '../../components/ViewLightDark';
 import TooltipButton from "../../components/TooltipButton";
@@ -29,7 +29,8 @@ const Matchups = ({navigation, route}) => {
         return item.indexOf('BN') !== -1;
     });
     const { allPlayers } = useContext(AllPlayersContext)
-    const { userData } = useContext(UserDataContext)
+    const { loginState } = useContext(AuthContext)
+    const userData = loginState.userData
 
     const userID = userData.user_id;
     const [allProjectedPoints, setAllProjectedPoints] = useState(null);

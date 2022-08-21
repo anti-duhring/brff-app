@@ -1,64 +1,92 @@
 import { useContext, useState, useEffect, useRef } from 'react';
 import { StyleSheet, Text, View, Button, Image, Pressable, ActivityIndicator, ScrollView, FlatList, Animated, StatusBar } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { NFLStatusContext } from '../../components/NFLStatusContext'
+import { NFLStatusContext } from '../../context/NFLStatusContext';
+import { AuthContext } from '../../context/AuthContext';
 import { scaleAnimation } from '../../animations/scale'
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import { DARK_BLACK, LIGHT_GREEN } from '../../components/Variables';
 import {colors} from '../../utils/colors'
+import { getLeaguesFromUser } from '../../utils/getSleeperData';
+import Placeholder from '../../components/LeagueList/Placeholder';
 
 const Leagues = ({navigation}) => {
-    const { season } = useContext(NFLStatusContext)
-    const { week } = useContext(NFLStatusContext)
+    const { season, week } = useContext(NFLStatusContext)
+    const { loginState } = useContext(AuthContext);
+    const userID = loginState.userData.user_id;
     const [leagues, setLeagues] = useState([]) 
     const [isLoading, setIsLoading] = useState(true)
-    const [DATA, setDATA] = useState([])
     const animateX = useRef(new Animated.Value(1)).current;
     const ITEM_SIZE = 70 + 10 * 3;
     const [itemAnimate, setItemAnimate] = useState(null);
 
-    const getInfos = async() => {
-        let userToken = null;
-        try{
-            userToken = await AsyncStorage.getItem('userToken')
-            
-          } catch(e){
-            console.log(e)
-          }
-
-          if(userToken){
-            fetch(`https://api.sleeper.app/v1/user/${userToken}/leagues/nfl/${season}`)
-            .then(response => response.json())
-            .then((data) => {
-                setLeagues(data)
-                setDATA(
-                  data.map((league, index) => {
-                    return {
-                      key: index,
-                      avatar: league.avatar,
-                      name: league.name,
-                      status: league.status.replace('_',' ').toUpperCase(),
-                      leagueObject: league
-                    }
-                  })
-                )
-
-                setIsLoading(false)
-            })
-            .catch((error) => {
-              console.log('Erro:',error)
-            })
-
-          }
-    }
-
 
 useEffect(() => {
+  (async() => {
+    if(!userID || !season) return
 
-      getInfos();
-   
-},[season])
+    const leaguesData = await getLeaguesFromUser(userID, season)
+    if(leaguesData.length) {
+      setLeagues(leaguesData)
+      setIsLoading(false)
+    }
+  })();
+},[userID, season])
 
+
+  const LeagueItem = ({item, index}) => {
+    const avatar = (item.avatar) ? {uri: `https://sleepercdn.com/avatars/${item.avatar}`} : require('../../../assets/Images/cropped-logo_2.png');
+
+    return (
+      <Animated.View
+        style={[styles.leagueContainer,{transform:[{scale: (itemAnimate == item.league_id) ? animateX : 1}]
+        }]}
+      >
+      <Pressable 
+        onPressIn={() => setItemAnimate(item.league_id)} onPress={() =>{ 
+        scaleAnimation(animateX,() => {
+          navigation.navigate('Players',{
+            leagueObject: item,
+            leagueName: item.name
+          })
+        })}}
+      >
+          <View style={{flexDirection:'row'}}>
+          <Image 
+            source={avatar} 
+            style={styles.leagueAvatar}
+            resizeMode='contain'
+          />
+          
+        
+        <View style={{justifyContent:'center'}}>
+          <Text style={styles.leagueTitle}>{item.name}</Text>
+          <View style={{flexDirection:'row'}}>
+            <Text style={styles.dotShadow}>● </Text>
+            <Text style={{
+                fontSize:12,color:LIGHT_GREEN,
+                }}>{item.status.replace('_',' ').toUpperCase()}
+            </Text>
+            </View>
+        </View>
+        </View>
+        </Pressable>
+      </Animated.View>
+    )
+    
+  }
+
+  const LoadingPlaceholders = () => {
+    return (
+      <View style={{flex:1,padding:10,}}>
+        <View style={{padding:10,paddingTop:0,paddingLeft:0}}>
+          <Text style={{fontSize:24,color:'#FCFCFC', fontWeight:'bold'}}>Minhas Ligas</Text>
+        </View>
+        {
+          new Array(7).fill(0).map((_,index) => <Placeholder key={index} />)
+        }
+      </View>
+    )
+  }
 
     return ( 
         <View style={{flex:1,backgroundColor:'#0B0D0F',paddingTop:50}}>
@@ -67,78 +95,12 @@ useEffect(() => {
         backgroundColor={DARK_BLACK}
         barStyle="light-content"
       />
-          {isLoading ? 
-      <View style={{flex:1,padding:10,}}>
-            <View style={{padding:10,paddingTop:0,paddingLeft:0}}>
-              <Text style={{fontSize:24,color:'#FCFCFC', fontWeight:'bold'}}>Minhas Ligas</Text>
-            </View>
-        <SkeletonPlaceholder>
-        </SkeletonPlaceholder>
-            <View style={{padding:10, marginBottom:10,backgroundColor:'transparent'}}>
-              <SkeletonPlaceholder highlightColor="#ffffff1a" backgroundColor="#15191C">
-                <View style={{ flexDirection: 'row', alignItems: "center" }}>
-                <View style={{ marginLeft:0,width:70,height:70,borderRadius:12 }} />
-                  <View style={{ marginLeft: 20 }}>
-                    <View style={{ width: 200, height: 20, borderRadius: 4 }} />
-                    <View style={{ marginTop: 6, width: 100, height: 20, borderRadius: 4 }} />  
-                  </View>
-    
-                </View>
-              </SkeletonPlaceholder>
-            </View>
-            <View style={{padding:10, marginBottom:10,backgroundColor:'transparent'}}>
-              <SkeletonPlaceholder highlightColor="#ffffff1a" backgroundColor="#15191C">
-                <View style={{ flexDirection: 'row', alignItems: "center" }}>
-                <View style={{ marginLeft:0,width:70,height:70,borderRadius:12 }} />
-                  <View style={{ marginLeft: 20 }}>
-                    <View style={{ width: 200, height: 20, borderRadius: 4 }} />
-                    <View style={{ marginTop: 6, width: 100, height: 20, borderRadius: 4 }} />  
-                  </View>
-    
-                </View>
-              </SkeletonPlaceholder>
-            </View>
-            <View style={{padding:10, marginBottom:10,backgroundColor:'transparent'}}>
-              <SkeletonPlaceholder highlightColor="#ffffff1a" backgroundColor="#15191C">
-                <View style={{ flexDirection: 'row', alignItems: "center" }}>
-                <View style={{ marginLeft:0,width:70,height:70,borderRadius:12 }} />
-                  <View style={{ marginLeft: 20 }}>
-                    <View style={{ width: 200, height: 20, borderRadius: 4 }} />
-                    <View style={{ marginTop: 6, width: 100, height: 20, borderRadius: 4 }} />  
-                  </View>
-    
-                </View>
-              </SkeletonPlaceholder>
-            </View>
-            <View style={{padding:10, marginBottom:10,backgroundColor:'transparent'}}>
-              <SkeletonPlaceholder highlightColor="#ffffff1a" backgroundColor="#15191C">
-                <View style={{ flexDirection: 'row', alignItems: "center" }}>
-                <View style={{ marginLeft:0,width:70,height:70,borderRadius:12 }} />
-                  <View style={{ marginLeft: 20 }}>
-                    <View style={{ width: 200, height: 20, borderRadius: 4 }} />
-                    <View style={{ marginTop: 6, width: 100, height: 20, borderRadius: 4 }} />  
-                  </View>
-    
-                </View>
-              </SkeletonPlaceholder>
-            </View>
-            <View style={{padding:10, marginBottom:10,backgroundColor:'transparent'}}>
-              <SkeletonPlaceholder highlightColor="#ffffff1a" backgroundColor="#15191C">
-                <View style={{ flexDirection: 'row', alignItems: "center" }}>
-                <View style={{ marginLeft:0,width:70,height:70,borderRadius:12 }} />
-                  <View style={{ marginLeft: 20 }}>
-                    <View style={{ width: 200, height: 20, borderRadius: 4 }} />
-                    <View style={{ marginTop: 6, width: 100, height: 20, borderRadius: 4 }} />  
-                  </View>
-    
-                </View>
-              </SkeletonPlaceholder>
-            </View>
-      </View>
+          {isLoading  ? 
+      <LoadingPlaceholders />
       :
       <Animated.FlatList
-            data={DATA}
-            keyExtractor={item => item.key}
+            data={leagues}
+            keyExtractor={item => item.league_id}
             contentContainerStyle={{
               padding:10,
             }}
@@ -147,59 +109,7 @@ useEffect(() => {
               <Text style={{fontSize:24,color:'#FCFCFC', fontWeight:'bold'}}>Minhas Ligas</Text>
             </View>
             )}
-            renderItem={({item, index}) => {
-              const avatar = (item.avatar) ? {uri: `https://sleepercdn.com/avatars/${item.avatar}`} : require('../../../assets/Images/cropped-logo_2.png');
-
-              return <Animated.View
-                style={{ borderRadius:12,marginBottom:10,padding:10,
-                shadowColor:'#000',
-                shadowOffset: {
-                  width: 0,
-                  height:10
-                },
-                shadowOpacity:1,
-                shadowRadius:20,
-                elevation:10,
-                borderWidth:1,
-                borderColor: /*(itemAnimate == item.key) ? 'rgba(0, 128, 55, 1)' :*/ 'rgba(255,255,255,0)',
-                backgroundColor: '#15191C',
-                transform:[{scale: (itemAnimate == item.key) ? animateX : 1}]
-                }}
-              >
-              <Pressable onPressIn={() => setItemAnimate(item.key)} onPress={() =>{ 
-              scaleAnimation(animateX,() => {
-                navigation.navigate('Players',{
-                  leagueObject: item.leagueObject,
-                  leagueName: item.name
-                })
-              })}}>
-                  <View style={{flexDirection:'row'}}>
-                  <Image 
-                    source={avatar} 
-                    style={{width:70,height:70,borderRadius:12,marginRight:10,backgroundColor:DARK_BLACK}}
-                    resizeMode='contain'
-                  />
-                  
-                
-                <View style={{justifyContent:'center',}}>
-                  <Text style={{fontSize:15,fontWeight:'700',color:'#C6C6C6',width:250}}>{item.name}</Text>
-                  <View style={{flexDirection:'row'}}>
-                    <Text style={{
-                      fontSize:12,color:LIGHT_GREEN,fontWeight:'bold',
-                      textShadowColor: LIGHT_GREEN,
-                      textShadowOffset: {width: 0, height: 0},
-                      textShadowRadius: 5
-                      }}>● </Text>
-                      <Text style={{
-                        fontSize:12,color:LIGHT_GREEN,
-                        }}>{item.status}</Text>
-                    </View>
-                </View>
-                </View>
-                </Pressable>
-              </Animated.View>
-              
-            }}
+            renderItem={LeagueItem}
           /> }   
         </View>
      );
@@ -208,36 +118,44 @@ useEffect(() => {
 export default Leagues;
 
 const styles = StyleSheet.create({
-  container:{
-  },
-  leagueContainer:{
-    flexDirection:'row',
-    margin:10,
+  leagueContainer: {
+    borderRadius:12,
+    marginBottom:10,
     padding:10,
-    paddingTop:15,
-    paddingBottom:15,
-    borderRadius:5,
+    shadowColor:'#000',
+    shadowOffset: {
+      width: 0,
+      height:10
+    },
+    shadowOpacity:1,
+    shadowRadius:20,
+    elevation:10,
+    borderWidth:1,
+    borderColor:  'rgba(255,255,255,0)',
+    backgroundColor: colors.LIGHT_BLACK,
   },
-  imageContainer:{},
-  imageLeague:{
-    width:50,
-    height:50,
-    borderRadius:100,
+  leagueAvatar: {
+    width:70,
+    height:70,
+    borderRadius:12,
+    marginRight:10,
+    backgroundColor: colors.DARK_BLACK
   },
-  infoContainer:{
-    marginLeft:10,
-    justifyContent:'center',
+  leagueTitle: {
+    fontSize:15,
+    fontWeight:'700',
+    color:'#C6C6C6',
+    width:250
   },
-  leagueName:{
+  dotShadow: {
+    fontSize:12,
+    color:LIGHT_GREEN,
     fontWeight:'bold',
-    fontSize:17,
-    color:'white'
-  },
-  leagueStatus:{
-    fontSize:10,
-    color:'white', //'#008037',
-    /*textShadowColor: 'blue',//'rgba(0, 128, 55, 0.5)',
-    textShadowOffset: {width: 1, height: 1},
-    textShadowRadius: 5*/
+    textShadowColor: LIGHT_GREEN,
+    textShadowOffset: {
+      width: 0, 
+      height: 0
+    },
+    textShadowRadius: 5
   }
 })

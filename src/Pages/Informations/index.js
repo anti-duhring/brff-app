@@ -1,7 +1,7 @@
 import { Text, View, StyleSheet, Dimensions, FlatList, Animated, findNodeHandle, TouchableOpacity, ActivityIndicator } from "react-native";
 import TabTopLeague from '../../components/TabTopLeague'
 import React, { useState, useEffect, useContext, useRef, useCallback } from "react";
-import { NFLStatusContext } from "../../components/NFLStatusContext";
+import { NFLStatusContext } from "../../context/NFLStatusContext";
 import { HeaderLeagueContextProvider } from "../../components/HeaderLeagueContext";
 import ViewLightDark from '../../components/ViewLightDark'
 import { DARKER_GRAY, DARK_BLACK, DARK_GRAY, LIGHT_BLACK, LIGHT_GRAY, LIGHT_GREEN, WHITE } from "../../components/Variables";
@@ -11,7 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Entypo } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
 import AnimatedTab from "../../components/AnimatedTab";
-import { AllPlayersContext } from "../../components/AllPlayersContext";
+import { AllPlayersContext } from "../../context/AllPlayersContext";
 import ProgressiveImage from "../../components/ProgressiveImage";
 
 const {width} = Dimensions.get('screen');

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Pressable, TouchableOpacity, Image,
 import PlayerStatsHeader from "../../components/PlayerStatsHeader";
 import { DARK_GRAY, DARK_GREEN, LIGHT_BLACK, LIGHT_GRAY, LIGHT_GREEN, WHITE } from "../../components/Variables";
 import ViewLightDark from "../../components/ViewLightDark";
-import { NFLStatusContext } from "../../components/NFLStatusContext";
+import { NFLStatusContext } from "../../context/NFLStatusContext";
 import Tooltip from "react-native-walkthrough-tooltip";
 import SelectDropdown from "react-native-select-dropdown";
 import { Entypo } from '@expo/vector-icons';

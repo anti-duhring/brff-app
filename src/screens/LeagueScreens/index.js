@@ -8,8 +8,6 @@ import Players from '../../Pages/Players'
 import PlayerProfile from '../../Pages/PlayerProfile';
 import Matchups from '../../Pages/Matchups';
 import PlayoffBracket from '../../Pages/PlayoffBracket';
-import Rostership from '../../Pages/Rostership'
-import AdvancedStats from '../../Pages/AdvancedStats'
 
 import { Entypo } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
@@ -39,7 +37,7 @@ const closeConfig = {
   }
 }
 
-const StackScreens = ({route}) => {
+const LeagueScreens = ({route}) => {
 
 
     return ( 
@@ -118,38 +116,23 @@ const StackScreens = ({route}) => {
             ),
             })} component={PlayoffBracket} />
 
-          <Stack.Screen name="PlayerStats" options={({navigation,route}) => ({
-            title:null,
-            headerTransparent: true,
-            headerLeft: () => (
-              <TouchableOpacity style={[styles.barButtons,{marginLeft:10}]} onPress={() => {
-                if(route.params?.goTo){
-                  navigation.popToTop();
-                  navigation.navigate('TrendingPlayers');
-                  return
-                } 
-                navigation.goBack()
-              }}>
-                <Ionicons name="close" size={24} color="white" />
-              </TouchableOpacity>
-            )})} component={PlayerStats} />
-
-            <Stack.Screen name="AdvancedStats" options={({navigation,route}) => ({
-              title: '',//route.params?.leagueName,
+          <Stack.Screen 
+            name="PlayerStats" 
+            options={({navigation,route}) => ({
+              title:null,
               headerTransparent: true,
               headerLeft: () => (
-                <TouchableOpacity style={[styles.barButtons,{marginLeft:10}]} onPress={() => navigation.navigate('Rostership')}>
-                  <Ionicons name="arrow-back" size={24} color="white" />
+                <TouchableOpacity style={[styles.barButtons,{marginLeft:10}]} onPress={() =>navigation.goBack()}>
+                  <Ionicons name="close" size={24} color="white" />
                 </TouchableOpacity>
-              ),
-              presentation:'modal'
-              })} component={AdvancedStats} />
-            
+              )})} 
+            component={PlayerStats} 
+          />
         </Stack.Navigator>
      );
 }
  
-export default StackScreens;
+export default LeagueScreens;
 
 const styles = StyleSheet.create({
     goBackButton:{

@@ -1,8 +1,7 @@
 import { useContext, useState, useEffect } from "react";
 import { View, Text, StyleSheet, Image, ImageBackground, Pressable, ActivityIndicator, Dimensions } from "react-native";
 import { DrawerContentScrollView, DrawerItemList, DrawerItem } from "@react-navigation/drawer";
-import { AuthContext } from '../../components/Context';
-import { UserDataContext } from "../UserDataContext";
+import { AuthContext } from "../../context/AuthContext";
 import { FontAwesome5 } from '@expo/vector-icons';
 import { WHITE, DARK_GREEN, DARKER_GRAY, DARK_BLACK, LIGHT_BLACK, LIGHT_GRAY } from "../Variables";
 import TrackPlayer, { State, usePlaybackState, useProgress } from "react-native-track-player";
@@ -13,8 +12,8 @@ import MultiSlider from "@ptomasroos/react-native-multi-slider";
 const WIDTH = Dimensions.get('window').width;
 
 const CustomDrawer = (props) => {
-    const { signOut } = useContext(AuthContext)
-    const { userData } = useContext(UserDataContext)
+    const { signOut, loginState } = useContext(AuthContext)
+    const userData  = loginState.userData
     const username = userData.username;
     const displayName = userData.display_name;
     const userAvatar = userData.avatar;

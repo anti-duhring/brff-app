@@ -9,7 +9,7 @@ import { API_URL_BASE } from '../../utils/constants';
 import { getLeagueData, getMatchup } from '../../utils/getSleeperData';
 import ViewLightDark from '../../components/ViewLightDark'
 import { DARKER_GRAY } from '../../components/Variables';
-import {NFLStatusContext} from '../../components/NFLStatusContext'
+import { NFLStatusContext } from '../../context/NFLStatusContext';
 
 const RADIUS = PixelRatio.roundToNearestPixel(100);
 const STROKE_WIDTH = 10;

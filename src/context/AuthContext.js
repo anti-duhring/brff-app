@@ -1,6 +1,7 @@
 import React, {createContext, useReducer, useMemo, useEffect} from "react";
 import { View, ActivityIndicator, StatusBar } from "react-native";
 import { colors } from "../utils/colors";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const AuthContext =  createContext();
 
