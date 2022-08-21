@@ -10,6 +10,7 @@ import DrawerScreens from "./src/screens/DrawerScreens";
 
 
 export default function App() {
+
   changeNavigationBarColor(DARK_BLACK);
 
   return (

@@ -505,12 +505,14 @@ const Matchups = ({navigation, route}) => {
     if(league.status!='in_season') {
         
         return (
-            <View style={{flex:1,backgroundColor:'#0B0D0F'}}>
+            <View style={{flex:1}}>
             <HeaderLeagueContextProvider leagueObject={league}>
                 <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueRosters={leagueRosters} leagueUsers={leagueUsers} />
-                <ViewLightDark>
-                    <Text style={{color: WHITE, textAlign:'center'}}>A temporada regular da liga ainda não começou.</Text>
-                </ViewLightDark>
+                <View style={styles.body}>
+                    <ViewLightDark>
+                        <Text style={{color: WHITE, textAlign:'center'}}>A temporada regular da liga ainda não começou.</Text>
+                    </ViewLightDark>
+                </View>
             </HeaderLeagueContextProvider>
         </View>
         )
@@ -518,25 +520,28 @@ const Matchups = ({navigation, route}) => {
 
     if(!hasMatchup) {
         return (
-            <View style={{flex:1,backgroundColor:'#0B0D0F'}}>
+            <View style={{flex:1}}>
             <HeaderLeagueContextProvider leagueObject={league}>
                 <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueUsers={leagueUsers} leagueRosters={route.params?.leagueRosters} />
-                <View style={{marginTop:20,marginLeft:10,marginRight:20,flexDirection:'row'}}>
-                    <WeekSelect />
-                    {starters && opponentStarters && <TooltipButton setTip={setTip} showTip={showTip} />}
+                <View style={styles.body}>
+                    <View style={{marginTop:20,marginLeft:10,marginRight:20,flexDirection:'row'}}>
+                        <WeekSelect />
+                        {starters && opponentStarters && <TooltipButton setTip={setTip} showTip={showTip} />}
+                    </View>
+                    <ViewLightDark>
+                        <Text style={{color: WHITE, textAlign:'center'}}>A liga não possui matchup para a semana {week}.</Text>
+                    </ViewLightDark>
                 </View>
-                <ViewLightDark>
-                    <Text style={{color: WHITE, textAlign:'center'}}>A liga não possui matchup para a semana {week}.</Text>
-                </ViewLightDark>
             </HeaderLeagueContextProvider>
         </View>
         )
     }
 
     return ( 
-        <View style={{flex:1,backgroundColor:'#0B0D0F'}}>
+        <View style={{flex:1}}>
             <HeaderLeagueContextProvider leagueObject={league}>
                 <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueUsers={leagueUsers} />
+                <View style={styles.body}>
                 <View style={{marginTop:20,marginLeft:10,marginRight:20,flexDirection:'row'}}>
                     <WeekSelect />
                     {starters && opponentStarters && <TooltipButton setTip={setTip} showTip={showTip} />}
@@ -610,6 +615,7 @@ const Matchups = ({navigation, route}) => {
                                 />
                             )
                         })}
+                </View>
                 </View>
             </HeaderLeagueContextProvider>
         </View>
@@ -733,5 +739,9 @@ const styles = StyleSheet.create({
         flexDirection:'row',
         alignItems:'center',
         justifyContent:'center'
-    }
+    },
+    body: {
+        backgroundColor:DARK_BLACK,
+        paddingTop:40
+      }
 })

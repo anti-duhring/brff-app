@@ -51,13 +51,5 @@ export const getLeaguePlayers = async(leagueID) => {
     const URL = `${API_URL_BASE}/league/${leagueID}/users`;
     const response = await fetch(URL);
     const data = await response.json()
-    return data.map((player, index) => {
-        return {
-        key: player.user_id,
-        avatar: player.avatar,
-        name: player.display_name,
-        teamname: player.metadata.team_name,
-        playerObject: player
-        }
-    })
+    return data
 }

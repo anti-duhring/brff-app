@@ -6,6 +6,7 @@ import { scaleAnimation } from "../../animations/scale";
 import { HeaderLeagueContextProvider } from "../../components/HeaderLeagueContext";
 import Placeholder from "../../components/LeagueList/Placeholder";
 import { getDraftSettings, getLeaguePlayers, getLeagueRosters } from "../../utils/getSleeperData";
+import { DARK_BLACK } from "../../components/Variables";
 
 const Players = ({navigation, route}) => {
     const leagueId = route.params?.leagueObject.league_id;
@@ -24,7 +25,15 @@ const Players = ({navigation, route}) => {
     (async() => {
       const playersData = await getLeaguePlayers(leagueId);
       setPlayers(playersData);
-      setDATA(playersData);
+      setDATA(playersData.map((player, index) => {
+        return {
+        key: player.user_id,
+        avatar: player.avatar,
+        name: player.display_name,
+        teamname: player.metadata.team_name,
+        playerObject: player
+        }
+    }));
     })();
     (async() => {
       const draftSettingsData = await getDraftSettings(leagueId);
@@ -82,7 +91,7 @@ const PlayerItem = ({item}) => {
 }
 
     return ( 
-      <View style={{flex:1,backgroundColor:'#0B0D0F',}}>
+      <View style={{flex:1,}}>
         <HeaderLeagueContextProvider leagueObject={leagueObject}>
         <TabTopLeague 
           activeButton={route.params?.active} 
@@ -92,6 +101,7 @@ const PlayerItem = ({item}) => {
           leagueDraftSettings={leagueDraftSettings} leagueObject={leagueObject} 
           opacity={(leagueDraftSettings && players && leagueRosters) ? 1 : 0.5}  
         />
+        <View style={styles.body}>
           {!DATA.length ?
             <LoadingPlaceholders /> :
             <View style={{padding:10,marginBottom:10}}>
@@ -99,6 +109,7 @@ const PlayerItem = ({item}) => {
               }
             </View>
           }
+          </View>
         </HeaderLeagueContextProvider>
       </View> 
     );
@@ -139,5 +150,8 @@ const styles = StyleSheet.create({
     color:'#008037',
     marginLeft:5,
     fontStyle:'italic'
+},body: {
+  backgroundColor:DARK_BLACK,
+  paddingTop:40
 }
 })

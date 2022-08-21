@@ -189,27 +189,29 @@ const MyTeam = ({navigation, route}) => {
         return (
             <HeaderLeagueContextProvider leagueObject={league}>
             <TabTopLeague leagueDraftSettings={leagueDraftSettings} isAble={true} activeButton={route.params?.active} leagueRosters={route.params?.leagueRosters} leagueObject={league} leagueUsers={route.params?.leagueUsers} />
+            <View style={styles.body}>
             <InformationPlayer />
-            <ViewLightDark title='Titulares' titleSize={18}>
-                {
-                roster.map((position, index) => {     
-                            if(position=='BN') return
-                            return (
-                                <PlayerPlaceholder key={index} position={position} />
-                            )
-                        }) 
-                }
-                </ViewLightDark>
-                <ViewLightDark title='Banco' titleSize={18}>
-                { 
+                <ViewLightDark title='Titulares' titleSize={18}>
+                    {
                     roster.map((position, index) => {     
-                            if(position!='BN') return
-                            return (
-                                <PlayerPlaceholder key={index} position={position} />
-                            )
-                    })
-                }
-                </ViewLightDark>
+                                if(position=='BN') return
+                                return (
+                                    <PlayerPlaceholder key={index} position={position} />
+                                )
+                            }) 
+                    }
+                    </ViewLightDark>
+                    <ViewLightDark title='Banco' titleSize={18}>
+                    { 
+                        roster.map((position, index) => {     
+                                if(position!='BN') return
+                                return (
+                                    <PlayerPlaceholder key={index} position={position} />
+                                )
+                        })
+                    }
+                    </ViewLightDark>
+                </View>
             </HeaderLeagueContextProvider>
         )
     }
@@ -217,35 +219,37 @@ const MyTeam = ({navigation, route}) => {
     return ( 
         <HeaderLeagueContextProvider leagueObject={league}>
             <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueUsers={leagueUsers} />
-            <InformationPlayer />
-                <ViewLightDark title='Titulares' titleSize={18}>
-                {
-                        roster.map((position, index) => {
-                            if(position=='BN') return
+            <View style={styles.body}>
+                <InformationPlayer />
+                    <ViewLightDark title='Titulares' titleSize={18}>
+                    {
+                            roster.map((position, index) => {
+                                if(position=='BN') return
+                                let player;
+
+                                (starters && starters[index]) ? player = starters[index] : player = playerEmpty
+
+                                return (
+                                    <Player key={index} position={position} player={player} name={player.name} />
+                                )
+                            })
+                    }
+                    </ViewLightDark>
+                    <ViewLightDark title='Banco' titleSize={18}>
+                    {
+                    
+                        roster_bench?.map((position, index) => {
                             let player;
 
-                            (starters && starters[index]) ? player = starters[index] : player = playerEmpty
+                                (bench && bench[index]) ? player = bench[index] : player = playerEmpty
 
                             return (
-                                <Player key={index} position={position} player={player} name={player.name} />
+                                <Player key={index} position={position} name={player.name} player={player} />
                             )
-                        })
-                }
-                </ViewLightDark>
-                <ViewLightDark title='Banco' titleSize={18}>
-                {
-                
-                    roster_bench?.map((position, index) => {
-                        let player;
-
-                            (bench && bench[index]) ? player = bench[index] : player = playerEmpty
-
-                        return (
-                            <Player key={index} position={position} name={player.name} player={player} />
-                        )
-                    }) 
-                }
-                </ViewLightDark>
+                        }) 
+                    }
+                    </ViewLightDark>
+                </View>
         </HeaderLeagueContextProvider> 
     );
 }
@@ -331,5 +335,9 @@ const styles = StyleSheet.create({
     informationView: {
         flexDirection:'row',
         paddingVertical:10
-    }
+    },
+    body: {
+        backgroundColor:DARK_BLACK,
+        paddingTop:40
+      }
 })

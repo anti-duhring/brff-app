@@ -17,7 +17,7 @@ const TabTopLeague = ({activeButton, isAble, leagueDraftSettings, leagueObject, 
 
 
     return(
-        <View style={{flexDirection:'row',margin:5,marginTop:10,justifyContent:'center',alignContent:'center',opacity:(opacity) ? opacity : 1}}>
+        <View style={[styles.container,{opacity:(opacity) ? opacity : 1}]}>
             <TouchableOpacity style={(activeButton=='Players'||!activeButton) ? styles.activeTab : styles.inactiveTab} onPress={() => {
                 if(!isAble) return
                 navigation.navigate('Players',{
@@ -119,20 +119,20 @@ export default TabTopLeague;
 const styles = StyleSheet.create({
     activeTab: {
         flexDirection:'row',
-        backgroundColor:COLOR,
+        backgroundColor: COLOR,
         flex:3,
-        marginHorizontal:5,
-        padding:5,
+        //marginHorizontal:5,
+        padding:10,
         justifyContent:'center',
         alignContent:'center',
-        borderRadius:5,
+        borderRadius: 50,
     },
     inactiveTab: {
         flexDirection:'row',
-        backgroundColor:GREEN2,
+        backgroundColor: 'transparent', //GREEN2,
         flex:1,
-        marginHorizontal:5,
-        padding:5,
+        //marginHorizontal:5,
+        padding:10,
         justifyContent:'center',
         alignContent:'center',
         borderRadius:5
@@ -144,5 +144,17 @@ const styles = StyleSheet.create({
     },
     buttonContent: {
         flexDirection:'row'
+    },
+    container: {
+        flexDirection:'row',
+        margin:5,
+        marginBottom:-20,
+        justifyContent:'center',
+        alignContent:'center',
+        zIndex:999,
+        backgroundColor: LIGHT_BLACK,
+        borderRadius: 50,
+        elevation: 10,
+        //padding: 5
     }
 })

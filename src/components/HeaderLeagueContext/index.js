@@ -1,7 +1,8 @@
 import { createContext, useRef, useState, useEffect } from "react"
 import HeaderImageScrollView, { TriggeringView } from 'react-native-image-header-scroll-view';
-import { View, StatusBar, Text, Image, Animated, StyleSheet } from "react-native";
-import { DARK_BLACK, DARK_GREEN } from "../Variables";
+import { View, StatusBar, Text, Image, Animated, StyleSheet, Dimensions, ActivityIndicator } from "react-native";
+import { DARK_BLACK, DARK_GREEN, LIGHT_GREEN } from "../Variables";
+import {useFonts} from 'expo-font'
 
 export const HeaderLeagueContext = createContext();
 
@@ -44,25 +45,27 @@ export const HeaderLeagueContextProvider = ({children, leagueObject}) => {
             maxHeight={260}
             minHeight={55}
             minOverlayOpacity={0}
-            headerImage={require('../../../assets/Images/leagueHeader2.png')}
-            scrollViewBackgroundColor='#0B0D0F'
+            //headerImage={require('../../../assets/Images/leagueHeader2.png')}
+            renderHeader={() => <Image source={require('../../../assets/Images/leagueHeader2.png')} style={{ height: 310, width: Dimensions.get('window').width }} blurRadius={0} />}
+            headerContainerStyle={styles.headerContainer}
+            scrollViewBackgroundColor={'transparent'}
             renderFixedForeground={() => (
                 <Animated.View style={[styles.navtitleView,{opacity: opacity.current}]}>
                     <Text style={styles.navTitle}>{leagueObject.name}</Text>
                 </Animated.View>
             )}
             renderForeground={() => (
-                <View style={{flex:1,justifyContent:'flex-end',alignItems:'center',paddingBottom:30,marginHorizontal:5}}>
-                    <Image source={avatar} style={{width:100, height:100, borderRadius:(hasAvatar) ? 100 : 0,}} />
-                    <Text style={{color:'white',fontSize:24, fontWeight:'bold',marginTop:10}}>{leagueObject.name}</Text>
-                    <View style={{paddingVertical:7,paddingHorizontal:10,marginTop:10,borderWidth:1,borderColor:'rgba(255,255,255,0.7)', borderRadius:5,}}>
-                        <Text style={{color:'white',fontWeight:'bold',fontSize:15}}>{leagueObject.status.replace('_',' ').toUpperCase()}
+                <View style={styles.foreground}>
+                    <Image source={avatar} style={{width:100, height:100, borderRadius:(hasAvatar) ? 100 : 0,marginTop:25}} />
+                    <Text style={styles.leagueName}>{leagueObject.name}</Text>
+                    <View style={styles.statusContainer}>
+                        <Text style={styles.statusFont}>{leagueObject.status.replace('_',' ').toUpperCase()}
                         </Text>
-                    </View>
+                     </View>
                 </View>
             )}
         >
-            <View style={{flex:1,backgroundColor:'#0B0D0F',minHeight:600}}>
+            <View style={{flex:1,minHeight:600}}>
                 <TriggeringView onDisplay={() => {fadeOut()}} onBeginHidden={() => {fadeIn()}}>
                     {children}
                 </TriggeringView>
@@ -84,5 +87,39 @@ const styles = StyleSheet.create({
     navTitle: {
         color: 'white',
         fontSize: 18,
+    },
+    foreground:{
+        flex:1,
+        justifyContent:'center',
+        alignItems:'center',
+        //paddingBottom:30,
+        marginHorizontal:5,
+        
+    },
+    headerContainer: {
+        height: 310
+    },
+    statusContainer: {
+        paddingVertical:7,
+        paddingHorizontal:10
+        ,marginTop:10,
+        borderWidth:1,
+        borderColor: 'rgba(0,0,0,0.5)', //'rgba(255,255,255,0.7)', 
+        borderRadius:5,
+        backgroundColor: 'rgba(0,0,0,0.5)'
+    },
+    statusFont: {
+        color:'white',
+        fontWeight:'bold',
+        fontSize:10,
+        //fontFamily:'BebasNeue-Regular'
+    },
+    leagueName: {
+        color:'white',
+        fontSize:28, 
+        //fontWeight:'bold',
+        marginTop:10,
+        fontFamily: 'sans-serif-condensed',
+
     }
 })

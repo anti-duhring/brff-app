@@ -13,6 +13,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import AnimatedTab from "../../components/AnimatedTab";
 import { AllPlayersContext } from "../../context/AllPlayersContext";
 import ProgressiveImage from "../../components/ProgressiveImage";
+import {FlashList} from '@shopify/flash-list'
 
 const {width} = Dimensions.get('screen');
 const dataTab = [
@@ -40,7 +41,7 @@ const Informations = ({navigation, route}) => {
     const leagueID = league.league_id;
 
     // USE CONTEXT
-    const {season, week} = useContext(NFLStatusContext);
+    const {season, week, NFLStatus} = useContext(NFLStatusContext);
     const { allPlayers } = useContext(AllPlayersContext);
 
     // LEAGUE DATA TO FETCH
@@ -70,6 +71,7 @@ const Informations = ({navigation, route}) => {
             this.user_data = leagueUsers.filter(user => {
                 return user.user_id == this.roster.owner_id
             })[0];
+            
         }
     } 
     
@@ -149,11 +151,14 @@ const Informations = ({navigation, route}) => {
     }
 
     const getTransactions = async() => {
-        const URL = `https://api.sleeper.app/v1/league/${leagueID}/transactions/${(week > 0) ? week : 1}`;
+        const URL = `https://api.sleeper.app/v1/league/${leagueID}/transactions/${(NFLStatus.season_type == 'regular') ? week : 1}`;
         fetch(URL)
         .then(response => response.json())
         .then(data => {
+            console.log(leagueID, week)
             setLeagueTransactions(data)
+        }).catch(err => {
+            console.log('Error:',err)
         });
     }
 
@@ -176,7 +181,7 @@ const Informations = ({navigation, route}) => {
     },[])
 
     const Footer = () => {
-        if(!leagueTransactions || leagueTransactions.length <= 0) return null
+        if(!leagueTransactions || !leagueTransactions.length) return null
 
         return (
         <View style={{flex:1,alignItems:'center',justifyContent:'center'}}>
@@ -263,7 +268,6 @@ const Informations = ({navigation, route}) => {
         const user1 = (tran?.roster_ids[0]) ? new UserTransaction(tran.roster_ids[0]) : new UserTransactionNull();
         const user2 = (tran?.roster_ids[1]) ? new UserTransaction(tran.roster_ids[1]) : new UserTransactionNull();
 
-
         const TradeInfo = ({userRoster, userData}) => {
             const adds = tran.adds;
             const picks = tran.draft_picks;
@@ -276,7 +280,7 @@ const Informations = ({navigation, route}) => {
                     leagueID: leagueID,
                     roster: league.roster_positions
                 })}>
-                    <ProgressiveImage style={{width:50,height:50,borderRadius:50}} uri={`https://sleepercdn.com/avatars/${userData.avatar}`} resizeMode='cover'/>
+                    <ProgressiveImage style={{width:50,height:50,borderRadius:50}} uri={`https://sleepercdn.com/avatars/${userData?.avatar}`} resizeMode='cover'/>
                 </TouchableOpacity>
                 <Text style={{color:DARK_GRAY}}>recebe:</Text>
                 <View style={{width:'100%',alignItems:'center'}}>
@@ -303,7 +307,12 @@ const Informations = ({navigation, route}) => {
                             if(pick.owner_id!=userRoster?.roster_id) return
 
                             return (
-                                <Text key={index} style={{color:WHITE,marginTop:5}}>{`Pick round ${pick.round} de ${pick.season}`}</Text>
+                                <Text key={index} style={{marginTop:5}}>
+                                    <Text style={{color:WHITE,}}>Pick round </Text>
+                                    <Text style={{color:LIGHT_GREEN,}}>{pick.round} </Text>
+                                    <Text style={{color:WHITE,}}>de </Text>
+                                    <Text style={{color:LIGHT_GREEN,}}>{pick.season}</Text>
+                                </Text>
                             )
                         })
                     }
@@ -451,10 +460,10 @@ const Informations = ({navigation, route}) => {
     }
 
     const TransactionsItem = ({item, index}) => {
-        if(index > showItems) {
+       /* if(index > showItems) {
             setIsMoreLoading(false);
             return
-        }
+        }*/
 
         return (
             <View>
@@ -477,7 +486,7 @@ const Informations = ({navigation, route}) => {
                     </>}
                 </View>
                 {leagueTransactions && 
-                <FlatList
+                <FlashList
                     data={(dropdownTransactionsOption!='Todas')?
                     leagueTransactions.filter((item, index) => {
                         return item.type.replace(/trade/g,'Trocas').replace(/waiver/g,'Waiver').replace(/free_agent/g,'Free Agency') == dropdownTransactionsOption
@@ -485,11 +494,10 @@ const Informations = ({navigation, route}) => {
                     : leagueTransactions
                     }
                     keyExtractor={item => item.transaction_id}
-                    contentContainerStyle={{marginTop:10,paddingBottom:50}}
                     renderItem={TransactionsItem}
                     nestedScrollEnabled={false}
-                    ListFooterComponent={<Footer />}
-
+                    //ListFooterComponent={<Footer />}
+                    estimatedItemSize={60}
                 />}
             </View>
         )
@@ -525,37 +533,39 @@ const Informations = ({navigation, route}) => {
     return ( 
         <HeaderLeagueContextProvider leagueObject={league}>
             <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueRosters={leagueRosters} leagueUsers={leagueUsers} />
-            <AnimatedTab scrollX={scrollX} data={dataTab} onTabPress={onTabPress} />
-            <Animated.FlatList
-                ref={flatlistRef}
-                data={dataTab}
-                horizontal={true}
-                showsHorizontalScrollIndicator={false}
-                pagingEnabled
-                onScroll={Animated.event(
-                    [{nativeEvent: {contentOffset: {x: scrollX}}}],
-                    {useNativeDriver: false}
-                )}
-                keyExtractor={item => item.key}
-                renderItem={({item}) => {
-                    if(item.key==0) {
-                        return (
-                            <GeneralInformations />
-                        )
-                    } else {
-                        if(!leagueTransactions) {
+            <View style={styles.body}>
+                <AnimatedTab scrollX={scrollX} data={dataTab} onTabPress={onTabPress} />
+                <Animated.FlatList
+                    ref={flatlistRef}
+                    data={dataTab}
+                    horizontal={true}
+                    showsHorizontalScrollIndicator={false}
+                    pagingEnabled
+                    onScroll={Animated.event(
+                        [{nativeEvent: {contentOffset: {x: scrollX}}}],
+                        {useNativeDriver: false}
+                    )}
+                    keyExtractor={item => item.key}
+                    renderItem={({item}) => {
+                        if(item.key==0) {
                             return (
-                                <View style={{flex:1,alignItems:'center',justifyContent:'center'}}>
-                                <ActivityIndicator size='large' color={LIGHT_GREEN} />
-                                </View>
+                                <GeneralInformations />
+                            )
+                        } else {
+                            if(!leagueTransactions) {
+                                return (
+                                    <View style={{flex:1,alignItems:'center',justifyContent:'center'}}>
+                                    <ActivityIndicator size='large' color={LIGHT_GREEN} />
+                                    </View>
+                                )
+                            }
+                            return (
+                                <TransactionsTab />
                             )
                         }
-                        return (
-                            <TransactionsTab />
-                        )
-                    }
-                }}
-            />
+                    }}
+                />
+            </View>
         </HeaderLeagueContextProvider>
     );
 }
@@ -619,5 +629,10 @@ const styles = StyleSheet.create({
         borderBottomRightRadius:5,
         flexDirection:'row',
         justifyContent:'center'
-    }
+    },
+    body: {
+        backgroundColor:DARK_BLACK,
+        paddingTop:20,
+        minHeight: 600,
+      }
 })

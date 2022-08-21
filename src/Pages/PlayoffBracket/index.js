@@ -140,7 +140,7 @@ const PlayoffBracket = ({route}) => {
     )
 
     const PlayerAvatar = ({player}) => (
-        <Image source={(player.userData.avatar) ? {uri: `https://sleepercdn.com/avatars/${player.userData.avatar}`} : require('../../../assets/Images/player_default.png')} style={styles.playerAvatar} />
+        <Image source={(player.userData?.avatar) ? {uri: `https://sleepercdn.com/avatars/${player.userData.avatar}`} : require('../../../assets/Images/player_default.png')} style={styles.playerAvatar} />
     );
 
     const PlayerFantasyPoints = ({player, position}) => (
@@ -274,10 +274,10 @@ const PlayoffBracket = ({route}) => {
     },[])
 
     return ( 
-        <View style={{flex:1,backgroundColor:'#0B0D0F',}}>
+        <View style={{flex:1}}>
             <HeaderLeagueContextProvider leagueObject={leagueObject}>
                 <TabTopLeague activeButton={route.params?.active} isAble={true} leagueDraftSettings={leagueDraftSettings} leagueObject={route.params?.leagueObject} leagueRosters={route.params?.leagueRosters} leagueUsers={leagueUsers}  />
-
+                <View style={styles.body}>
                 <View style={{marginTop:20,marginLeft:10,marginRight:20,flexDirection:'row'}}>
                     <RoundSelect />
                     {playoffData && <TooltipButton setTip={setTip} showTip={showTip} />}
@@ -357,6 +357,7 @@ const PlayoffBracket = ({route}) => {
                         <MatchupPlaceholder />
                     </>}
                 </View>
+                </View>
             </HeaderLeagueContextProvider>
         </View>
      );
@@ -409,5 +410,9 @@ const styles = StyleSheet.create({
     }, 
     titleContainer: {
         marginBottom:0,
-    }
+    },
+    body: {
+        backgroundColor:DARK_BLACK,
+        paddingTop:40
+      }
 })
