@@ -95,11 +95,12 @@ const PlayerItem = ({item}) => {
         <HeaderLeagueContextProvider leagueObject={leagueObject}>
         <TabTopLeague 
           activeButton={route.params?.active} 
-          isAble={(leagueDraftSettings && players && leagueRosters) ? true : false} 
+          isAble={(leagueDraftSettings && players.length && leagueRosters) ? true : false} 
           leagueRosters={leagueRosters} 
           leagueUsers={players} 
           leagueDraftSettings={leagueDraftSettings} leagueObject={leagueObject} 
           opacity={(leagueDraftSettings && players && leagueRosters) ? 1 : 0.5}  
+          loading={leagueDraftSettings && players && leagueRosters}
         />
         <View style={styles.body}>
           {!DATA.length ?
