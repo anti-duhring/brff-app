@@ -67,7 +67,9 @@ export const HeaderLeagueContextProvider = ({children, leagueObject}) => {
         >
             <View style={{flex:1,minHeight:600}}>
                 <TriggeringView onDisplay={() => {fadeOut()}} onBeginHidden={() => {fadeIn()}}>
-                    {children}
+                    
+                        {children}
+ 
                 </TriggeringView>
             </View>
         </HeaderImageScrollView>

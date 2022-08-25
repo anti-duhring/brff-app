@@ -6,11 +6,11 @@ import {BORDER_RADIUS, DARK_BLACK, DARK_GRAY, LIGHT_BLACK, LIGHT_GRAY, LIGHT_GRE
 
 const SignIn = () => {
   const [username, setUsername] = useState('')
-  const { signIn } = useContext(AuthContext)
+  const { authContext } = useContext(AuthContext)
 
   const loginHandle = (name) => {
     
-    signIn(name)
+    authContext.signIn(name)
   }
 
     return ( 

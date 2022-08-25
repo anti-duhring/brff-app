@@ -12,7 +12,7 @@ import MultiSlider from "@ptomasroos/react-native-multi-slider";
 const WIDTH = Dimensions.get('window').width;
 
 const CustomDrawer = (props) => {
-    const { signOut, loginState } = useContext(AuthContext)
+    const { authContext, loginState } = useContext(AuthContext)
     const userData  = loginState.userData
     const username = userData.username;
     const displayName = userData.display_name;
@@ -87,26 +87,12 @@ const CustomDrawer = (props) => {
                         source={{uri: `http://sleepercdn.com/avatars/${userAvatar}`}}/>}
                 </View>
                 <View style={styles.drawerName}>
-                    <Text style={styles.drawerNameText}>{displayName}</Text>
-                    <Text style={styles.drawerUsernameText}>@{username}</Text>
+                    <View style={styles.drawerUsernameContainer}>
+                        <Text style={styles.drawerNameText}>{displayName}</Text>
+                    </View>
                 </View>
             </View>
-        </ImageBackground>
-        <DrawerContentScrollView style={styles.drawerContainer} {...props}>  
-            <DrawerItemList {...props} />
-            <DrawerItem
-                label="Sair"
-                icon={({color}) => (
-                    <FontAwesome5 name="sign-out-alt"  size={17} color={color} />
-                )}
-                labelStyle={{marginLeft:-25, fontFamily: 'Roboto-Medium', fontSize:15}}
-                activeTintColor={WHITE}
-                inactiveTintColor={DARKER_GRAY}
-                activeBackgroundColor={DARK_GREEN}
-                onPress={() => signOut()}
-            />
-        </DrawerContentScrollView>
-        {currentEpisode &&         
+            {currentEpisode &&         
             <View style={styles.miniPlayerContainer}>
                 <View style={{flex:1}}>
                     <MiniPlayerImage />
@@ -134,6 +120,22 @@ const CustomDrawer = (props) => {
                     </Pressable>
                 </View>
             </View>}
+        </ImageBackground>
+        <DrawerContentScrollView style={styles.drawerContainer} {...props}>  
+            <DrawerItemList {...props} />
+            <DrawerItem
+                label="Sair"
+                icon={({color}) => (
+                    <FontAwesome5 name="sign-out-alt"  size={17} color={color} />
+                )}
+                labelStyle={{marginLeft:-25, fontFamily: 'Roboto-Medium', fontSize:15}}
+                activeTintColor={WHITE}
+                inactiveTintColor={DARKER_GRAY}
+                activeBackgroundColor={DARK_GREEN}
+                onPress={() => authContext.signOut()}
+            />
+        </DrawerContentScrollView>
+
     </View>
     );
 }
@@ -144,8 +146,12 @@ const styles = StyleSheet.create({
     drawerContainer: {
         backgroundColor: '#0B0D0F',
     },
+    drawerUser: {
+        flex: 1,
+        justifyContent:'center'
+    },
     userContainer: {
-        height:150,
+        height:250,
         alignItems:'center',
         justifyContent:'center'
     },
@@ -154,13 +160,14 @@ const styles = StyleSheet.create({
         alignItems:'center'
     },
     drawerImageAvatar:{
-        width:80,
-        height:80,
-        borderRadius:40,
+        width:100,
+        height:100,
+        borderRadius:100,
     },
     drawerName: {
         alignContent:'center',
-        alignItems:'center'
+        alignItems:'center',
+        marginTop: 10,
     },
     drawerNameText:{
         fontWeight:'bold',
@@ -168,7 +175,8 @@ const styles = StyleSheet.create({
         fontSize:15,
     },
     drawerUsernameText: {
-        color: 'rgba(0,0,0,0.6)',
+        color:'white',
+        fontWeight:'bold',
         fontSize:13,
     },  
     logoutContainer:{
@@ -193,7 +201,9 @@ const styles = StyleSheet.create({
         backgroundColor:DARK_BLACK,
         flexDirection:'row',
         marginHorizontal:10,
-        marginBottom:40
+        marginBottom: 10,
+        borderRadius: 5,
+        opacity: 1
       },
       miniPlayerSliderContainer: {
         flex:3,
@@ -203,5 +213,13 @@ const styles = StyleSheet.create({
         borderTopRightRadius:5,
         paddingHorizontal:10,
         paddingVertical:5
+      },
+      drawerUsernameContainer: {
+        paddingVertical:3,
+        paddingHorizontal:10,
+        borderWidth:1,
+        borderColor: 'rgba(0,0,0,0.5)', //'rgba(255,255,255,0.7)', 
+        borderRadius:5,
+        backgroundColor: 'rgba(0,0,0,0.5)'
       }
 })

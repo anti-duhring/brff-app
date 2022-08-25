@@ -228,7 +228,7 @@ const Informations = ({navigation, route}) => {
                 {leagueTransactions && 
                 <FlashList
                     data={(dropdownTransactionsOption!='Todas')?
-                    leagueTransactions.filter((item, index) => {
+                    leagueTransactions?.filter((item, index) => {
                         return item.type.replace(/trade/g,'Trocas').replace(/waiver/g,'Waiver').replace(/free_agent/g,'Free Agency') == dropdownTransactionsOption
                     })
                     : leagueTransactions
@@ -272,7 +272,14 @@ const Informations = ({navigation, route}) => {
 
     return ( 
         <HeaderLeagueContextProvider leagueObject={league}>
-            <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueRosters={leagueRosters} leagueUsers={leagueUsers} />
+            <TabTopLeague 
+                isAble={true} 
+                leagueDraftSettings={leagueDraftSettings} 
+                activeButton={route.params?.active} 
+                leagueObject={league} 
+                leagueRosters={leagueRosters} 
+                leagueUsers={leagueUsers} 
+            />
             <View style={styles.body}>
                 <AnimatedTab scrollX={scrollX} data={dataTab} onTabPress={onTabPress} />
                 <Animated.FlatList

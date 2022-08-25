@@ -13,6 +13,7 @@ import { AllPlayersContext } from "../../context/AllPlayersContext";
 import { LIGHT_GREEN, LIGHT_BLACK, LIGHT_GRAY, DARK_GRAY, DARKER_GRAY, WHITE, DARK_BLACK, DARK_GREEN } from '../../components/Variables'
 import ViewLightDark from '../../components/ViewLightDark';
 import TooltipButton from "../../components/TooltipButton";
+import LeagueBody from '../../components/League/LeagueBody'
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -91,24 +92,6 @@ const Matchups = ({navigation, route}) => {
 
     },[week])
     
-
-    const getLeagueRosters = async(_user_ID, _league_ID) => {
-        fetch(`https://api.sleeper.app/v1/league/${_league_ID}/rosters`,{signal})
-        .then(response => response.json())
-        .then((data) => {
-            setLeagueRosters(data);
-            data.map((roster, index) => {
-                if(roster.owner_id==_user_ID && roster.players) {
-                    setPlayerRosterID(roster.roster_id)
-                    getMatchup(roster.roster_id, leagueID, week, data)
-                }
-            })
-        }).catch((e) => {
-            console.log('Erro gl:',e)
-            controller.abort()
-            setErrorMessage(e)
-        })
-    }
 
     const getMatchup = async(_league_id, _week, _league_rosters) => {
         const URL = `https://api.sleeper.app/v1/league/${_league_id}/matchups/${_week}`
@@ -505,43 +488,48 @@ const Matchups = ({navigation, route}) => {
     if(league.status!='in_season') {
         
         return (
-            <View style={{flex:1}}>
             <HeaderLeagueContextProvider leagueObject={league}>
                 <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueRosters={leagueRosters} leagueUsers={leagueUsers} />
-                <View style={styles.body}>
+                <LeagueBody>
                     <ViewLightDark>
                         <Text style={{color: WHITE, textAlign:'center'}}>A temporada regular da liga ainda não começou.</Text>
                     </ViewLightDark>
-                </View>
+                </LeagueBody>
             </HeaderLeagueContextProvider>
-        </View>
         )
     }
 
     if(!hasMatchup) {
         return (
-            <View style={{flex:1}}>
             <HeaderLeagueContextProvider leagueObject={league}>
-                <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueUsers={leagueUsers} leagueRosters={route.params?.leagueRosters} />
-                <View style={styles.body}>
+                <TabTopLeague 
+                    isAble={true} 
+                    leagueDraftSettings={leagueDraftSettings} 
+                    activeButton={route.params?.active} 
+                    leagueObject={league} 
+                    leagueUsers={leagueUsers} 
+                    leagueRosters={route.params?.leagueRosters} 
+                />
+                <LeagueBody>
                     <View style={{marginTop:20,marginLeft:10,marginRight:20,flexDirection:'row'}}>
                         <WeekSelect />
                         {starters && opponentStarters && <TooltipButton setTip={setTip} showTip={showTip} />}
                     </View>
                     <ViewLightDark>
-                        <Text style={{color: WHITE, textAlign:'center'}}>A liga não possui matchup para a semana {week}.</Text>
+                        <Text style={{color: WHITE, textAlign:'center'}}>
+                            A liga não possui matchup para a semana {week}.
+                        </Text>
                     </ViewLightDark>
-                </View>
+                </LeagueBody>
             </HeaderLeagueContextProvider>
-        </View>
         )
     }
 
     return ( 
-        <View style={{flex:1}}>
+    
             <HeaderLeagueContextProvider leagueObject={league}>
                 <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueUsers={leagueUsers} />
-                <View style={styles.body}>
+                <LeagueBody>
                 <View style={{marginTop:20,marginLeft:10,marginRight:20,flexDirection:'row'}}>
                     <WeekSelect />
                     {starters && opponentStarters && <TooltipButton setTip={setTip} showTip={showTip} />}
@@ -616,9 +604,8 @@ const Matchups = ({navigation, route}) => {
                             )
                         })}
                 </View>
-                </View>
+                </LeagueBody>
             </HeaderLeagueContextProvider>
-        </View>
      );
 }
  
@@ -653,7 +640,8 @@ const styles = StyleSheet.create({
         width:40,
         height:40,
         borderRadius:40,
-        resizeMode: 'cover'
+        resizeMode: 'cover',
+        zIndex: 999
     },
     leftAvatar: {
         left: (windowWidth / 2) / 2 

@@ -83,11 +83,11 @@ const MyTeam = ({navigation, route}) => {
                 })
             } else{
                 players.push({
-                    name: 'Empty',
+                    name: 'Vazio',
                     position: 'Empty',
                     index: index,
                     team: null,
-                    player_id: 0,
+                    player_id: null,
                 })
             }
         })
@@ -218,7 +218,14 @@ const MyTeam = ({navigation, route}) => {
 
     return ( 
         <HeaderLeagueContextProvider leagueObject={league}>
-            <TabTopLeague isAble={true} leagueDraftSettings={leagueDraftSettings} activeButton={route.params?.active} leagueObject={league} leagueUsers={leagueUsers} />
+            <TabTopLeague 
+                isAble={true} 
+                leagueDraftSettings={leagueDraftSettings} 
+                activeButton={route.params?.active} 
+                leagueObject={league} 
+                leagueUsers={leagueUsers} 
+                leagueRosters={route.params?.leagueRosters} 
+            />
             <View style={styles.body}>
                 <InformationPlayer />
                     <ViewLightDark title='Titulares' titleSize={18}>

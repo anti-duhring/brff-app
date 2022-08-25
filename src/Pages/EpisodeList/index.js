@@ -7,7 +7,8 @@ import { scaleAnimation } from "../../animations/scale";
 import { AntDesign } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
-import { BORDER_RADIUS } from "../../components/Variables";
+import { BORDER_RADIUS, DARK_BLACK } from "../../components/Variables";
+import { FlashList } from "@shopify/flash-list";
 
 const EpisodeList = ({navigation}) => {
     const [isLoading, setIsLoading] = useState(true)
@@ -161,10 +162,9 @@ const EpisodeList = ({navigation}) => {
     }
 
     const Episode = ({item,index}) => {
-        if(index > showItems) return
         if(!item) return null
         return (
-            <Animated.View
+            <View
                 style={{ 
                 marginHorizontal:10,
                 marginBottom:10,
@@ -172,10 +172,10 @@ const EpisodeList = ({navigation}) => {
                 marginBottom:10,
                 borderWidth:1,
                 borderColor: 'rgba(255,255,255,0)',
-                transform:[{scale: (itemAnimate == item.key) ? animateX : 1}]
                 }}
               >
-              <Pressable onPressIn={() => setItemAnimate(item.key)} onPress={() =>{ 
+              <TouchableOpacity
+              onPress={() =>{ 
               scaleAnimation(animateX,() => {
                 navigation.navigate('Episode',{
                     episodeObject: item.episodeObject,
@@ -192,7 +192,14 @@ const EpisodeList = ({navigation}) => {
                                         item.episodeObject.title.replace(/[0-9]x[0-9][0-9] /g,'').replace('- ','')
                                     }</Text>
                                     <Text style={{fontSize:12,color:'rgba(255,255,255,0.6)',}}>{weekDay(item.episodeObject.date)}</Text>
-                                    <Text  style={{fontSize:12,color:'rgba(255,255,255,0.6)',}}>{secondsToHms(item.episodeObject.duration)}</Text>
+                                    <Text  style={{fontSize:12,color:'rgba(255,255,255,0.6)',}}>
+                                        {
+                                        `${item.episodeObject.duration.split(':')[0] > 0 ? 
+                                            `${item.episodeObject.duration.split(':')[0][1]}hr e ${item.episodeObject.duration.split(':')[1]}min`
+                                        : 
+                                            `${item.episodeObject.duration.split(':')[1]}min`}`
+                                        }
+                                    </Text>
                                 </View>
                                 <View style={{flex:1, justifyContent:'flex-end',padding:10}}>
                                     <AntDesign name="play" size={36} color="white" />
@@ -200,13 +207,13 @@ const EpisodeList = ({navigation}) => {
                             </View>
                     </LinearGradient>
                 </ImageBackground>
-                </Pressable>
-              </Animated.View>
+                </TouchableOpacity>
+              </View>
         )
     }
 
     return ( 
-        <View style={{flex:1,backgroundColor:'#0B0D0F'}}>
+        <View style={{flex:1,backgroundColor:DARK_BLACK}}>
             <Pressable onPress={Keyboard.dismiss}>
             {errorMessage && <Text>{errorMessage}</Text>}
             <View style={{alignItems:'center', padding:10}}>
@@ -228,21 +235,18 @@ const EpisodeList = ({navigation}) => {
             new Array(5).fill(0).map((item, index) => {
                 return <EpisodePlaceholder key={index} />
             }) :
-            <Animated.FlatList
+            <View style={{height:'100%', width:'100%'}}>
+            <FlashList
                 data={episodes}
                 keyExtractor={item => item.key}
                 contentContainerStyle={{
                 paddingBottom:80
                 }}
+                estimatedItemSize={170}
                 removeClippedSubviews={false}
-                ListFooterComponent={<Footer />}
-                //getItemLayout={(data, index) => ({length: 175, offset: 175 * index, index})}
-                onEndReachedThreshold={0.5}
-                onEndReached={
-                    () => setShowItems(showItems + 10)
-                }
                 renderItem={Episode}
             />
+            </View>
             }
           </Pressable>
         </View>

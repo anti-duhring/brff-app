@@ -7,6 +7,7 @@ import { HeaderLeagueContextProvider } from "../../components/HeaderLeagueContex
 import Placeholder from "../../components/LeagueList/Placeholder";
 import { getDraftSettings, getLeaguePlayers, getLeagueRosters } from "../../utils/getSleeperData";
 import { DARK_BLACK } from "../../components/Variables";
+import LeagueBody from "../../components/League/LeagueBody";
 
 const Players = ({navigation, route}) => {
     const leagueId = route.params?.leagueObject.league_id;
@@ -99,10 +100,10 @@ const PlayerItem = ({item}) => {
           leagueRosters={leagueRosters} 
           leagueUsers={players} 
           leagueDraftSettings={leagueDraftSettings} leagueObject={leagueObject} 
-          opacity={(leagueDraftSettings && players && leagueRosters) ? 1 : 0.5}  
+          opacity={1}  
           loading={leagueDraftSettings && players && leagueRosters}
         />
-        <View style={styles.body}>
+        <LeagueBody>
           {!DATA.length ?
             <LoadingPlaceholders /> :
             <View style={{padding:10,marginBottom:10}}>
@@ -110,7 +111,7 @@ const PlayerItem = ({item}) => {
               }
             </View>
           }
-          </View>
+          </LeagueBody>
         </HeaderLeagueContextProvider>
       </View> 
     );
@@ -151,8 +152,5 @@ const styles = StyleSheet.create({
     color:'#008037',
     marginLeft:5,
     fontStyle:'italic'
-},body: {
-  backgroundColor:DARK_BLACK,
-  paddingTop:40
 }
 })

@@ -13,7 +13,8 @@ const COLORTEXT = 'white';
 
 const TabTopLeague = ({activeButton, isAble, leagueDraftSettings, leagueObject, leagueUsers, leagueRosters, opacity}) => {
     const navigation = useNavigation();
-    const { week } = useContext(NFLStatusContext)
+    const { NFLStatus } = useContext(NFLStatusContext)
+    const week = NFLStatus.season_type != 'regular' ? 1 : NFLStatus.week;
 
 
     return(
