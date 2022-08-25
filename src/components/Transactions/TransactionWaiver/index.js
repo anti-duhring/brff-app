@@ -20,10 +20,10 @@ const TransactionWaiver = (props) => {
         <View style={{backgroundColor:LIGHT_BLACK,borderRadius:12,margin:10,marginBottom:20,elevation:10,padding: 10}}>
             <View style={{flex:1}}>
                 <TouchableOpacity style={{flexDirection:'row',alignItems:'center'}} onPress={() => 
-                    navigation.navigate('PlayerProfile',{
+                    props.navigation.navigate('PlayerProfile',{
                     playerObject: user.user_data,
-                    leagueID: leagueID,
-                    roster: league.roster_positions
+                    leagueID: props.league.league_id,
+                    roster: props.league.roster_positions
                 })}>
                     <ProgressiveImage style={{width:50,height:50,borderRadius:50}} uri={`https://sleepercdn.com/avatars/${user.user_data.avatar}`} resizeMode='cover'/>
                     <Text style={{color:DARK_GRAY,marginLeft:10,flexWrap:'wrap',flexShrink:1}}><Text style={{color:WHITE,}}>{user.user_data.display_name}</Text> {tran.metadata.notes}</Text>
@@ -38,7 +38,7 @@ const TransactionWaiver = (props) => {
                         return (
                             <TouchableOpacity key={index} 
                             onPress={() => 
-                                navigation.navigate('PlayerStats', {playerObject: allPlayers[item[0]]})} 
+                                props.navigation.navigate('PlayerStats', {playerObject: allPlayers[item[0]]})} 
                             style={{flexDirection:'row'}}>
                                 <ProgressiveImage style={{width:50,height:50,borderRadius:50,backgroundColor:DARK_BLACK,borderWidth:1,borderColor:'red'}} uri={`https://sleepercdn.com/content/nfl/players/${allPlayers[item[0]].player_id}.jpg`} resizeMode='cover'/>
                                 <FontAwesome name="minus-circle" size={17} color='red' style={{marginLeft:-10}} />
@@ -55,7 +55,7 @@ const TransactionWaiver = (props) => {
                         return (
                             <TouchableOpacity key={index} 
                             onPress={() => 
-                                navigation.navigate('PlayerStats', {playerObject: allPlayers[item[0]]})} 
+                                props.navigation.navigate('PlayerStats', {playerObject: allPlayers[item[0]]})} 
                             style={{flexDirection:'row'}}>
                                 <ProgressiveImage style={{width:50,height:50,borderRadius:50,backgroundColor:DARK_BLACK,borderWidth:1,borderColor:LIGHT_GREEN}} uri={`https://sleepercdn.com/content/nfl/players/${allPlayers[item[0]].player_id}.jpg`} resizeMode='cover'/>
                                 <FontAwesome name="plus-circle" size={17} color={LIGHT_GREEN} style={{marginLeft:-10}} />
@@ -68,3 +68,5 @@ const TransactionWaiver = (props) => {
         </View>
     )
 }
+
+export default TransactionWaiver;

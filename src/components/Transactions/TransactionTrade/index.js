@@ -24,8 +24,8 @@ const TransactionTrade = (props) => {
             <TouchableOpacity onPress={() => 
                 props.navigation.navigate('PlayerProfile',{
                 playerObject: userData,
-                leagueID: leagueID,
-                roster: league.roster_positions
+                leagueID: props.league.league_id,
+                roster: props.league.roster_positions
             })}>
                 <ProgressiveImage style={{width:50,height:50,borderRadius:50}} uri={`https://sleepercdn.com/avatars/${userData?.avatar}`} resizeMode='cover'/>
             </TouchableOpacity>

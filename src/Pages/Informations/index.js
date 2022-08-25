@@ -17,6 +17,7 @@ import {FlashList} from '@shopify/flash-list'
 import { objectToArray, replaceObjectKey, UserTransaction, UserTransactionNull } from "../../utils/leagueInformations";
 import TransactionTrade from "../../components/Transactions/TransactionTrade";
 import TransactionFreeAgent from "../../components/Transactions/TransactionFreeAgent";
+import TransactionWaiver from '../../components/Transactions/TransactionWaiver'
 
 const {width} = Dimensions.get('screen');
 const dataTab = [
@@ -185,6 +186,7 @@ const Informations = ({navigation, route}) => {
                         transaction={item} 
                         leagueRosters={leagueRosters}
                         leagueUsers={leagueUsers}
+                        league={league}
                     />
                 }
                 {item.type == 'free_agent' && 
@@ -193,6 +195,7 @@ const Informations = ({navigation, route}) => {
                         navigation={navigation} 
                         leagueRosters={leagueRosters}
                         leagueUsers={leagueUsers}
+                        league={league}
                     />
                 }
                 {item.type == 'waiver' && 
@@ -201,6 +204,7 @@ const Informations = ({navigation, route}) => {
                         navigation={navigation} 
                         leagueRosters={leagueRosters}
                         leagueUsers={leagueUsers}
+                        league={league}
                     />
                 }
             </View>

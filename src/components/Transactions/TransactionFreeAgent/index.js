@@ -22,8 +22,8 @@ const TransactionFreeAgent = (props) => {
                 <TouchableOpacity style={{flexDirection:'row',alignItems:'center'}} onPress={() => 
                     props.navigation.navigate('PlayerProfile',{
                     playerObject: user.user_data,
-                    leagueID: leagueID,
-                    roster: league.roster_positions
+                    leagueID: props.league.league_id,
+                    roster: props.league.roster_positions
                 })}>
                     <ProgressiveImage style={{width:50,height:50,borderRadius:50}} uri={`https://sleepercdn.com/avatars/${user.user_data.avatar}`} resizeMode='cover'/>
                     <Text style={{color:DARK_GRAY,marginLeft:10,flexWrap:'wrap',flexShrink:1}}><Text style={{color:WHITE,}}>{user.user_data.display_name}</Text> dispensou/contratou os seguintes jogadores:</Text>
