@@ -66,7 +66,18 @@ const Rostership = ({navigation}) => {
     return (
       <View style={styles.placeholderContainer}>
         <SkeletonPlaceholder backgroundColor={colors.LIGHT_BLACK} highlightColor={colors.HIGHTLIGHT_BLACK}>
-          <View style={styles.playerPlaceholder}></View>
+          <View style={{flexDirection:'row'}}>
+            <View style={{width: 50,height: 50,borderRadius:50,}}></View>
+            <View style={{justifyContent:'center',marginLeft: 10}}>
+              <View style={{width: 100,height: 20,borderRadius:5,}}></View>
+              <View style={{width: 50,height: 17,borderRadius:5,marginTop:5}}></View>
+            </View>
+            <View style={{flexDirection:'row',justifyContent:'flex-end', flex:1,alignItems:'center'}}>
+              <View style={{width: 40,height: 25,borderRadius:5,}}></View>
+              <View style={{width: 20,height: 25,borderRadius:5,marginLeft:5}}></View>
+            </View>
+            {/*<View style={styles.playerPlaceholder}></View>*/}
+          </View>
         </SkeletonPlaceholder>
       </View>
     )
@@ -140,6 +151,8 @@ const styles = StyleSheet.create({
   placeholderContainer: {
     margin: 10,
     marginBottom: 0,
+    borderRadius: 12,
+    padding: 10,
   },
   title: {
     color:'white',

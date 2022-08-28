@@ -235,7 +235,7 @@ const EpisodeList = ({navigation}) => {
             new Array(5).fill(0).map((item, index) => {
                 return <EpisodePlaceholder key={index} />
             }) :
-            <View style={{height:'100%', width:'100%'}}>
+            <View style={{height:'100%', width:'100%', paddingBottom: 40}}>
             <FlashList
                 data={episodes}
                 keyExtractor={item => item.key}

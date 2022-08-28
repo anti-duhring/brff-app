@@ -1,34 +1,45 @@
-import { createContext, useEffect} from "react"
+import { createContext, useEffect, useState} from "react"
 import TrackPlayer, { State, usePlaybackState, useProgress, Capability } from "react-native-track-player";
 import * as rssParser from 'react-native-rss-parser'
+import { getWhereEpisodeStopped, setWhereEpisodeStopped } from "../utils/trackPlayer";
 
 export const TrackPlayerContext = createContext()
 
 export const TrackPlayerContextProvider = ({children}) => {
     const playbackState = usePlaybackState();
     const { position, duration } = useProgress();
-
+    const [episodeList, setEpisodeList] = useState(null);
 
     const togglePlayback = async(trackIndex) => {
+        let currentTrack = await TrackPlayer.getCurrentTrack();
+        let currentTrackObj = await TrackPlayer.getTrack(trackIndex);
+        const trackURL = currentTrackObj.url;
+        //console.log(currentTrackObj.url);
 
-            let currentTrack = await TrackPlayer.getCurrentTrack();
-    
-    
-            if(currentTrack!=trackIndex){
-                await TrackPlayer.skip(trackIndex)
+        if(currentTrack!=trackIndex){
+            const trackPrevPlay = await getWhereEpisodeStopped(trackURL);
+
+            await TrackPlayer.skip(trackIndex)
+            await TrackPlayer.play();
+            if(trackPrevPlay) TrackPlayer.seekTo(trackPrevPlay)
+
+            return
+        }
+
+        if(currentTrack != null) {
+            if(playbackState == State.Paused || playbackState == State.Ready) {
+                const trackPrevPlay = await getWhereEpisodeStopped(trackURL);
+
                 await TrackPlayer.play();
-                return
+
+                if(trackPrevPlay) TrackPlayer.seekTo(trackPrevPlay)
+
+            } else {
+                await setWhereEpisodeStopped(trackURL, position);
+                await TrackPlayer.pause();
             }
-    
-            if(currentTrack != null) {
-                if(playbackState == State.Paused || playbackState == State.Ready) {
-                    await TrackPlayer.play();
-                } else {
-                    await TrackPlayer.pause();
-                }
-            } 
-
-
+            return 
+        } 
     }
 
     const setupPlayer = async() => {
@@ -86,7 +97,7 @@ export const TrackPlayerContextProvider = ({children}) => {
               date: episode.published
           })
       })
-    
+      setEpisodeList(playlist);
       await TrackPlayer.add(playlist);
       console.log(playlist.length,'episodes tracked')
     }
@@ -98,7 +109,13 @@ export const TrackPlayerContextProvider = ({children}) => {
 
 
     return ( 
-        <TrackPlayerContext.Provider value={{playbackState,position,duration,togglePlayback}}>
+        <TrackPlayerContext.Provider value={{
+            playbackState,
+            position,
+            duration,
+            togglePlayback,
+            episodeList
+        }}>
             {children}
         </TrackPlayerContext.Provider> 
     );

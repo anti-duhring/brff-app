@@ -1,11 +1,11 @@
 import { useEffect, useState, useContext } from "react";
 import { View, Text, Pressable, TouchableOpacity, ActivityIndicator, StyleSheet, Dimensions } from "react-native";
-import TrackPlayer, { State } from "react-native-track-player";
+import TrackPlayer, { State, useProgress } from "react-native-track-player";
 import { FontAwesome } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import MultiSlider from "@ptomasroos/react-native-multi-slider";
 import { TrackPlayerContext } from "../../context/TrackPlayerContext";
-import { HEADER_BUTTON_BG } from "../Variables";
+import { HEADER_BUTTON_BG, LIGHT_GREEN } from "../Variables";
 
 const WIDTH = Dimensions.get('window').width;
 
@@ -15,10 +15,9 @@ const MusicPlayer = ({track, trackIndex, navigation, reRender}) => {
     const [nextEpisode, setNextEpisode] = useState(null);
     const { 
         playbackState,
-        position,
-        duration,
         togglePlayback,
     } = useContext(TrackPlayerContext)
+    const {position, buffered, duration} = useProgress();
 
     const getCurrentTrack = async() => {
         const index = await TrackPlayer.getCurrentTrack()
