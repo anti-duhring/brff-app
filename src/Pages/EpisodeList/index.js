@@ -9,6 +9,8 @@ import { FontAwesome } from '@expo/vector-icons';
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import { BORDER_RADIUS, DARK_BLACK } from "../../components/Variables";
 import { FlashList } from "@shopify/flash-list";
+import { getWhereEpisodeStopped } from "../../utils/trackPlayer";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const EpisodeList = ({navigation}) => {
     const [isLoading, setIsLoading] = useState(true)
@@ -19,7 +21,7 @@ const EpisodeList = ({navigation}) => {
     const [searchText, setSearchText] = useState('')
     const [episodes,setEpisodes] = useState([])
     const [DATA, setDATA] = useState([])
-    const [showItems, setShowItems] = useState(10)
+    const [episodesProgress, setEpisodesProgress] = useState(null);
 
     const animateX = useRef(new Animated.Value(1)).current;
     const [itemAnimate, setItemAnimate] = useState(null);
@@ -29,13 +31,17 @@ const EpisodeList = ({navigation}) => {
         try {
             const response = await fetch(RSS_URL)
             const responseData = await response.text()
-            const data = await rssParser.parse(responseData)
+            const data = await rssParser.parse(responseData);
+            const epProgress = await AsyncStorage.getItem('episodesPlayed');
+            
+            setEpisodesProgress(JSON.parse(epProgress));
             setEpisodes(                
                 data.items.map((episode, index) => {
+                    const URL = 'https://'+episode.enclosures[0].url.split('https%3A%2F%2F')[1].replace(/%2F/g,'/');
                     return {
                     key: episode.id,
                     episodeObject: {
-                        url: 'https://'+episode.enclosures[0].url.split('https%3A%2F%2F')[1].replace(/%2F/g,'/'),
+                        url: URL,
                         title: episode.title,
                         artist: episode.authors[0].name,
                         artwork: episode.itunes.image,
@@ -43,7 +49,8 @@ const EpisodeList = ({navigation}) => {
                         description: episode.description,
                         date: episode.published
                     },
-                    episodeID: index
+                    episodeID: index,
+                    episodeProgress: episodesProgress[URL]? episodesProgress[URL] : 0
                     }
                 })
               )
@@ -51,10 +58,11 @@ const EpisodeList = ({navigation}) => {
             //setPlaylistPodcast(data.items)
             setDATA(
                 data.items.map((episode, index) => {
+                const URL = 'https://'+episode.enclosures[0].url.split('https%3A%2F%2F')[1].replace(/%2F/g,'/');
                   return {
                     key: episode.id,
                     episodeObject: {
-                        url: 'https://'+episode.enclosures[0].url.split('https%3A%2F%2F')[1].replace(/%2F/g,'/'),
+                        url: URL,
                         title: episode.title,
                         artist: episode.authors[0].name,
                         artwork: episode.itunes.image,
@@ -62,7 +70,8 @@ const EpisodeList = ({navigation}) => {
                         description: episode.description,
                         date: episode.published
                     },
-                    episodeID: index
+                    episodeID: index,
+                    episodeProgress: episodesProgress[URL]? episodesProgress[URL] : 0
                   }
                 })
               )
@@ -124,6 +133,7 @@ const EpisodeList = ({navigation}) => {
     },[])
 
     useEffect(() => {
+        if(!DATA.length) return 
         if(searchText=='') {
             setEpisodes(DATA)
         } else {
@@ -199,6 +209,7 @@ const EpisodeList = ({navigation}) => {
                                         : 
                                             `${item.episodeObject.duration.split(':')[1]}min`}`
                                         }
+                                        {`${item.episodeProgress}`}
                                     </Text>
                                 </View>
                                 <View style={{flex:1, justifyContent:'flex-end',padding:10}}>
@@ -231,10 +242,7 @@ const EpisodeList = ({navigation}) => {
 
                 </View>
             </View>
-            { isLoading ?
-            new Array(5).fill(0).map((item, index) => {
-                return <EpisodePlaceholder key={index} />
-            }) :
+            { episodes.length ?
             <View style={{height:'100%', width:'100%', paddingBottom: 40}}>
             <FlashList
                 data={episodes}
@@ -246,7 +254,10 @@ const EpisodeList = ({navigation}) => {
                 removeClippedSubviews={false}
                 renderItem={Episode}
             />
-            </View>
+            </View> :
+                new Array(5).fill(0).map((item, index) => {
+                    return <EpisodePlaceholder key={index} />
+                })
             }
           </Pressable>
         </View>

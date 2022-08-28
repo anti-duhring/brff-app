@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState} from "react"
 import TrackPlayer, { State, usePlaybackState, useProgress, Capability } from "react-native-track-player";
 import * as rssParser from 'react-native-rss-parser'
-import { getWhereEpisodeStopped, setWhereEpisodeStopped } from "../utils/trackPlayer";
+import { getWhereEpisodeStopped, setupPlayer, setWhereEpisodeStopped } from "../utils/trackPlayer";
 
 export const TrackPlayerContext = createContext()
 
@@ -42,35 +42,6 @@ export const TrackPlayerContextProvider = ({children}) => {
         } 
     }
 
-    const setupPlayer = async() => {
-        try {
-            await TrackPlayer.setupPlayer();
-            await TrackPlayer.updateOptions({
-              stopWithApp:true,
-                capabilities: [
-                    Capability.Play,
-                    Capability.Pause,
-                    Capability.SeekTo,
-                    Capability.SkipToNext,
-                    Capability.SkipToPrevious
-                ],
-                compactCapabilities: [
-                  Capability.Play,
-                  Capability.Pause,
-                  Capability.SeekTo,
-                  Capability.SkipToNext,
-                  Capability.SkipToPrevious
-                ],
-                color: '#00ce4e',
-                icon: require('../../assets/Images/american-football.png')
-            })
-            console.log('Track Player loaded!')
-        }
-        catch(e) {
-            console.log('Erro:',e)
-        } 
-        
-    }
     
     const getPodcasts = async() => {
       const RSS_URL = `https://anchor.fm/s/dea812c/podcast/rss`;
@@ -120,4 +91,3 @@ export const TrackPlayerContextProvider = ({children}) => {
         </TrackPlayerContext.Provider> 
     );
 }
- 

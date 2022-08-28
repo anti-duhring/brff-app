@@ -6,6 +6,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import MultiSlider from "@ptomasroos/react-native-multi-slider";
 import { TrackPlayerContext } from "../../context/TrackPlayerContext";
 import { HEADER_BUTTON_BG, LIGHT_GREEN } from "../Variables";
+import { getWhereEpisodeStopped } from "../../utils/trackPlayer";
 
 const WIDTH = Dimensions.get('window').width;
 
@@ -13,6 +14,8 @@ const MusicPlayer = ({track, trackIndex, navigation, reRender}) => {
     const [currentTrack, setCurrentTrack] = useState(null)
     const [prevEpisode, setPrevEpisode] = useState(null);
     const [nextEpisode, setNextEpisode] = useState(null);
+    const [trackAlreadyPlayed, setTrackAlreadyPlayed] = useState(0);
+    const [thisEpisodeDuration, setThisEpisodeDuration] = useState(100);
     const { 
         playbackState,
         togglePlayback,
@@ -20,8 +23,19 @@ const MusicPlayer = ({track, trackIndex, navigation, reRender}) => {
     const {position, buffered, duration} = useProgress();
 
     const getCurrentTrack = async() => {
-        const index = await TrackPlayer.getCurrentTrack()
-        setCurrentTrack(index)
+        const index = await TrackPlayer.getCurrentTrack();
+        setCurrentTrack(index);
+    }
+
+    const getThisEpisodeTrackPlayed = async() => {
+        const thisEpisodeObj = await TrackPlayer.getTrack(trackIndex);
+        const thisEpisodeDur = thisEpisodeObj.duration;
+        const thisEpisodeDurInSeconds = Number(thisEpisodeDur.split(':')[0]) * 60 * 60 + Number(thisEpisodeDur.split(':')[1]) * 60 + Number(thisEpisodeDur.split(':')[2]);
+        const trackURL = thisEpisodeObj.url;
+        const trackPrevPlay = await getWhereEpisodeStopped(trackURL);
+
+        setTrackAlreadyPlayed(trackPrevPlay);
+        setThisEpisodeDuration(thisEpisodeDurInSeconds);
     }
 
     const getPrevAndNextEpisode = async() => {
@@ -36,6 +50,10 @@ const MusicPlayer = ({track, trackIndex, navigation, reRender}) => {
         getCurrentTrack();
         getPrevAndNextEpisode();
     },[trackIndex,reRender])
+
+    useEffect(() => {
+        getThisEpisodeTrackPlayed();
+    },[trackIndex, playbackState])
 
     const NextAndPrevButton = ({action}) => {
         const conditional = (action=='prev') ? !prevEpisode || trackIndex<=0 : !nextEpisode;
@@ -95,10 +113,10 @@ const MusicPlayer = ({track, trackIndex, navigation, reRender}) => {
                 markerStyle={{backgroundColor:'white'}}
                 containerStyle={{height:20}}
                 selectedStyle={{backgroundColor:'white'}}
-                values={currentTrack == trackIndex ? [position] : [0]}
+                values={currentTrack == trackIndex && playbackState == State.Playing ? [position] : [trackAlreadyPlayed]}
                 min={0}
                 sliderLength={WIDTH - 60}
-                max={duration > 0 && currentTrack == trackIndex && isNaN(duration) == false ? duration : 100}
+                max={duration > 0 && currentTrack == trackIndex && isNaN(duration) == false ? duration : thisEpisodeDuration}
                 onValuesChangeFinish={async(values) => {
                     await TrackPlayer.seekTo(values[0])
                 }}
@@ -106,16 +124,16 @@ const MusicPlayer = ({track, trackIndex, navigation, reRender}) => {
             <View style={{flexDirection:'row', width:'95%', justifyContent:'space-between'}}>
                 <Text style={{color:'white'}} >
                     {
-                        currentTrack == trackIndex ?
+                        currentTrack == trackIndex && playbackState == State.Playing ?
                         new Date(position * 1000).toISOString().substring(12, 19) :
-                        '0:00:00'
+                        new Date(trackAlreadyPlayed * 1000).toISOString().substring(12, 19)
                     }
                 </Text>
                 <Text style={{color:'white'}} >
                     {
                         currentTrack == trackIndex ?
                         new Date((duration - position) * 1000).toISOString().substring(12, 19) : 
-                        '0:00:00'
+                        new Date((thisEpisodeDuration - trackAlreadyPlayed) * 1000).toISOString().substring(12, 19)
                     }
                 </Text>
             </View>
