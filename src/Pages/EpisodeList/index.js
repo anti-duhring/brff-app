@@ -11,6 +11,7 @@ import { BORDER_RADIUS, DARK_BLACK } from "../../components/Variables";
 import { FlashList } from "@shopify/flash-list";
 import { getWhereEpisodeStopped } from "../../utils/trackPlayer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import PlayButtonChart from "../../components/Podcast/PlayButtonChart";
 
 const EpisodeList = ({navigation}) => {
     const [isLoading, setIsLoading] = useState(true)
@@ -32,49 +33,33 @@ const EpisodeList = ({navigation}) => {
             const response = await fetch(RSS_URL)
             const responseData = await response.text()
             const data = await rssParser.parse(responseData);
-            const epProgress = await AsyncStorage.getItem('episodesPlayed');
-            
-            setEpisodesProgress(JSON.parse(epProgress));
-            setEpisodes(                
-                data.items.map((episode, index) => {
-                    const URL = 'https://'+episode.enclosures[0].url.split('https%3A%2F%2F')[1].replace(/%2F/g,'/');
-                    return {
-                    key: episode.id,
-                    episodeObject: {
-                        url: URL,
-                        title: episode.title,
-                        artist: episode.authors[0].name,
-                        artwork: episode.itunes.image,
-                        duration: episode.itunes.duration, //(Number(episode.enclosures[0].length) / 1000).toFixed(0),
-                        description: episode.description,
-                        date: episode.published
-                    },
-                    episodeID: index,
-                    episodeProgress: episodesProgress[URL]? episodesProgress[URL] : 0
-                    }
-                })
-              )
 
-            //setPlaylistPodcast(data.items)
-            setDATA(
-                data.items.map((episode, index) => {
+            // Get the track  progress saved
+            const epProgress = await AsyncStorage.getItem('episodesPlayed');
+            const epProgressParsed = JSON.parse(epProgress);
+
+            const episodesMapped = data.items.map((episode, index) => {
                 const URL = 'https://'+episode.enclosures[0].url.split('https%3A%2F%2F')[1].replace(/%2F/g,'/');
-                  return {
-                    key: episode.id,
-                    episodeObject: {
-                        url: URL,
-                        title: episode.title,
-                        artist: episode.authors[0].name,
-                        artwork: episode.itunes.image,
-                        duration: episode.itunes.duration, //(Number(episode.enclosures[0].length) / 1000).toFixed(0),
-                        description: episode.description,
-                        date: episode.published
-                    },
-                    episodeID: index,
-                    episodeProgress: episodesProgress[URL]? episodesProgress[URL] : 0
-                  }
-                })
-              )
+                return {
+                key: episode.id,
+                episodeObject: {
+                    url: URL,
+                    title: episode.title,
+                    artist: episode.authors[0].name,
+                    artwork: episode.itunes.image,
+                    duration: episode.itunes.duration, //(Number(episode.enclosures[0].length) / 1000).toFixed(0),
+                    description: episode.description,
+                    date: episode.published
+                },
+                episodeID: index,
+                episodeProgress: epProgressParsed[URL]? epProgressParsed[URL] : 0,
+                episodeDuration: Number(episode.itunes.duration.split(':')[0]) * 60 * 60 + Number(episode.itunes.duration.split(':')[1]) * 60 + Number(episode.itunes.duration.split(':')[2])
+                }
+            })
+            
+            setEpisodesProgress(epProgressParsed);
+            setEpisodes( episodesMapped)
+            setDATA(episodesMapped)
               setIsLoading(false)
         } catch(e) {
             console.log('Erro:',e)
@@ -116,17 +101,6 @@ const EpisodeList = ({navigation}) => {
         return `${dayPT} - ${daycalendar} ${monthcalendar} ${yearcalendar}`
     }
 
-    const secondsToHms = (d) => {
-        d = Number(d);
-        var h = Math.floor(d / 3600);
-        var m = Math.floor(d % 3600 / 60);
-        var s = Math.floor(d % 3600 % 60);
-    
-        var hDisplay = h > 0 ? h + (h == 1 ? "hr " : "hrs ") : "";
-        var mDisplay = m > 0 ? m + (m == 1 ? "min" : "mins") : "";
-        var sDisplay = s > 0 ? s + (s == 1 ? "s" : "s") : "";
-        return hDisplay + mDisplay; 
-    } 
 
     useEffect(() => {
         getPodcasts();
@@ -148,12 +122,6 @@ const EpisodeList = ({navigation}) => {
             )
         }
     },[searchText])
-
-    const Footer = () => (
-        <View style={{flex:1,alignItems:'center',justifyContent:'center'}}>
-            <ActivityIndicator size='large' color='rgba(0, 128, 55, 1)' />
-        </View>
-    )
 
     const EpisodePlaceholder = () => {
         return (
@@ -196,7 +164,7 @@ const EpisodeList = ({navigation}) => {
               })}}>
                 <ImageBackground imageStyle={{borderRadius:12,resizeMode:'center'}} style={styles.imageBackground} source={{uri: item.episodeObject.artwork}}>
                     <LinearGradient locations={[0, 0.8]} colors={['transparent', 'rgba(0, 128, 55, .6)']} style={styles.episodeContainer}>
-                            <View style={{height:'100%',flexDirection:'row',paddingBottom:5}}>
+                            <View style={{height:'100%',flexDirection:'row',paddingBottom:5, padding:10,}}>
                                 <View style={{flex:7, justifyContent:'flex-end'}}>
                                     <Text style={{fontSize:17,fontWeight:'700',color:'white'}}>{
                                         item.episodeObject.title.replace(/[0-9]x[0-9][0-9] /g,'').replace('- ','')
@@ -212,8 +180,9 @@ const EpisodeList = ({navigation}) => {
                                         {`${item.episodeProgress}`}
                                     </Text>
                                 </View>
-                                <View style={{flex:1, justifyContent:'flex-end',padding:10}}>
-                                    <AntDesign name="play" size={36} color="white" />
+                                <View style={{flex:1.5, justifyContent:'flex-end'}}>
+                                    {/*<AntDesign name="play" size={36} color="white" />*/}
+                                    <PlayButtonChart percentageComplete={item.episodeProgress / item.episodeDuration} />
                                 </View>
                             </View>
                     </LinearGradient>
@@ -273,7 +242,6 @@ const styles = StyleSheet.create({
         borderRadius:BORDER_RADIUS,
     },
     episodeContainer:{
-        padding:10,
         height:'100%',
         borderRadius:BORDER_RADIUS,
     }
